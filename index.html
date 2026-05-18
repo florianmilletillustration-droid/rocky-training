@@ -25,6 +25,8 @@
             --accent-red: #ff3333;
             --accent-yellow: #ffd700;
             --accent-green: #00ff88;
+            --accent-blue: #3399ff;
+            --accent-purple: #9966ff;
             --text-primary: #ffffff;
             --text-secondary: #aaaaaa;
             --border: #333333;
@@ -53,7 +55,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
             position: relative;
@@ -285,6 +287,221 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Session Training */
+        .session-controls {
+            background: var(--bg-elevated);
+            border: 2px solid var(--accent-yellow);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .session-timer {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            color: var(--accent-green);
+            letter-spacing: 4px;
+            margin: 20px 0;
+        }
+
+        .session-timer.running {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .session-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .category-select {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin: 15px 0;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Today's Sessions */
+        .today-sessions {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .session-item {
+            background: var(--bg-elevated);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .session-info {
+            flex: 1;
+        }
+
+        .session-category {
+            font-weight: 600;
+            color: var(--accent-yellow);
+            margin-bottom: 5px;
+        }
+
+        .session-time {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .session-delete {
+            background: transparent;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.3s;
+        }
+
+        .session-delete:hover {
+            background: var(--accent-red);
+            color: var(--text-primary);
+        }
+
+        /* Manual Entry Form */
+        .manual-entry {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            background: var(--bg-elevated);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-yellow);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+        }
+
+        /* Category Stats */
+        .category-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .category-stat-card {
+            background: var(--bg-elevated);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .category-name {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .category-time {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            color: var(--accent-green);
+        }
+
+        /* History List */
+        .history-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .history-list {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .history-item {
+            background: var(--bg-elevated);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-purple);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-date {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .history-details {
+            font-size: 0.9rem;
+        }
+
         /* Day Selector */
         .day-selector {
             display: grid;
@@ -333,41 +550,6 @@
         .day-label {
             font-weight: 600;
             font-size: 0.9rem;
-        }
-
-        /* Session Training */
-        .session-controls {
-            background: var(--bg-elevated);
-            border: 2px solid var(--accent-yellow);
-            border-radius: 12px;
-            padding: 30px;
-            margin: 30px 0;
-            text-align: center;
-        }
-
-        .session-timer {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 4rem;
-            color: var(--accent-green);
-            letter-spacing: 4px;
-            margin: 20px 0;
-        }
-
-        .session-timer.running {
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .session-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
         }
 
         /* Exercise Block */
@@ -489,6 +671,11 @@
 
         .btn-green:hover {
             background: var(--accent-yellow);
+        }
+
+        .btn-small {
+            padding: 10px 25px;
+            font-size: 0.8rem;
         }
 
         /* Generator */
@@ -669,12 +856,20 @@
             .dice-container { gap: 15px; }
             .dice { width: 80px; height: 80px; font-size: 1rem; }
             .session-timer { font-size: 3rem; }
+            .form-row { grid-template-columns: 1fr; }
         }
 
         .loading {
             text-align: center;
             padding: 40px;
             color: var(--accent-yellow);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-style: italic;
         }
     </style>
 </head>
@@ -683,7 +878,7 @@
         <h1>Programme Rocky</h1>
         <p class="subtitle">Entraînement Intensif Cloud</p>
         <p style="color: var(--text-secondary); margin-top: 20px; max-width: 500px;">
-            Connecte-toi avec Google pour sauvegarder tes données dans le cloud! 🚀
+            Connecte-toi avec Google pour sauvegarder tes données! 🚀
         </p>
         <button class="login-btn" onclick="loginWithGoogle()">
             🔐 Connexion avec Google
@@ -717,15 +912,22 @@
                 <div class="stat-label">Streak actuel</div>
                 <div class="stat-value" id="streak">0 🔥</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-label">Aujourd'hui</div>
+                <div class="stat-value" id="today-total">0min</div>
+            </div>
         </div>
 
         <div class="tab-nav">
             <button class="tab-btn active" onclick="switchTab('programme')">Programme</button>
+            <button class="tab-btn" onclick="switchTab('tracking')">Tracking</button>
+            <button class="tab-btn" onclick="switchTab('historique')">Historique</button>
             <button class="tab-btn" onclick="switchTab('generator')">Générateur</button>
             <button class="tab-btn" onclick="switchTab('timer')">Timer</button>
             <button class="tab-btn" onclick="switchTab('progress')">Progrès</button>
         </div>
 
+        <!-- TAB: PROGRAMME -->
         <div id="tab-programme" class="tab-content active">
             <div class="day-selector" id="day-selector"></div>
             
@@ -733,20 +935,153 @@
             <div class="session-controls">
                 <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 3px; margin-bottom: 10px;">Session Training</h2>
                 <div class="session-timer" id="session-timer">00:00:00</div>
+                
+                <select class="category-select" id="session-category">
+                    <option value="Programme Rocky">Programme Rocky</option>
+                    <option value="Peinture">Peinture</option>
+                    <option value="Gouache">Gouache</option>
+                    <option value="Aquarelle">Aquarelle</option>
+                    <option value="Acrylique">Acrylique</option>
+                    <option value="Huile">Huile</option>
+                    <option value="Inking">Inking</option>
+                    <option value="Illustration">Illustration</option>
+                    <option value="Digital">Digital</option>
+                    <option value="Croquis">Croquis/Sketching</option>
+                    <option value="Anatomie">Étude anatomie</option>
+                    <option value="Perspective">Étude perspective</option>
+                    <option value="Couleur">Couleur/Théorie</option>
+                    <option value="Composition">Composition</option>
+                    <option value="Autre">Autre</option>
+                </select>
+                
                 <div class="session-buttons">
-                    <button class="btn btn-green" id="btn-start" onclick="startSession()">🟢 START TRAINING</button>
+                    <button class="btn btn-green" id="btn-start" onclick="startSession()">🟢 START</button>
                     <button class="btn btn-secondary" id="btn-pause" onclick="pauseSession()" style="display:none;">⏸️ PAUSE</button>
-                    <button class="btn btn-stop" id="btn-stop" onclick="stopSession()" style="display:none;">🛑 STOP</button>
+                    <button class="btn btn-secondary" id="btn-reset" onclick="resetSession()" style="display:none;">🔄 RESET</button>
+                    <button class="btn btn-stop" id="btn-save" onclick="saveSession()" style="display:none;">💾 SAUVEGARDER</button>
                 </div>
+                
+                <button class="btn" onclick="markDayCompleted()" style="margin-top: 20px; display: none;" id="btn-complete-day">
+                    ✅ TERMINER LA JOURNÉE
+                </button>
             </div>
 
             <div id="exercises-container"></div>
         </div>
 
+        <!-- TAB: TRACKING -->
+        <div id="tab-tracking" class="tab-content">
+            <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 3px; margin-bottom: 20px;">Tracking Pratique</h2>
+            
+            <!-- Today's Sessions -->
+            <div class="today-sessions">
+                <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 20px; color: var(--accent-yellow);">
+                    📅 Sessions d'aujourd'hui
+                </h3>
+                <div id="today-sessions-list"></div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 1.2rem; font-weight: 600;">Total aujourd'hui:</span>
+                        <span style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--accent-green);" id="today-sessions-total">0 min</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Entry Form -->
+            <div class="manual-entry">
+                <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 20px; color: var(--accent-yellow);">
+                    ✏️ Ajouter une pratique manuellement
+                </h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Catégorie</label>
+                        <select class="form-select" id="manual-category">
+                            <option value="Programme Rocky">Programme Rocky</option>
+                            <option value="Peinture">Peinture</option>
+                            <option value="Gouache">Gouache</option>
+                            <option value="Aquarelle">Aquarelle</option>
+                            <option value="Acrylique">Acrylique</option>
+                            <option value="Huile">Huile</option>
+                            <option value="Inking">Inking</option>
+                            <option value="Illustration">Illustration</option>
+                            <option value="Digital">Digital</option>
+                            <option value="Croquis">Croquis/Sketching</option>
+                            <option value="Anatomie">Étude anatomie</option>
+                            <option value="Perspective">Étude perspective</option>
+                            <option value="Couleur">Couleur/Théorie</option>
+                            <option value="Composition">Composition</option>
+                            <option value="Études">Études diverses</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Durée (minutes)</label>
+                        <input type="number" class="form-input" id="manual-duration" min="1" value="30">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Note / Description (optionnel)</label>
+                    <textarea class="form-textarea" id="manual-note" placeholder="Ex: Pratique portraits au fusain"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-input" id="manual-date">
+                </div>
+                
+                <button class="btn btn-green" onclick="addManualSession()">➕ AJOUTER</button>
+            </div>
+
+            <!-- Category Stats -->
+            <div style="margin-top: 40px;">
+                <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 20px; color: var(--accent-yellow);">
+                    📊 Stats par catégorie
+                </h3>
+                <div class="category-stats" id="category-stats"></div>
+            </div>
+        </div>
+
+        <!-- TAB: HISTORIQUE -->
+        <div id="tab-historique" class="tab-content">
+            <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 3px; margin-bottom: 20px;">Historique Complet</h2>
+            
+            <div class="history-filters">
+                <select class="form-select" id="filter-category" style="max-width: 250px;" onchange="filterHistory()">
+                    <option value="all">Toutes les catégories</option>
+                    <option value="Programme Rocky">Programme Rocky</option>
+                    <option value="Peinture">Peinture</option>
+                    <option value="Gouache">Gouache</option>
+                    <option value="Aquarelle">Aquarelle</option>
+                    <option value="Acrylique">Acrylique</option>
+                    <option value="Huile">Huile</option>
+                    <option value="Inking">Inking</option>
+                    <option value="Illustration">Illustration</option>
+                    <option value="Digital">Digital</option>
+                    <option value="Croquis">Croquis</option>
+                    <option value="Anatomie">Anatomie</option>
+                    <option value="Perspective">Perspective</option>
+                    <option value="Couleur">Couleur</option>
+                    <option value="Composition">Composition</option>
+                    <option value="Autre">Autre</option>
+                </select>
+                
+                <input type="date" class="form-input" id="filter-date-from" style="max-width: 200px;" onchange="filterHistory()">
+                <span style="padding: 10px; color: var(--text-secondary);">à</span>
+                <input type="date" class="form-input" id="filter-date-to" style="max-width: 200px;" onchange="filterHistory()">
+                
+                <button class="btn btn-secondary btn-small" onclick="clearFilters()">Effacer filtres</button>
+            </div>
+            
+            <div class="history-list" id="history-list"></div>
+        </div>
+
+        <!-- TAB: GÉNÉRATEUR -->
         <div id="tab-generator" class="tab-content">
             <div class="generator-container">
                 <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 3px; margin-bottom: 20px;">Générateur d'idées</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 30px;">Lance les dés pour obtenir une combinaison créative aléatoire!</p>
+                <p style="color: var(--text-secondary); margin-bottom: 30px;">Lance les dés pour obtenir une combinaison créative!</p>
                 
                 <div class="dice-container">
                     <div class="dice" onclick="rollDice('subject')" id="dice-subject">
@@ -768,16 +1103,14 @@
                 </div>
 
                 <button class="btn" onclick="rollAllDice()">Lancer tous les dés</button>
-                <button class="btn btn-secondary" onclick="saveCurrentIdea()" style="margin-left: 10px;">Sauvegarder l'idée</button>
 
                 <div class="result-box" id="result-box" style="display: none;">
                     <div class="result-text" id="result-text"></div>
                 </div>
-
-                <div class="saved-ideas-list" id="saved-ideas"></div>
             </div>
         </div>
 
+        <!-- TAB: TIMER -->
         <div id="tab-timer" class="tab-content">
             <div class="timer-widget">
                 <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 3px; margin-bottom: 20px;">Timer d'exercice</h2>
@@ -800,6 +1133,7 @@
             </div>
         </div>
 
+        <!-- TAB: PROGRÈS -->
         <div id="tab-progress" class="tab-content">
             <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 3px; margin-bottom: 30px;">Ton Progrès</h2>
             
@@ -879,6 +1213,10 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-content').classList.add('active');
                 document.getElementById('user-email').textContent = user.email;
+                
+                // Set today's date in manual entry
+                document.getElementById('manual-date').valueAsDate = new Date();
+                
                 loadAllData();
             } else {
                 document.getElementById('login-screen').style.display = 'flex';
@@ -897,6 +1235,16 @@
         function logout() {
             auth.signOut();
         }
+
+        // Global variables
+        let allSessions = [];
+        let currentDay = 0;
+
+        // Session Training Variables
+        let sessionInterval = null;
+        let sessionSeconds = 0;
+        let sessionRunning = false;
+        let sessionPaused = false;
 
         // Program data - COMPLETE VERSION
         const programData = {
@@ -1164,18 +1512,14 @@
             constraint: ["Vue de dessous", "Silhouette pure", "Palette 3 couleurs", "Formes triangulaires", "Symétrie parfaite", "Asymétrie extrême", "Contre-jour", "Gros plan", "Vue aérienne", "Reflet dans l'eau", "Fumée/brouillard", "Composition circulaire", "Diagonales fortes", "Espace négatif dominant"]
         };
 
-        let currentDay = 0;
         let timerInterval = null;
         let timerSeconds = 900;
         let timerRunning = false;
 
-        // Session Training Variables
-        let sessionInterval = null;
-        let sessionSeconds = 0;
-        let sessionRunning = false;
-        let sessionPaused = false;
+        // ============================================
+        // FIRESTORE FUNCTIONS
+        // ============================================
 
-        // Firestore functions
         async function loadAllData() {
             if (!currentUser) return;
             
@@ -1186,6 +1530,7 @@
                 if (doc.exists) {
                     const data = doc.data();
                     
+                    // Load basic stats
                     document.getElementById('current-week').textContent = data.week || 1;
                     
                     const completedDays = data.completedDays || [];
@@ -1197,6 +1542,16 @@
                     
                     document.getElementById('streak').textContent = `${data.streak || 0} 🔥`;
                     
+                    // Load sessions
+                    allSessions = data.sessions || [];
+                    
+                    // Update all displays
+                    updateTodayDisplay();
+                    updateCategoryStats();
+                    renderHistory();
+                    updateDayButtons(completedDays);
+                    
+                    // Load progress
                     if (data.progress) {
                         ['fluidity', 'originality', 'composition', 'confidence'].forEach(type => {
                             const val = data.progress[type] || 0;
@@ -1204,17 +1559,156 @@
                             document.getElementById(`${type}-slider`).value = val;
                         });
                     }
-
-                    if (data.savedIdeas) {
-                        renderSavedIdeas(data.savedIdeas);
-                    }
-
-                    // Update day buttons
-                    updateDayButtons(completedDays);
                 }
             } catch (error) {
                 console.error("Error loading data:", error);
             }
+        }
+
+        function getTodayString() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        function getTodaySessions() {
+            const today = getTodayString();
+            return allSessions.filter(s => s.date === today);
+        }
+
+        function updateTodayDisplay() {
+            const todaySessions = getTodaySessions();
+            const totalMinutes = todaySessions.reduce((sum, s) => sum + s.minutes, 0);
+            
+            document.getElementById('today-total').textContent = `${totalMinutes}min`;
+            
+            const listContainer = document.getElementById('today-sessions-list');
+            if (todaySessions.length === 0) {
+                listContainer.innerHTML = '<div class="empty-state">Aucune session aujourd\'hui. Lance-toi! 💪</div>';
+            } else {
+                listContainer.innerHTML = todaySessions.map(session => `
+                    <div class="session-item">
+                        <div class="session-info">
+                            <div class="session-category">${session.category}</div>
+                            <div class="session-time">${session.minutes} min${session.note ? ' - ' + session.note : ''}</div>
+                        </div>
+                        <button class="session-delete" onclick="deleteSession('${session.id}')">🗑️</button>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('today-sessions-total').textContent = `${totalMinutes} min`;
+            
+            // Show complete day button if there are sessions
+            document.getElementById('btn-complete-day').style.display = todaySessions.length > 0 ? 'block' : 'none';
+        }
+
+        function updateCategoryStats() {
+            const categoryTotals = {};
+            
+            allSessions.forEach(session => {
+                if (!categoryTotals[session.category]) {
+                    categoryTotals[session.category] = 0;
+                }
+                categoryTotals[session.category] += session.minutes;
+            });
+            
+            const sorted = Object.entries(categoryTotals)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8);
+            
+            const container = document.getElementById('category-stats');
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="empty-state">Commence à pratiquer pour voir tes stats! 🎨</div>';
+            } else {
+                container.innerHTML = sorted.map(([cat, mins]) => `
+                    <div class="category-stat-card">
+                        <div class="category-name">${cat}</div>
+                        <div class="category-time">${Math.floor(mins / 60)}h${mins % 60 > 0 ? ' ' + (mins % 60) + 'm' : ''}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderHistory() {
+            const filteredSessions = getFilteredSessions();
+            const container = document.getElementById('history-list');
+            
+            if (filteredSessions.length === 0) {
+                container.innerHTML = '<div class="empty-state">Aucune session trouvée.</div>';
+                return;
+            }
+            
+            container.innerHTML = filteredSessions.map(session => {
+                const date = new Date(session.date);
+                const dateStr = date.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                
+                return `
+                    <div class="history-item">
+                        <div>
+                            <div class="history-date">${dateStr}</div>
+                            <div class="history-details">
+                                <strong>${session.category}</strong> - ${session.minutes} min
+                                ${session.note ? `<br><em>${session.note}</em>` : ''}
+                            </div>
+                        </div>
+                        <button class="session-delete" onclick="deleteSession('${session.id}')">🗑️</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getFilteredSessions() {
+            let filtered = [...allSessions];
+            
+            const category = document.getElementById('filter-category')?.value;
+            if (category && category !== 'all') {
+                filtered = filtered.filter(s => s.category === category);
+            }
+            
+            const dateFrom = document.getElementById('filter-date-from')?.value;
+            if (dateFrom) {
+                filtered = filtered.filter(s => s.date >= dateFrom);
+            }
+            
+            const dateTo = document.getElementById('filter-date-to')?.value;
+            if (dateTo) {
+                filtered = filtered.filter(s => s.date <= dateTo);
+            }
+            
+            return filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        function filterHistory() {
+            renderHistory();
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-category').value = 'all';
+            document.getElementById('filter-date-from').value = '';
+            document.getElementById('filter-date-to').value = '';
+            renderHistory();
+        }
+
+        async function saveSessions() {
+            if (!currentUser) return;
+            
+            try {
+                await db.collection('users').doc(currentUser.uid).set({
+                    sessions: allSessions,
+                    totalMinutes: allSessions.reduce((sum, s) => sum + s.minutes, 0),
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            } catch (error) {
+                console.error("Error saving sessions:", error);
+            }
+        }
+
+        async function deleteSession(sessionId) {
+            if (!confirm('Supprimer cette session?')) return;
+            
+            allSessions = allSessions.filter(s => s.id !== sessionId);
+            await saveSessions();
+            await loadAllData();
         }
 
         function updateDayButtons(completedDays) {
@@ -1231,20 +1725,10 @@
             return parseInt(document.getElementById('current-week').textContent);
         }
 
-        async function saveToCloud(field, value) {
-            if (!currentUser) return;
-            
-            try {
-                await db.collection('users').doc(currentUser.uid).set({
-                    [field]: value,
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-            } catch (error) {
-                console.error("Error saving:", error);
-            }
-        }
+        // ============================================
+        // SESSION TRAINING
+        // ============================================
 
-        // Session Training Functions
         function startSession() {
             if (!sessionRunning) {
                 sessionRunning = true;
@@ -1256,7 +1740,8 @@
                 
                 document.getElementById('btn-start').style.display = 'none';
                 document.getElementById('btn-pause').style.display = 'inline-block';
-                document.getElementById('btn-stop').style.display = 'inline-block';
+                document.getElementById('btn-reset').style.display = 'inline-block';
+                document.getElementById('btn-save').style.display = 'inline-block';
                 document.getElementById('session-timer').classList.add('running');
             }
         }
@@ -1278,31 +1763,54 @@
             }
         }
 
-        async function stopSession() {
-            if (!sessionRunning && sessionSeconds === 0) return;
+        function resetSession() {
+            if (!confirm('Reset le chrono? (Le temps actuel sera perdu si non sauvegardé)')) return;
             
             clearInterval(sessionInterval);
-            
-            const minutes = Math.floor(sessionSeconds / 60);
-            const hours = Math.floor(minutes / 60);
-            const mins = minutes % 60;
-            
-            const confirmMsg = `Session terminée!\n\nTemps: ${hours > 0 ? hours + 'h ' : ''}${mins}min\n\nMarquer ce jour comme complété?`;
-            
-            if (confirm(confirmMsg)) {
-                await markDayCompleted(currentDay, minutes);
-            }
-            
-            // Reset session
             sessionSeconds = 0;
             sessionRunning = false;
             sessionPaused = false;
             updateSessionDisplay();
+            
             document.getElementById('btn-start').style.display = 'inline-block';
             document.getElementById('btn-pause').style.display = 'none';
-            document.getElementById('btn-stop').style.display = 'none';
+            document.getElementById('btn-reset').style.display = 'none';
+            document.getElementById('btn-save').style.display = 'none';
             document.getElementById('btn-pause').textContent = '⏸️ PAUSE';
             document.getElementById('session-timer').classList.remove('running');
+        }
+
+        async function saveSession() {
+            if (sessionSeconds === 0) {
+                alert('Aucun temps à sauvegarder!');
+                return;
+            }
+            
+            const minutes = Math.floor(sessionSeconds / 60);
+            const category = document.getElementById('session-category').value;
+            
+            if (!confirm(`Sauvegarder cette session?\n\nCatégorie: ${category}\nDurée: ${minutes} min`)) {
+                return;
+            }
+            
+            const session = {
+                id: 'session_' + Date.now(),
+                date: getTodayString(),
+                category: category,
+                minutes: minutes,
+                note: '',
+                timestamp: Date.now()
+            };
+            
+            allSessions.push(session);
+            await saveSessions();
+            await loadAllData();
+            
+            alert(`✅ Session sauvegardée!\n\n+${minutes} minutes ajoutées`);
+            
+            // Don't reset - keep timer running for next session
+            sessionSeconds = 0;
+            updateSessionDisplay();
         }
 
         function updateSessionDisplay() {
@@ -1314,8 +1822,8 @@
                 `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        async function markDayCompleted(dayIndex, minutesSpent) {
-            if (!currentUser) return;
+        async function markDayCompleted() {
+            if (!confirm('Marquer ce jour comme complété?')) return;
             
             try {
                 const docRef = db.collection('users').doc(currentUser.uid);
@@ -1324,22 +1832,20 @@
                 
                 const completedDays = data.completedDays || [];
                 const currentWeek = getCurrentWeek();
-                const dayKey = `day${dayIndex}_week${currentWeek}`;
+                const dayKey = `day${currentDay}_week${currentWeek}`;
                 
                 if (!completedDays.includes(dayKey)) {
                     completedDays.push(dayKey);
                     
-                    const totalMinutes = (data.totalMinutes || 0) + minutesSpent;
                     const newStreak = calculateStreak(completedDays);
                     
                     await db.collection('users').doc(currentUser.uid).set({
                         completedDays: completedDays,
-                        totalMinutes: totalMinutes,
                         streak: newStreak,
                         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
                     
-                    alert(`✅ Jour complété!\n\n+${minutesSpent} minutes\nStreak: ${newStreak} jours 🔥`);
+                    alert(`✅ Jour complété!\n\nStreak: ${newStreak} jours 🔥`);
                     loadAllData();
                 }
             } catch (error) {
@@ -1348,12 +1854,48 @@
         }
 
         function calculateStreak(completedDays) {
-            if (completedDays.length === 0) return 0;
-            
-            // Simple streak calculation
-            // In production, you'd want to check consecutive dates
+            // Simple calculation - in production you'd check consecutive dates
             return completedDays.length;
         }
+
+        // ============================================
+        // MANUAL ENTRY
+        // ============================================
+
+        async function addManualSession() {
+            const category = document.getElementById('manual-category').value;
+            const duration = parseInt(document.getElementById('manual-duration').value);
+            const note = document.getElementById('manual-note').value.trim();
+            const date = document.getElementById('manual-date').value;
+            
+            if (!duration || duration <= 0) {
+                alert('Durée invalide!');
+                return;
+            }
+            
+            const session = {
+                id: 'session_' + Date.now(),
+                date: date,
+                category: category,
+                minutes: duration,
+                note: note,
+                timestamp: Date.now()
+            };
+            
+            allSessions.push(session);
+            await saveSessions();
+            await loadAllData();
+            
+            // Reset form
+            document.getElementById('manual-duration').value = '30';
+            document.getElementById('manual-note').value = '';
+            
+            alert(`✅ Pratique ajoutée!\n\n${category} - ${duration} min`);
+        }
+
+        // ============================================
+        // PROGRESS
+        // ============================================
 
         async function saveProgressToCloud() {
             if (!currentUser) return;
@@ -1365,54 +1907,25 @@
                 confidence: parseInt(document.getElementById('confidence-slider').value)
             };
             
-            await saveToCloud('progress', progress);
+            await db.collection('users').doc(currentUser.uid).set({
+                progress: progress,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            
             alert('Progrès sauvegardé! 💪☁️');
         }
 
-        async function saveCurrentIdea() {
-            const subject = document.querySelector('#dice-subject span').textContent;
-            const style = document.querySelector('#dice-style span').textContent;
-            const emotion = document.querySelector('#dice-emotion span').textContent;
-            const constraint = document.querySelector('#dice-constraint span').textContent;
-            
-            if (subject !== '?' && style !== '?' && emotion !== '?' && constraint !== '?') {
-                const idea = {
-                    text: `Dessine un ${subject} en style ${style}, avec une émotion ${emotion}, en utilisant ${constraint}`,
-                    date: new Date().toLocaleDateString()
-                };
-                
-                try {
-                    const docRef = db.collection('users').doc(currentUser.uid);
-                    const doc = await docRef.get();
-                    const ideas = doc.exists && doc.data().savedIdeas ? doc.data().savedIdeas : [];
-                    ideas.push(idea);
-                    
-                    await saveToCloud('savedIdeas', ideas);
-                    renderSavedIdeas(ideas);
-                    alert('Idée sauvegardée! 🎨☁️');
-                } catch (error) {
-                    console.error("Error saving idea:", error);
-                }
-            }
+        function updateProgress(type, value) {
+            const fill = document.getElementById(`progress-${type}`);
+            const percentage = (value / 10) * 100;
+            fill.style.width = `${percentage}%`;
+            fill.textContent = value;
         }
 
-        function renderSavedIdeas(ideas) {
-            const container = document.getElementById('saved-ideas');
-            if (ideas && ideas.length > 0) {
-                let html = '<h3 style="font-family: \'Bebas Neue\', sans-serif; margin: 30px 0 15px; letter-spacing: 2px;">Idées sauvegardées</h3>';
-                ideas.slice(-5).reverse().forEach(idea => {
-                    html += `
-                        <div class="idea-item">
-                            <div class="idea-text">${idea.text}</div>
-                            <div class="idea-date">${idea.date}</div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            }
-        }
+        // ============================================
+        // DAY SELECTOR & EXERCISES
+        // ============================================
 
-        // Day selector
         function initDaySelector() {
             const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
             const labels = ['Mix 1', 'Mix 2', 'Mix 3', 'Focus', 'Intégré', 'Repos', 'Libre'];
@@ -1462,7 +1975,10 @@
             container.innerHTML = html;
         }
 
-        // Dice
+        // ============================================
+        // GENERATOR
+        // ============================================
+
         function rollDice(category) {
             const dice = document.getElementById(`dice-${category}`);
             dice.classList.add('rolling');
@@ -1494,7 +2010,10 @@
             }
         }
 
-        // Timer
+        // ============================================
+        // TIMER
+        // ============================================
+
         function startTimer() {
             if (!timerRunning) {
                 timerRunning = true;
@@ -1531,15 +2050,10 @@
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        // Progress
-        function updateProgress(type, value) {
-            const fill = document.getElementById(`progress-${type}`);
-            const percentage = (value / 10) * 100;
-            fill.style.width = `${percentage}%`;
-            fill.textContent = value;
-        }
+        // ============================================
+        // TAB SWITCHING
+        // ============================================
 
-        // Tab switching
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -1551,7 +2065,10 @@
             event.target.classList.add('active');
         }
 
-        // Initialize
+        // ============================================
+        // INITIALIZE
+        // ============================================
+
         initDaySelector();
         loadExercises(0);
         updateTimerDisplay();
