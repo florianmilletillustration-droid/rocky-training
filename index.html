@@ -313,6 +313,11 @@
             background: rgba(255, 51, 51, 0.1);
         }
 
+        .day-btn.completed {
+            border-color: var(--accent-green);
+            background: rgba(0, 255, 136, 0.1);
+        }
+
         .day-btn.rest {
             opacity: 0.5;
         }
@@ -328,6 +333,41 @@
         .day-label {
             font-weight: 600;
             font-size: 0.9rem;
+        }
+
+        /* Session Training */
+        .session-controls {
+            background: var(--bg-elevated);
+            border: 2px solid var(--accent-yellow);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .session-timer {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            color: var(--accent-green);
+            letter-spacing: 4px;
+            margin: 20px 0;
+        }
+
+        .session-timer.running {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .session-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
         }
 
         /* Exercise Block */
@@ -389,6 +429,66 @@
             color: var(--accent-red);
             font-weight: 700;
             font-size: 1.2rem;
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: 'Space Mono', monospace;
+            background: var(--accent-red);
+            color: var(--text-primary);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background: var(--accent-yellow);
+            color: var(--bg-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--accent-yellow);
+            color: var(--accent-yellow);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-yellow);
+            color: var(--bg-dark);
+        }
+
+        .btn-stop {
+            background: transparent;
+            border: 2px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .btn-stop:hover {
+            background: var(--accent-red);
+            color: var(--text-primary);
+        }
+
+        .btn-green {
+            background: var(--accent-green);
+            color: var(--bg-dark);
+        }
+
+        .btn-green:hover {
+            background: var(--accent-yellow);
         }
 
         /* Generator */
@@ -466,40 +566,6 @@
             line-height: 1.8;
             color: var(--text-primary);
             font-weight: 500;
-        }
-
-        /* Buttons */
-        .btn {
-            font-family: 'Space Mono', monospace;
-            background: var(--accent-red);
-            color: var(--text-primary);
-            border: none;
-            padding: 15px 40px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .btn:hover {
-            background: var(--accent-yellow);
-            color: var(--bg-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid var(--accent-yellow);
-            color: var(--accent-yellow);
-        }
-
-        .btn-secondary:hover {
-            background: var(--accent-yellow);
-            color: var(--bg-dark);
         }
 
         /* Timer Widget */
@@ -602,6 +668,7 @@
             .day-selector { grid-template-columns: repeat(4, 1fr); }
             .dice-container { gap: 15px; }
             .dice { width: 80px; height: 80px; font-size: 1rem; }
+            .session-timer { font-size: 3rem; }
         }
 
         .loading {
@@ -616,15 +683,11 @@
         <h1>Programme Rocky</h1>
         <p class="subtitle">Entraînement Intensif Cloud</p>
         <p style="color: var(--text-secondary); margin-top: 20px; max-width: 500px;">
-            Connecte-toi avec Google pour sauvegarder tes données dans le cloud et y accéder de n'importe où! 🚀
+            Connecte-toi avec Google pour sauvegarder tes données dans le cloud! 🚀
         </p>
         <button class="login-btn" onclick="loginWithGoogle()">
             🔐 Connexion avec Google
         </button>
-        <p style="color: var(--text-secondary); margin-top: 20px; font-size: 0.75rem;">
-            ☁️ Tes données seront sauvegardées automatiquement<br>
-            📱 Accessibles sur tous tes appareils
-        </p>
     </div>
 
     <div id="app-content" class="app-content container">
@@ -665,6 +728,18 @@
 
         <div id="tab-programme" class="tab-content active">
             <div class="day-selector" id="day-selector"></div>
+            
+            <!-- Session Training Controls -->
+            <div class="session-controls">
+                <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 3px; margin-bottom: 10px;">Session Training</h2>
+                <div class="session-timer" id="session-timer">00:00:00</div>
+                <div class="session-buttons">
+                    <button class="btn btn-green" id="btn-start" onclick="startSession()">🟢 START TRAINING</button>
+                    <button class="btn btn-secondary" id="btn-pause" onclick="pauseSession()" style="display:none;">⏸️ PAUSE</button>
+                    <button class="btn btn-stop" id="btn-stop" onclick="stopSession()" style="display:none;">🛑 STOP</button>
+                </div>
+            </div>
+
             <div id="exercises-container"></div>
         </div>
 
@@ -775,21 +850,16 @@
     </div>
 
     <script>
-        // ============================================
-        // IMPORTANT: CONFIGURATION FIREBASE
-        // ============================================
-        // Tu dois remplacer cette config avec la tienne!
-        // Instructions complètes en bas du fichier
-        
+        // Firebase Configuration
         const firebaseConfig = {
-  apiKey: "AIzaSyA1y7_GRSPmSCsgMu-8aGhCtcMxMzIdtiQ",
-  authDomain: "drawing-rocky-training.firebaseapp.com",
-  projectId: "drawing-rocky-training",
-  storageBucket: "drawing-rocky-training.firebasestorage.app",
-  messagingSenderId: "106676074989",
-  appId: "1:106676074989:web:1c23055e796e6d21653078",
-  measurementId: "G-YYHWCKFTKD"
-};
+            apiKey: "AIzaSyA1y7_GRSPmSCsgMu-8aGhCtcMxMzIdtiQ",
+            authDomain: "drawing-rocky-training.firebaseapp.com",
+            projectId: "drawing-rocky-training",
+            storageBucket: "drawing-rocky-training.firebasestorage.app",
+            messagingSenderId: "106676074989",
+            appId: "1:106676074989:web:1c23055e796e6d21653078",
+            measurementId: "G-YYHWCKFTKD"
+        };
 
         // Initialize Firebase
         let db, auth, currentUser;
@@ -799,8 +869,7 @@
             db = firebase.firestore();
             auth = firebase.auth();
         } catch (error) {
-            console.error("Erreur Firebase config:", error);
-            alert("⚠️ Configuration Firebase requise! Voir les instructions en bas du fichier HTML.");
+            console.error("Erreur Firebase:", error);
         }
 
         // Auth state observer
@@ -829,14 +898,14 @@
             auth.signOut();
         }
 
-        // Program data
+        // Program data - COMPLETE VERSION
         const programData = {
             0: {
                 name: "Lundi - Mix équilibré",
                 total: "65 min",
                 blocks: [
                     {
-                        title: "Block 1: Fondamentaux (NOUVEAU!)",
+                        title: "Block 1: Fondamentaux",
                         time: "15 min",
                         exercises: [
                             "5 min: Cubes en perspective - 20 cubes sous différents angles",
@@ -849,15 +918,17 @@
                         time: "10 min",
                         exercises: [
                             "20 gestures de 30 secondes - RAPIDE et FLUIDE",
-                            "Focus: ligne d'action en C ou S AVANT tout"
+                            "Focus: ligne d'action en C ou S AVANT tout",
+                            "Ne pas lever le crayon"
                         ]
                     },
                     {
                         title: "Block 3: Créativité éclair",
                         time: "15 min",
                         exercises: [
-                            "Mash-up: 3 combinaisons impossibles",
-                            "5 min par combo, thumbnails rapides"
+                            "Mash-up: 3 combinaisons impossibles (ex: robot-samouraï-flottant)",
+                            "5 min par combo, thumbnails rapides",
+                            "Ne pas censurer les idées bizarres"
                         ]
                     },
                     {
@@ -865,6 +936,7 @@
                         time: "15 min",
                         exercises: [
                             "Une scène, 12 thumbnails (3x3cm max)",
+                            "Varie les angles: plongée, contre-plongée, profil",
                             "Objectif: 3 doivent te surprendre"
                         ]
                     },
@@ -873,31 +945,235 @@
                         time: "10 min",
                         exercises: [
                             "5 poses dynamiques avec exagération",
-                            "Exagère le mouvement de 30%"
+                            "Exagère le mouvement de 30%",
+                            "Focus sur les courbes S et C"
                         ]
                     }
                 ]
             },
-            // Abbreviated for space - add other days similarly
-            1: { name: "Mardi - Mix varié", total: "65 min", blocks: [{title: "Fondamentaux", time: "15 min", exercises: ["Formes en perspective"]}] },
-            2: { name: "Mercredi - Mix intense", total: "70 min", blocks: [{title: "Fondamentaux", time: "15 min", exercises: ["Cubes complexes"]}] },
-            3: { name: "Jeudi - Focus", total: "75 min", blocks: [{title: "Fondamentaux", time: "15 min", exercises: ["Architecture"]}] },
-            4: { name: "Vendredi - Intégration", total: "75 min", blocks: [{title: "Projet", time: "60 min", exercises: ["Illustration complète"]}] },
-            5: { name: "Samedi - Repos", total: "0 min", blocks: [{title: "Repos", time: "0 min", exercises: ["Pas de dessin"]}] },
-            6: { name: "Dimanche - Libre", total: "Variable", blocks: [{title: "Libre", time: "Variable", exercises: ["Dessine ce que tu veux"]}] }
+            1: {
+                name: "Mardi - Mix varié",
+                total: "65 min",
+                blocks: [
+                    {
+                        title: "Block 1: Fondamentaux",
+                        time: "15 min",
+                        exercises: [
+                            "5 min: Formes en perspective oblique",
+                            "5 min: Ellipses et volumes cylindriques",
+                            "5 min: Construction de boîtes complexes"
+                        ]
+                    },
+                    {
+                        title: "Block 2: Storytelling poses",
+                        time: "15 min",
+                        exercises: [
+                            "10 poses qui racontent une émotion",
+                            "1 minute par pose",
+                            "Pas de visage - juste le langage corporel"
+                        ]
+                    },
+                    {
+                        title: "Block 3: Angle challenges",
+                        time: "15 min",
+                        exercises: [
+                            "Même sujet, 6 angles différents",
+                            "Plongée extrême, contre-plongée, vue de dessous",
+                            "Cherche l'angle le plus dramatique"
+                        ]
+                    },
+                    {
+                        title: "Block 4: Contrainte créative",
+                        time: "15 min",
+                        exercises: [
+                            "Dessine avec 3 formes max (cercle, carré, triangle)",
+                            "5 créatures ou personnages",
+                            "Varie les proportions"
+                        ]
+                    },
+                    {
+                        title: "Block 5: Flow gestures",
+                        time: "5 min",
+                        exercises: [
+                            "15 gestures de 20 secondes",
+                            "Focus: fluidité totale",
+                            "Ligne continue sans lever le crayon"
+                        ]
+                    }
+                ]
+            },
+            2: {
+                name: "Mercredi - Mix intense",
+                total: "70 min",
+                blocks: [
+                    {
+                        title: "Block 1: Fondamentaux",
+                        time: "15 min",
+                        exercises: [
+                            "5 min: Architecture en perspective 3-points",
+                            "5 min: Formes organiques en volume",
+                            "5 min: Construction de véhicules"
+                        ]
+                    },
+                    {
+                        title: "Block 2: Speed shapes",
+                        time: "10 min",
+                        exercises: [
+                            "30 secondes: dessine une silhouette reconnaissable",
+                            "20 répétitions",
+                            "Varie: humain, animal, objet, créature"
+                        ]
+                    },
+                    {
+                        title: "Block 3: Combo challenge",
+                        time: "20 min",
+                        exercises: [
+                            "Prends 3 références random",
+                            "Fusionne-les en une image cohérente",
+                            "Cherche le lien narratif"
+                        ]
+                    },
+                    {
+                        title: "Block 4: Rule of thirds practice",
+                        time: "15 min",
+                        exercises: [
+                            "6 compositions avec règle des tiers",
+                            "Place les éléments clés sur les intersections",
+                            "Varie les centres d'intérêt"
+                        ]
+                    },
+                    {
+                        title: "Block 5: Dynamic figures",
+                        time: "10 min",
+                        exercises: [
+                            "6 figures en mouvement extrême",
+                            "Sports, danse, combat",
+                            "Exagère les lignes d'action"
+                        ]
+                    }
+                ]
+            },
+            3: {
+                name: "Jeudi - Focus technique",
+                total: "75 min",
+                blocks: [
+                    {
+                        title: "Block 1: Fondamentaux",
+                        time: "15 min",
+                        exercises: [
+                            "5 min: Perspective à 1 point - intérieurs",
+                            "5 min: Perspective à 2 points - extérieurs",
+                            "5 min: Perspective à 3 points - vues extrêmes"
+                        ]
+                    },
+                    {
+                        title: "Block 2: Contrapposto mastery",
+                        time: "20 min",
+                        exercises: [
+                            "8 poses avec contrapposto prononcé",
+                            "Focus: poids sur une jambe",
+                            "Observe les hanches et épaules"
+                        ]
+                    },
+                    {
+                        title: "Block 3: Negative space",
+                        time: "20 min",
+                        exercises: [
+                            "Dessine les espaces négatifs autour du sujet",
+                            "6 compositions",
+                            "Le vide est aussi important que le plein"
+                        ]
+                    },
+                    {
+                        title: "Block 4: Scene construction",
+                        time: "20 min",
+                        exercises: [
+                            "Construis une scène complète avec plusieurs personnages",
+                            "Perspective cohérente",
+                            "Interaction entre les éléments"
+                        ]
+                    }
+                ]
+            },
+            4: {
+                name: "Vendredi - Intégration",
+                total: "75 min",
+                blocks: [
+                    {
+                        title: "Block 1: Fondamentaux",
+                        time: "15 min",
+                        exercises: [
+                            "5 min: Révision des bases - cubes et cylindres",
+                            "5 min: Formes complexes en perspective",
+                            "5 min: Construction rapide d'environnements"
+                        ]
+                    },
+                    {
+                        title: "Block 2: Projet créatif",
+                        time: "60 min",
+                        exercises: [
+                            "Crée une illustration complète",
+                            "Intègre: pose dynamique + composition originale + histoire",
+                            "Utilise tout ce que tu as pratiqué cette semaine",
+                            "Ne pas se censurer - expérimente!",
+                            "Vise le fun, pas la perfection"
+                        ]
+                    }
+                ]
+            },
+            5: {
+                name: "Samedi - Repos",
+                total: "0 min",
+                blocks: [
+                    {
+                        title: "Jour de repos",
+                        time: "0 min",
+                        exercises: [
+                            "PAS DE DESSIN AUJOURD'HUI",
+                            "Repos = partie de l'entraînement",
+                            "Laisse ton cerveau assimiler",
+                            "Regarde de l'art, des films, va marcher",
+                            "Reviens frais lundi!"
+                        ]
+                    }
+                ]
+            },
+            6: {
+                name: "Dimanche - Pratique libre",
+                total: "Variable",
+                blocks: [
+                    {
+                        title: "Session libre",
+                        time: "À ton rythme",
+                        exercises: [
+                            "Dessine ce que TU veux",
+                            "Aucune contrainte",
+                            "Explore, expérimente, joue",
+                            "C'est TON temps créatif",
+                            "Si tu veux ne rien faire, c'est OK aussi!"
+                        ]
+                    }
+                ]
+            }
         };
 
         const ideaData = {
-            subject: ["Guerrier", "Robot", "Dragon", "Sorcière", "Astronaute", "Pirate", "Ninja", "Créature"],
-            style: ["Cyberpunk", "Steampunk", "Fantasy", "Sci-fi", "Médiéval", "Futuriste"],
-            emotion: ["Furieux", "Serein", "Mélancolique", "Triomphant", "Terrifié", "Confiant"],
-            constraint: ["Vue de dessous", "Silhouette pure", "Palette 3 couleurs", "Formes triangulaires"]
+            subject: ["Guerrier", "Robot", "Dragon", "Sorcière", "Astronaute", "Pirate", "Ninja", "Créature", "Chevalier", "Magicien", "Démon", "Ange", "Samurai", "Viking", "Cyborg", "Alien", "Fantôme", "Vampire"],
+            style: ["Cyberpunk", "Steampunk", "Fantasy", "Sci-fi", "Médiéval", "Futuriste", "Baroque", "Minimaliste", "Art Nouveau", "Gothique", "Tribal", "Aztèque", "Japonais", "Égyptien", "Nordique", "Biomécanique"],
+            emotion: ["Furieux", "Serein", "Mélancolique", "Triomphant", "Terrifié", "Confiant", "Mystérieux", "Joueur", "Déterminé", "Épuisé", "Émerveillé", "Menaçant", "Protecteur", "Désespéré", "Victorieux", "Calculateur"],
+            constraint: ["Vue de dessous", "Silhouette pure", "Palette 3 couleurs", "Formes triangulaires", "Symétrie parfaite", "Asymétrie extrême", "Contre-jour", "Gros plan", "Vue aérienne", "Reflet dans l'eau", "Fumée/brouillard", "Composition circulaire", "Diagonales fortes", "Espace négatif dominant"]
         };
 
         let currentDay = 0;
         let timerInterval = null;
         let timerSeconds = 900;
         let timerRunning = false;
+
+        // Session Training Variables
+        let sessionInterval = null;
+        let sessionSeconds = 0;
+        let sessionRunning = false;
+        let sessionPaused = false;
 
         // Firestore functions
         async function loadAllData() {
@@ -911,8 +1187,14 @@
                     const data = doc.data();
                     
                     document.getElementById('current-week').textContent = data.week || 1;
-                    document.getElementById('days-completed').textContent = `${data.daysCompleted || 0}/72`;
-                    document.getElementById('total-time').textContent = `${data.totalHours || 0}h`;
+                    
+                    const completedDays = data.completedDays || [];
+                    document.getElementById('days-completed').textContent = `${completedDays.length}/72`;
+                    
+                    const totalMinutes = data.totalMinutes || 0;
+                    const hours = Math.floor(totalMinutes / 60);
+                    document.getElementById('total-time').textContent = `${hours}h`;
+                    
                     document.getElementById('streak').textContent = `${data.streak || 0} 🔥`;
                     
                     if (data.progress) {
@@ -926,10 +1208,27 @@
                     if (data.savedIdeas) {
                         renderSavedIdeas(data.savedIdeas);
                     }
+
+                    // Update day buttons
+                    updateDayButtons(completedDays);
                 }
             } catch (error) {
                 console.error("Error loading data:", error);
             }
+        }
+
+        function updateDayButtons(completedDays) {
+            const buttons = document.querySelectorAll('.day-btn');
+            buttons.forEach((btn, index) => {
+                const dayKey = `day${index}_week${getCurrentWeek()}`;
+                if (completedDays.includes(dayKey)) {
+                    btn.classList.add('completed');
+                }
+            });
+        }
+
+        function getCurrentWeek() {
+            return parseInt(document.getElementById('current-week').textContent);
         }
 
         async function saveToCloud(field, value) {
@@ -945,6 +1244,117 @@
             }
         }
 
+        // Session Training Functions
+        function startSession() {
+            if (!sessionRunning) {
+                sessionRunning = true;
+                sessionPaused = false;
+                sessionInterval = setInterval(() => {
+                    sessionSeconds++;
+                    updateSessionDisplay();
+                }, 1000);
+                
+                document.getElementById('btn-start').style.display = 'none';
+                document.getElementById('btn-pause').style.display = 'inline-block';
+                document.getElementById('btn-stop').style.display = 'inline-block';
+                document.getElementById('session-timer').classList.add('running');
+            }
+        }
+
+        function pauseSession() {
+            if (sessionRunning && !sessionPaused) {
+                clearInterval(sessionInterval);
+                sessionPaused = true;
+                document.getElementById('btn-pause').textContent = '▶️ REPRENDRE';
+                document.getElementById('session-timer').classList.remove('running');
+            } else if (sessionPaused) {
+                sessionInterval = setInterval(() => {
+                    sessionSeconds++;
+                    updateSessionDisplay();
+                }, 1000);
+                sessionPaused = false;
+                document.getElementById('btn-pause').textContent = '⏸️ PAUSE';
+                document.getElementById('session-timer').classList.add('running');
+            }
+        }
+
+        async function stopSession() {
+            if (!sessionRunning && sessionSeconds === 0) return;
+            
+            clearInterval(sessionInterval);
+            
+            const minutes = Math.floor(sessionSeconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            
+            const confirmMsg = `Session terminée!\n\nTemps: ${hours > 0 ? hours + 'h ' : ''}${mins}min\n\nMarquer ce jour comme complété?`;
+            
+            if (confirm(confirmMsg)) {
+                await markDayCompleted(currentDay, minutes);
+            }
+            
+            // Reset session
+            sessionSeconds = 0;
+            sessionRunning = false;
+            sessionPaused = false;
+            updateSessionDisplay();
+            document.getElementById('btn-start').style.display = 'inline-block';
+            document.getElementById('btn-pause').style.display = 'none';
+            document.getElementById('btn-stop').style.display = 'none';
+            document.getElementById('btn-pause').textContent = '⏸️ PAUSE';
+            document.getElementById('session-timer').classList.remove('running');
+        }
+
+        function updateSessionDisplay() {
+            const hours = Math.floor(sessionSeconds / 3600);
+            const minutes = Math.floor((sessionSeconds % 3600) / 60);
+            const seconds = sessionSeconds % 60;
+            
+            document.getElementById('session-timer').textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        async function markDayCompleted(dayIndex, minutesSpent) {
+            if (!currentUser) return;
+            
+            try {
+                const docRef = db.collection('users').doc(currentUser.uid);
+                const doc = await docRef.get();
+                const data = doc.exists ? doc.data() : {};
+                
+                const completedDays = data.completedDays || [];
+                const currentWeek = getCurrentWeek();
+                const dayKey = `day${dayIndex}_week${currentWeek}`;
+                
+                if (!completedDays.includes(dayKey)) {
+                    completedDays.push(dayKey);
+                    
+                    const totalMinutes = (data.totalMinutes || 0) + minutesSpent;
+                    const newStreak = calculateStreak(completedDays);
+                    
+                    await db.collection('users').doc(currentUser.uid).set({
+                        completedDays: completedDays,
+                        totalMinutes: totalMinutes,
+                        streak: newStreak,
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    
+                    alert(`✅ Jour complété!\n\n+${minutesSpent} minutes\nStreak: ${newStreak} jours 🔥`);
+                    loadAllData();
+                }
+            } catch (error) {
+                console.error("Error marking day:", error);
+            }
+        }
+
+        function calculateStreak(completedDays) {
+            if (completedDays.length === 0) return 0;
+            
+            // Simple streak calculation
+            // In production, you'd want to check consecutive dates
+            return completedDays.length;
+        }
+
         async function saveProgressToCloud() {
             if (!currentUser) return;
             
@@ -956,7 +1366,7 @@
             };
             
             await saveToCloud('progress', progress);
-            alert('Progrès sauvegardé dans le cloud! 💪☁️');
+            alert('Progrès sauvegardé! 💪☁️');
         }
 
         async function saveCurrentIdea() {
@@ -1148,82 +1558,3 @@
     </script>
 </body>
 </html>
-
-<!-- 
-============================================
-📝 INSTRUCTIONS DE CONFIGURATION FIREBASE
-============================================
-
-ÉTAPE 1: Créer un projet Firebase (GRATUIT!)
----------------------------------------------
-1. Va sur: https://console.firebase.google.com/
-2. Clique "Ajouter un projet"
-3. Nom du projet: "rocky-training" (ou ce que tu veux)
-4. Désactive Google Analytics (pas nécessaire)
-5. Clique "Créer le projet"
-
-ÉTAPE 2: Activer l'authentification Google
--------------------------------------------
-1. Dans ton projet, clique "Authentication" dans le menu
-2. Clique "Get started"
-3. Onglet "Sign-in method"
-4. Clique sur "Google"
-5. Active le toggle
-6. Choisis un email de support
-7. Clique "Enregistrer"
-
-ÉTAPE 3: Créer Firestore Database
-----------------------------------
-1. Dans le menu, clique "Firestore Database"
-2. Clique "Créer une base de données"
-3. Mode: "Production"
-4. Emplacement: choisis le plus proche (us-east1 par exemple)
-5. Dans "Règles", change pour:
-
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
-
-6. Clique "Publier"
-
-ÉTAPE 4: Obtenir ta configuration
-----------------------------------
-1. Dans "Paramètres du projet" (icône engrenage)
-2. Section "Vos applications"
-3. Clique sur l'icône web </>
-4. Nom de l'app: "Rocky Training"
-5. COPIE les valeurs de firebaseConfig
-6. REMPLACE dans le code JavaScript ci-dessus (ligne ~570)
-
-Exemple de ce que tu dois copier:
-const firebaseConfig = {
-  apiKey: "AIzaSyC...",
-  authDomain: "rocky-training-123.firebaseapp.com",
-  projectId: "rocky-training-123",
-  storageBucket: "rocky-training-123.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123"
-};
-
-ÉTAPE 5: Héberger sur GitHub Pages
------------------------------------
-1. Crée un repo GitHub: "rocky-training"
-2. Upload ce fichier HTML
-3. Renomme en "index.html"
-4. Settings → Pages
-5. Source: "Deploy from branch"
-6. Branch: "main"
-7. Ton lien: https://TON-USERNAME.github.io/rocky-training
-
-C'EST TOUT! 🎉
-
-Tes données seront sauvegardées dans Firebase Cloud
-et accessibles de n'importe quel appareil! 
-
-Questions? Demande-moi! 💪
--->
