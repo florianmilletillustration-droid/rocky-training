@@ -612,6 +612,58 @@
             gap: 10px;
         }
 
+        /* Generator Button */
+        .generator-btn {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-red));
+            color: var(--bg-dark);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            margin: 15px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .generator-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .generated-subject {
+            background: var(--bg-elevated);
+            border-left: 4px solid var(--accent-yellow);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-green);
+            display: none;
+        }
+
+        .generated-subject.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
         .exercise-list {
             list-style: none;
         }
@@ -846,29 +898,6 @@
             padding-right: 15px;
             font-weight: 700;
             font-size: 0.85rem;
-        }
-
-        .saved-ideas-list {
-            margin-top: 30px;
-        }
-
-        .idea-item {
-            background: var(--bg-elevated);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            border-left: 3px solid var(--accent-green);
-            text-align: left;
-        }
-
-        .idea-text {
-            font-size: 0.85rem;
-            margin-bottom: 5px;
-        }
-
-        .idea-date {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
         }
 
         /* Responsive */
@@ -1292,7 +1321,6 @@
                 document.getElementById('app-content').classList.add('active');
                 document.getElementById('user-email').textContent = user.email;
                 
-                // Set today's date in manual entry
                 document.getElementById('manual-date').valueAsDate = new Date();
                 
                 loadAllData();
@@ -1324,7 +1352,210 @@
         let sessionRunning = false;
         let sessionPaused = false;
 
-        // Program data - COMPLETE VERSION
+        // SUBJECT GENERATORS DATA - 500+ subjects total!
+        const subjectGenerators = {
+            angleChallenges: [
+                // Objects quotidiens (30)
+                "Une chaise", "Une lampe", "Un vélo", "Une tasse", "Une bouteille", "Un livre ouvert", "Des lunettes", "Une clé", "Un marteau", "Des ciseaux",
+                "Un parapluie", "Une montre", "Un sac à dos", "Des écouteurs", "Un téléphone", "Un appareil photo", "Une guitare", "Un skateboard", "Un casque", "Des bottes",
+                "Un chapeau", "Un ballon", "Une chaussure", "Une plante en pot", "Un vase", "Un couteau", "Une fourchette", "Une cuillère", "Un pot de peinture", "Un pinceau",
+                
+                // Personnages neutres (25)
+                "Un personnage debout", "Un personnage assis", "Un personnage accroupi", "Un personnage à genoux", "Un personnage les bras croisés",
+                "Un personnage mains dans les poches", "Un personnage appuyé contre un mur", "Un personnage les bras levés", "Un personnage penché en avant", "Un personnage étiré",
+                "Un robot humanoïde", "Une silhouette encapuchonnée", "Un guerrier au repos", "Un mage en méditation", "Un archer bandant son arc",
+                "Un ninja en position neutre", "Un samouraï à genoux", "Un chevalier en armure", "Un astronaute flottant", "Un plongeur sous-marin",
+                "Un alpiniste en escalade", "Un danseur en équilibre", "Un gymnaste en préparation", "Un boxeur en garde", "Un escrimeur en position",
+                
+                // Véhicules (20)
+                "Une voiture de sport", "Une moto", "Un vaisseau spatial", "Un avion", "Un hélicoptère", "Un sous-marin", "Un tank", "Un vélo futuriste",
+                "Un scooter", "Une fusée", "Un planeur", "Un drone", "Un jet", "Un bolide de course", "Une navette spatiale", "Un mecha", "Un exosquelette",
+                "Un chariot", "Une carriole", "Un traineau",
+                
+                // Architecture/Structures (20)
+                "Une maison simple", "Une tour", "Un pont suspendu", "Un château fort", "Une cabane", "Un phare", "Un moulin à vent", "Une pyramide",
+                "Un temple grec", "Une arche", "Un portail", "Une fontaine", "Un puits", "Une grange", "Une serre", "Un silo", "Une tour de guet",
+                "Un beffroi", "Un donjon", "Un campanile",
+                
+                // Nature (15)
+                "Un arbre solitaire", "Un rocher imposant", "Un coquillage", "Un cristal", "Un tronc d'arbre mort", "Une souche", "Une branche tordue",
+                "Un champignon géant", "Un cactus", "Un bambou", "Un palmier", "Un pin tordu", "Un bonsaï", "Une fougère", "Une fleur géante",
+                
+                // Armes/Équipement (20)
+                "Une épée plantée", "Un bouclier", "Une hache", "Un crâne", "Une lance", "Un arc", "Une arbalète", "Une masse d'armes",
+                "Un fléau", "Une dague", "Un katana", "Un bâton de combat", "Une hallebarde", "Une armure complète", "Un casque cornu",
+                "Un gantelet", "Des gantelets blindés", "Une bannière", "Un étendard", "Une torche enflammée",
+                
+                // Animaux (15)
+                "Un loup hurlant", "Un dragon enroulé", "Un oiseau perché", "Un serpent lovés", "Un félin accroupi", "Un ours debout",
+                "Un aigle majestueux", "Un corbeau observateur", "Une panthère tapis", "Un lion au repos", "Un tigre couché",
+                "Un renard rusé", "Un hibou vigilant", "Un faucon en chasse", "Un phénix perché",
+                
+                // Robots/Méchas (10)
+                "Un robot sentinelle", "Un droïde sphérique", "Un mecha bipède", "Un android humanoïde", "Un exosquelette militaire",
+                "Un robot araignée", "Un drone volant", "Un golem mécanique", "Un robot ouvrier", "Un cyborg",
+            ],
+            
+            storytelling: [
+                // Émotions pures (20)
+                "Quelqu'un qui vient d'apprendre une excellente nouvelle", "Quelqu'un qui vient d'apprendre une mauvaise nouvelle",
+                "Quelqu'un submergé par la peur", "Quelqu'un rayonnant de joie", "Quelqu'un accablé par la tristesse",
+                "Quelqu'un bouillonnant de colère", "Quelqu'un paralysé par la surprise", "Quelqu'un submergé par le doute",
+                "Quelqu'un brillant de confiance", "Quelqu'un écrasé par la honte", "Quelqu'un transporté par l'espoir",
+                "Quelqu'un rongé par le regret", "Quelqu'un dévoré par la jalousie", "Quelqu'un éclatant de fierté",
+                "Quelqu'un saisi par la nostalgie", "Quelqu'un empli d'émerveillement", "Quelqu'un torturé par l'anxiété",
+                "Quelqu'un baigné de sérénité", "Quelqu'un consumé par la frustration", "Quelqu'un illuminé par l'inspiration",
+                
+                // Situations narratives (30)
+                "Quelqu'un découvrant un secret", "Quelqu'un prenant une décision difficile", "Quelqu'un se préparant au combat",
+                "Quelqu'un protégeant quelque chose", "Quelqu'un fuyant un danger", "Quelqu'un cherchant quelque chose de perdu",
+                "Quelqu'un confrontant son ennemi", "Quelqu'un aidant un allié blessé", "Quelqu'un escaladant un obstacle",
+                "Quelqu'un franchissant un seuil", "Quelqu'un contemplant un paysage", "Quelqu'un lisant une lettre importante",
+                "Quelqu'un réparant quelque chose", "Quelqu'un créant une œuvre", "Quelqu'un enseignant à un élève",
+                "Quelqu'un apprenant quelque chose de nouveau", "Quelqu'un célébrant une victoire", "Quelqu'un pleurant une défaite",
+                "Quelqu'un offrant un cadeau", "Quelqu'un recevant une récompense", "Quelqu'un payant le prix de ses actions",
+                "Quelqu'un se souvenant du passé", "Quelqu'un imaginant le futur", "Quelqu'un vivant l'instant présent",
+                "Quelqu'un disant au revoir", "Quelqu'un accueillant quelqu'un", "Quelqu'un seul dans la foule",
+                "Quelqu'un trouvant le courage", "Quelqu'un perdant espoir", "Quelqu'un reprenant espoir",
+                
+                // Réactions physiques (15)
+                "Quelqu'un s'écroulant d'épuisement", "Quelqu'un bondir de surprise", "Quelqu'un reculer de dégoût",
+                "Quelqu'un se figer de terreur", "Quelqu'un s'élancer avec enthousiasme", "Quelqu'un se replier sur soi",
+                "Quelqu'un se redresser avec défi", "Quelqu'un s'effondrer de chagrin", "Quelqu'un se contorsionner de douleur",
+                "Quelqu'un se détendre avec soulagement", "Quelqu'un trembler de froid", "Quelqu'un suer sous l'effort",
+                "Quelqu'un chanceler de fatigue", "Quelqu'un jubiler de triomphe", "Quelqu'un frissonner d'anticipation",
+                
+                // États mentaux (15)
+                "Quelqu'un perdu dans ses pensées", "Quelqu'un concentré sur une tâche", "Quelqu'un distrait par quelque chose",
+                "Quelqu'un méditant en silence", "Quelqu'un réfléchissant intensément", "Quelqu'un priant avec ferveur",
+                "Quelqu'un rêvassant éveillé", "Quelqu'un calculant mentalement", "Quelqu'un se remémorant un souvenir",
+                "Quelqu'un anticipant un événement", "Quelqu'un observant attentivement", "Quelqu'un écoutant avec attention",
+                "Quelqu'un imaginant des possibilités", "Quelqu'un analysant une situation", "Quelqu'un cherchant l'inspiration",
+            ],
+            
+            composition: [
+                // Environnements naturels (25)
+                "Forêt mystérieuse au crépuscule", "Montagne enneigée sous les étoiles", "Plage déserte au lever du soleil",
+                "Canyon profond avec une rivière", "Vallée verdoyante parsemée de fleurs", "Grotte illuminée par des cristaux",
+                "Cascade tombant d'une falaise", "Marais brumeux avec des arbres morts", "Désert de dunes sous la lune",
+                "Falaises rocheuses battues par les vagues", "Prairie ondulante sous l'orage", "Jungle dense et luxuriante",
+                "Toundra gelée avec aurore boréale", "Oasis dans le désert", "Lac de montagne reflétant les pics",
+                "Forêt de bambous traversée par la lumière", "Champs de lavande au coucher du soleil", "Fjord majestueux",
+                "Geysers crachant de la vapeur", "Mangrove au bord de l'eau", "Savane avec acacias isolés",
+                "Récif de corail sous-marin", "Glacier éclatant sous le soleil", "Volcan en éruption au loin",
+                "Archipel d'îles volcaniques",
+                
+                // Environnements urbains (20)
+                "Ruelle sombre dans une ville cyberpunk", "Place médiévale bondée de marchands", "Toit de gratte-ciel futuriste",
+                "Métro abandonné envahi par la végétation", "Marché nocturne illuminé de lanternes", "Port spatial avec vaisseaux",
+                "Bibliothèque ancienne aux rayonnages infinis", "Atelier d'artisan encombré d'outils", "Salle de trône majestueuse",
+                "Laboratoire high-tech rempli d'écrans", "Dojo traditionnel zen", "Cathédrale gothique baignée de lumière colorée",
+                "Station spatiale en orbite", "Arena de combat futuriste", "Jardin japonais avec pont rouge",
+                "Hangar industriel désaffecté", "Salon victorien élégant", "Forge de forgeron avec feu ardent",
+                "Observatoire astronomique", "Temple en ruines recouvert de lierre",
+                
+                // Conditions atmosphériques (15)
+                "Tempête de sable balayant le paysage", "Brouillard épais masquant les formes", "Pluie torrentielle dans la ville",
+                "Neige tombant doucement dans la forêt", "Éclair zébrant le ciel nocturne", "Arc-en-ciel après la pluie",
+                "Vent violent courbant les arbres", "Nuages dramatiques au coucher du soleil", "Givre cristallisant chaque surface",
+                "Chaleur écrasante faisant trembler l'air", "Grêle tambourinant sur les toits", "Tornade se formant au loin",
+                "Bourrasque de feuilles d'automne", "Bruine fine créant un halo", "Ciel étoilé infiniment clair",
+                
+                // Moments de la journée (10)
+                "Aube naissante peignant le ciel", "Midi éclatant de lumière crue", "Après-midi doré et paisible",
+                "Crépuscule violet et orange", "Nuit tombante enveloppant le monde", "Minuit sous la pleine lune",
+                "Heure bleue avant l'aube", "Golden hour baignant tout d'or", "Nuit noire sans étoiles",
+                "Lever de soleil perçant les nuages",
+                
+                // Lieux spécifiques (15)
+                "Pont suspendu au-dessus d'un gouffre", "Phare solitaire sur un rocher", "Moulin à vent sur une colline",
+                "Ruines d'un château fort", "Camp nomade dans le désert", "Village de pêcheurs au bord de l'eau",
+                "Monastère perché sur la montagne", "Campement militaire fortifié", "Ferme isolée dans la plaine",
+                "Mine abandonnée dans les montagnes", "Sanctuaire caché dans la jungle", "Avant-poste frontière dans la neige",
+                "Caravane traversant les dunes", "Navire échoué sur la plage", "Citadelle flottante dans les nuages",
+                
+                // Ambiances narratives (15)
+                "Lieu hanté par les fantômes", "Endroit oublié par le temps", "Refuge chaleureux et accueillant",
+                "Territoire hostile et dangereux", "Sanctuaire de paix et méditation", "Champ de bataille après la guerre",
+                "Jardin secret et enchanteur", "Prison sombre et oppressante", "Palais opulent et décadent",
+                "Laboratoire fou et chaotique", "Temple sacré et vénéré", "Taverne animée et bruyante",
+                "Cimetière ancien et solennel", "Arsenal rempli d'armes", "Salle du trésor étincelante",
+            ],
+            
+            speedShapes: [
+                // Mix humains (20)
+                "Guerrier", "Mage", "Voleur", "Archer", "Paladin", "Nécromancien", "Druide", "Moine", "Berserk", "Assassin",
+                "Prêtre", "Sorcière", "Chevalier", "Ninja", "Samouraï", "Gladiateur", "Pirate", "Viking", "Spartiate", "Ronin",
+                
+                // Créatures fantastiques (20)
+                "Dragon", "Phénix", "Griffon", "Chimère", "Hydre", "Basilic", "Sphinx", "Minotaure", "Centaure", "Licorne",
+                "Pégase", "Cerbère", "Kraken", "Léviathan", "Béhémoth", "Golem", "Élémentaire", "Djinn", "Gargoyle", "Wyvern",
+                
+                // Animaux (15)
+                "Loup", "Ours", "Aigle", "Serpent", "Tigre", "Lion", "Panthère", "Faucon", "Corbeau", "Renard",
+                "Hibou", "Requin", "Baleine", "Araignée", "Scorpion",
+                
+                // Tech/Sci-fi (15)
+                "Robot", "Cyborg", "Android", "Droïde", "Mecha", "Exosquelette", "Drone", "IA", "Hologramme", "Clone",
+                "Mutant", "Bioform", "Nanobot", "Synthétique", "Augmenté",
+                
+                // Monstres (15)
+                "Démon", "Ange déchu", "Ombre vivante", "Esprit", "Spectre", "Zombie", "Vampire", "Loup-garou", "Liche",
+                "Momie", "Goule", "Banshee", "Wraith", "Revenant", "Aberration",
+                
+                // Objets animés (10)
+                "Armure vivante", "Arme consciente", "Livre maudit", "Statue animée", "Arbre ancien",  "Cristal pulsant",
+                "Flamme vivante", "Eau consciente", "Nuage pensant", "Roche flottante",
+                
+                // Professions/Archétypes (10)
+                "Forgeron", "Alchimiste", "Marchand", "Barde", "Érudit", "Explorateur", "Mercenaire", "Garde", "Noble", "Sage",
+            ],
+            
+            constraints: [
+                // Contraintes de forme (20)
+                "Uniquement des triangles", "Uniquement des cercles", "Uniquement des carrés", "Formes organiques uniquement",
+                "Formes géométriques uniquement", "Lignes droites seulement", "Courbes fluides seulement", "Zigzags et angles",
+                "Spirales et tourbillons", "Grilles et motifs répétitifs", "Asymétrie extrême", "Symétrie parfaite",
+                "Fractales et récursion", "Formes qui se chevauchent", "Formes séparées sans contact", "Forme principale en négatif",
+                "Silhouette pure sans détails", "Maximum 5 formes", "Maximum 3 lignes", "Une seule forme répétée",
+                
+                // Contraintes de couleur (15)
+                "Monochrome noir et blanc", "Camaïeu de bleus", "Camaïeu de rouges", "Palette de 3 couleurs max",
+                "Couleurs complémentaires uniquement", "Couleurs analogues uniquement", "Tons chauds seulement",
+                "Tons froids seulement", "Couleurs désaturées", "Couleurs saturées au max", "Niveaux de gris avec un accent",
+                "Palette rétro années 80", "Palette pastel douce", "Palette néon cyberpunk", "Sépia et vintage",
+                
+                // Contraintes de technique (15)
+                "Ligne continue sans lever", "Pointillisme uniquement", "Hachures croisées", "Traits courts et rapides",
+                "Taches et éclaboussures", "Dégradés doux", "Contrastes forts", "Contours épais", "Pas de contours",
+                "Textures uniquement", "Motifs décoratifs", "Style minimaliste", "Style maximaliste", "Abstraction géométrique",
+                "Réalisme strict",
+                
+                // Contraintes conceptuelles (15)
+                "Vue de dessus uniquement", "Vue de dessous uniquement", "Profil strict", "Face frontale", "Vue isométrique",
+                "Perspective exagérée", "Pas de perspective", "Gros plan extrême", "Plan large panoramique", "Point de vue d'insecte",
+                "Point de vue d'oiseau", "Reflet dans l'eau", "Vu à travers un objet", "Partiellement caché", "Fragmenté et dispersé",
+                
+                // Contraintes narratives (15)
+                "Mouvement figé", "Action explosive", "Calme avant la tempête", "Moment de tension", "Instant de repos",
+                "Transformation en cours", "Début d'une histoire", "Fin d'une aventure", "Moment décisif", "Point de non-retour",
+                "Révélation surprise", "Secret caché", "Double sens visuel", "Métaphore visuelle", "Symbolisme fort",
+            ]
+        };
+
+        // Existing generator data for mash-ups
+        const ideaData = {
+            subject: ["Guerrier", "Robot", "Dragon", "Sorcière", "Astronaute", "Pirate", "Ninja", "Créature", "Chevalier", "Magicien", "Démon", "Ange", "Samurai", "Viking", "Cyborg", "Alien", "Fantôme", "Vampire", "Nécromancien", "Druide", "Assassin", "Paladin", "Barde", "Moine"],
+            style: ["Cyberpunk", "Steampunk", "Fantasy", "Sci-fi", "Médiéval", "Futuriste", "Baroque", "Minimaliste", "Art Nouveau", "Gothique", "Tribal", "Aztèque", "Japonais", "Égyptien", "Nordique", "Biomécanique", "Post-apocalyptique", "Rétro-futuriste", "Dark Fantasy", "High Fantasy"],
+            emotion: ["Furieux", "Serein", "Mélancolique", "Triomphant", "Terrifié", "Confiant", "Mystérieux", "Joueur", "Déterminé", "Épuisé", "Émerveillé", "Menaçant", "Protecteur", "Désespéré", "Victorieux", "Calculateur", "Nostalgique", "Inspiré", "Torturé", "Sage"],
+            constraint: ["Vue de dessous", "Silhouette pure", "Palette 3 couleurs", "Formes triangulaires", "Symétrie parfaite", "Asymétrie extrême", "Contre-jour", "Gros plan", "Vue aérienne", "Reflet dans l'eau", "Fumée/brouillard", "Composition circulaire", "Diagonales fortes", "Espace négatif dominant", "Perspective forcée", "Point de fuite multiple"]
+        };
+
+        let timerInterval = null;
+        let timerSeconds = 900;
+        let timerRunning = false;
+
+        // Program data with generator integration
         const programData = {
             0: {
                 name: "Lundi - Mix équilibré",
@@ -1337,7 +1568,8 @@
                             "5 min: Cubes en perspective - 20 cubes sous différents angles",
                             "5 min: Cylindres - 15 cylindres dans l'espace",
                             "5 min: Grille de perspective - Dessine une grille 2-point perspective"
-                        ]
+                        ],
+                        hasGenerator: false
                     },
                     {
                         title: "Block 2: Warm-up fluidité",
@@ -1346,16 +1578,19 @@
                             "20 gestures de 30 secondes - RAPIDE et FLUIDE",
                             "Focus: ligne d'action en C ou S AVANT tout",
                             "Ne pas lever le crayon"
-                        ]
+                        ],
+                        hasGenerator: false
                     },
                     {
-                        title: "Block 3: Créativité éclair",
+                        title: "Block 3: Créativité éclair (Mash-ups)",
                         time: "15 min",
                         exercises: [
-                            "Mash-up: 3 combinaisons impossibles (ex: robot-samouraï-flottant)",
+                            "3 combinaisons impossibles",
                             "5 min par combo, thumbnails rapides",
                             "Ne pas censurer les idées bizarres"
-                        ]
+                        ],
+                        hasGenerator: true,
+                        generatorType: 'mashup'
                     },
                     {
                         title: "Block 4: Composition thumbnails",
@@ -1364,7 +1599,9 @@
                             "Une scène, 12 thumbnails (3x3cm max)",
                             "Varie les angles: plongée, contre-plongée, profil",
                             "Objectif: 3 doivent te surprendre"
-                        ]
+                        ],
+                        hasGenerator: true,
+                        generatorType: 'composition'
                     },
                     {
                         title: "Block 5: Cool-down poses",
@@ -1373,7 +1610,8 @@
                             "5 poses dynamiques avec exagération",
                             "Exagère le mouvement de 30%",
                             "Focus sur les courbes S et C"
-                        ]
+                        ],
+                        hasGenerator: false
                     }
                 ]
             },
@@ -1388,7 +1626,8 @@
                             "5 min: Formes en perspective oblique",
                             "5 min: Ellipses et volumes cylindriques",
                             "5 min: Construction de boîtes complexes"
-                        ]
+                        ],
+                        hasGenerator: false
                     },
                     {
                         title: "Block 2: Storytelling poses",
@@ -1397,7 +1636,9 @@
                             "10 poses qui racontent une émotion",
                             "1 minute par pose",
                             "Pas de visage - juste le langage corporel"
-                        ]
+                        ],
+                        hasGenerator: true,
+                        generatorType: 'storytelling'
                     },
                     {
                         title: "Block 3: Angle challenges",
@@ -1406,16 +1647,20 @@
                             "Même sujet, 6 angles différents",
                             "Plongée extrême, contre-plongée, vue de dessous",
                             "Cherche l'angle le plus dramatique"
-                        ]
+                        ],
+                        hasGenerator: true,
+                        generatorType: 'angleChallenge'
                     },
                     {
                         title: "Block 4: Contrainte créative",
                         time: "15 min",
                         exercises: [
-                            "Dessine avec 3 formes max (cercle, carré, triangle)",
+                            "Dessine avec une contrainte spécifique",
                             "5 créatures ou personnages",
                             "Varie les proportions"
-                        ]
+                        ],
+                        hasGenerator: true,
+                        generatorType: 'constraint'
                     },
                     {
                         title: "Block 5: Flow gestures",
@@ -1424,7 +1669,8 @@
                             "15 gestures de 20 secondes",
                             "Focus: fluidité totale",
                             "Ligne continue sans lever le crayon"
-                        ]
+                        ],
+                        hasGenerator: false
                     }
                 ]
             },
@@ -1439,7 +1685,8 @@
                             "5 min: Architecture en perspective 3-points",
                             "5 min: Formes organiques en volume",
                             "5 min: Construction de véhicules"
-                        ]
+                        ],
+                        hasGenerator: false
                     },
                     {
                         title: "Block 2: Speed shapes",
@@ -1448,16 +1695,19 @@
                             "30 secondes: dessine une silhouette reconnaissable",
                             "20 répétitions",
                             "Varie: humain, animal, objet, créature"
-                        ]
+                        ],
+                        hasGenerator: true,
+                        generatorType: 'speedShape'
                     },
                     {
                         title: "Block 3: Combo challenge",
                         time: "20 min",
                         exercises: [
-                            "Prends 3 références random",
-                            "Fusionne-les en une image cohérente",
+                            "Fusionne 3 éléments en une image cohérente",
                             "Cherche le lien narratif"
-                        ]
+                        ],
+                        hasGenerator: true,
+                        generatorType: 'mashup'
                     },
                     {
                         title: "Block 4: Rule of thirds practice",
@@ -1466,7 +1716,9 @@
                             "6 compositions avec règle des tiers",
                             "Place les éléments clés sur les intersections",
                             "Varie les centres d'intérêt"
-                        ]
+                        ],
+                        hasGenerator: true,
+                        generatorType: 'composition'
                     },
                     {
                         title: "Block 5: Dynamic figures",
@@ -1475,7 +1727,8 @@
                             "6 figures en mouvement extrême",
                             "Sports, danse, combat",
                             "Exagère les lignes d'action"
-                        ]
+                        ],
+                        hasGenerator: false
                     }
                 ]
             },
@@ -1490,7 +1743,8 @@
                             "5 min: Perspective à 1 point - intérieurs",
                             "5 min: Perspective à 2 points - extérieurs",
                             "5 min: Perspective à 3 points - vues extrêmes"
-                        ]
+                        ],
+                        hasGenerator: false
                     },
                     {
                         title: "Block 2: Contrapposto mastery",
@@ -1499,7 +1753,8 @@
                             "8 poses avec contrapposto prononcé",
                             "Focus: poids sur une jambe",
                             "Observe les hanches et épaules"
-                        ]
+                        ],
+                        hasGenerator: false
                     },
                     {
                         title: "Block 3: Negative space",
@@ -1508,7 +1763,9 @@
                             "Dessine les espaces négatifs autour du sujet",
                             "6 compositions",
                             "Le vide est aussi important que le plein"
-                        ]
+                        ],
+                        hasGenerator: true,
+                        generatorType: 'angleChallenge'
                     },
                     {
                         title: "Block 4: Scene construction",
@@ -1517,7 +1774,9 @@
                             "Construis une scène complète avec plusieurs personnages",
                             "Perspective cohérente",
                             "Interaction entre les éléments"
-                        ]
+                        ],
+                        hasGenerator: true,
+                        generatorType: 'composition'
                     }
                 ]
             },
@@ -1532,7 +1791,8 @@
                             "5 min: Révision des bases - cubes et cylindres",
                             "5 min: Formes complexes en perspective",
                             "5 min: Construction rapide d'environnements"
-                        ]
+                        ],
+                        hasGenerator: false
                     },
                     {
                         title: "Block 2: Projet créatif",
@@ -1543,7 +1803,9 @@
                             "Utilise tout ce que tu as pratiqué cette semaine",
                             "Ne pas se censurer - expérimente!",
                             "Vise le fun, pas la perfection"
-                        ]
+                        ],
+                        hasGenerator: true,
+                        generatorType: 'mashup'
                     }
                 ]
             },
@@ -1560,7 +1822,8 @@
                             "Laisse ton cerveau assimiler",
                             "Regarde de l'art, des films, va marcher",
                             "Reviens frais lundi!"
-                        ]
+                        ],
+                        hasGenerator: false
                     }
                 ]
             },
@@ -1577,22 +1840,52 @@
                             "Explore, expérimente, joue",
                             "C'est TON temps créatif",
                             "Si tu veux ne rien faire, c'est OK aussi!"
-                        ]
+                        ],
+                        hasGenerator: false
                     }
                 ]
             }
         };
 
-        const ideaData = {
-            subject: ["Guerrier", "Robot", "Dragon", "Sorcière", "Astronaute", "Pirate", "Ninja", "Créature", "Chevalier", "Magicien", "Démon", "Ange", "Samurai", "Viking", "Cyborg", "Alien", "Fantôme", "Vampire"],
-            style: ["Cyberpunk", "Steampunk", "Fantasy", "Sci-fi", "Médiéval", "Futuriste", "Baroque", "Minimaliste", "Art Nouveau", "Gothique", "Tribal", "Aztèque", "Japonais", "Égyptien", "Nordique", "Biomécanique"],
-            emotion: ["Furieux", "Serein", "Mélancolique", "Triomphant", "Terrifié", "Confiant", "Mystérieux", "Joueur", "Déterminé", "Épuisé", "Émerveillé", "Menaçant", "Protecteur", "Désespéré", "Victorieux", "Calculateur"],
-            constraint: ["Vue de dessous", "Silhouette pure", "Palette 3 couleurs", "Formes triangulaires", "Symétrie parfaite", "Asymétrie extrême", "Contre-jour", "Gros plan", "Vue aérienne", "Reflet dans l'eau", "Fumée/brouillard", "Composition circulaire", "Diagonales fortes", "Espace négatif dominant"]
-        };
-
-        let timerInterval = null;
-        let timerSeconds = 900;
-        let timerRunning = false;
+        // Generator functions
+        function generateSubject(type, blockId) {
+            let subject = '';
+            
+            switch(type) {
+                case 'angleChallenge':
+                    const angles = subjectGenerators.angleChallenges;
+                    subject = angles[Math.floor(Math.random() * angles.length)];
+                    break;
+                case 'storytelling':
+                    const stories = subjectGenerators.storytelling;
+                    subject = stories[Math.floor(Math.random() * stories.length)];
+                    break;
+                case 'composition':
+                    const comps = subjectGenerators.composition;
+                    subject = comps[Math.floor(Math.random() * comps.length)];
+                    break;
+                case 'speedShape':
+                    const speeds = subjectGenerators.speedShapes;
+                    subject = speeds[Math.floor(Math.random() * speeds.length)];
+                    break;
+                case 'constraint':
+                    const constraints = subjectGenerators.constraints;
+                    subject = constraints[Math.floor(Math.random() * constraints.length)];
+                    break;
+                case 'mashup':
+                    const subj = ideaData.subject[Math.floor(Math.random() * ideaData.subject.length)];
+                    const style = ideaData.style[Math.floor(Math.random() * ideaData.style.length)];
+                    const emotion = ideaData.emotion[Math.floor(Math.random() * ideaData.emotion.length)];
+                    subject = `${subj} + ${style} + ${emotion}`;
+                    break;
+            }
+            
+            const displayEl = document.getElementById(`generated-${blockId}`);
+            if (displayEl) {
+                displayEl.textContent = `💡 ${subject}`;
+                displayEl.classList.add('show');
+            }
+        }
 
         // ============================================
         // FIRESTORE FUNCTIONS
@@ -1608,7 +1901,6 @@
                 if (doc.exists) {
                     const data = doc.data();
                     
-                    // Load basic stats
                     document.getElementById('current-week').textContent = data.week || 1;
                     
                     const completedDays = data.completedDays || [];
@@ -1620,16 +1912,13 @@
                     
                     document.getElementById('streak').textContent = `${data.streak || 0} 🔥`;
                     
-                    // Load sessions
                     allSessions = data.sessions || [];
                     
-                    // Update all displays
                     updateTodayDisplay();
                     updateCategoryStats();
                     renderHistory();
                     updateDayButtons(completedDays);
                     
-                    // Load progress
                     if (data.progress) {
                         ['fluidity', 'originality', 'composition', 'confidence'].forEach(type => {
                             const val = data.progress[type] || 0;
@@ -1676,7 +1965,6 @@
             
             document.getElementById('today-sessions-total').textContent = `${totalMinutes} min`;
             
-            // Show complete day button if there are sessions
             document.getElementById('btn-complete-day').style.display = todaySessions.length > 0 ? 'block' : 'none';
         }
 
@@ -1886,7 +2174,6 @@
             
             alert(`✅ Session sauvegardée!\n\n+${minutes} minutes ajoutées`);
             
-            // Don't reset - keep timer running for next session
             sessionSeconds = 0;
             updateSessionDisplay();
         }
@@ -1932,7 +2219,6 @@
         }
 
         function calculateStreak(completedDays) {
-            // Simple calculation - in production you'd check consecutive dates
             return completedDays.length;
         }
 
@@ -1956,7 +2242,6 @@
             await saveSessions();
             await loadAllData();
             
-            // Visual feedback
             showQuickFeedback(`✅ +${minutes} min ajoutées!`);
         }
 
@@ -1982,15 +2267,12 @@
             await saveSessions();
             await loadAllData();
             
-            // Reset input
             document.getElementById('quick-minutes').value = '';
             
-            // Visual feedback
             showQuickFeedback(`✅ +${minutes} min ajoutées!`);
         }
 
         function showQuickFeedback(message) {
-            // Create temporary feedback element
             const feedback = document.createElement('div');
             feedback.textContent = message;
             feedback.style.cssText = `
@@ -2042,7 +2324,6 @@
             await saveSessions();
             await loadAllData();
             
-            // Reset form
             document.getElementById('manual-duration').value = '30';
             document.getElementById('manual-note').value = '';
             
@@ -2114,13 +2395,20 @@
             let html = `<h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 3px; margin: 30px 0 20px;">${data.name}</h2>`;
             html += `<p style="color: var(--text-secondary); margin-bottom: 30px;">Durée totale: ${data.total}</p>`;
             
-            data.blocks.forEach(block => {
+            data.blocks.forEach((block, blockIndex) => {
+                const blockId = `day${day}_block${blockIndex}`;
                 html += `
                     <div class="exercise-block">
                         <div class="exercise-header">
                             <div class="exercise-title">${block.title}</div>
                             <div class="exercise-timer">⏱ ${block.time}</div>
                         </div>
+                        ${block.hasGenerator ? `
+                            <button class="generator-btn" onclick="generateSubject('${block.generatorType}', '${blockId}')">
+                                🎲 Générer un sujet
+                            </button>
+                            <div class="generated-subject" id="generated-${blockId}"></div>
+                        ` : ''}
                         <ul class="exercise-list">
                             ${block.exercises.map(ex => `<li class="exercise-item">${ex}</li>`).join('')}
                         </ul>
