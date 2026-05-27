@@ -271,9 +271,17 @@
         </header>
 
         <div class="stats-bar">
-            <div class="stat-card">
+            <div class="stat-card" style="cursor:default;">
                 <div class="stat-label">Semaine actuelle</div>
                 <div class="stat-value" id="current-week">1</div>
+                <button onclick="advanceWeek()" style="
+                    margin-top:10px;font-family:'Space Mono',monospace;
+                    background:transparent;border:1px solid var(--accent-yellow);
+                    color:var(--accent-yellow);padding:5px 12px;border-radius:4px;
+                    cursor:pointer;font-size:0.7rem;text-transform:uppercase;
+                    letter-spacing:1px;transition:all 0.3s;width:100%;">
+                    ➡ Semaine suivante
+                </button>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Jours complétés</div>
@@ -1082,22 +1090,12 @@ async function loadAllData() {
         const doc = await docRef.get();
         const data = doc.exists ? doc.data() : {};
 
-        // ── AUTO-WEEK CALCULATION ──────────────────────────
-        // La semaine s'incrémente automatiquement toutes les 7 jours
-        // depuis la date de début du programme enregistrée dans Firebase.
-        let startDate = data.startDate;
-        if (!startDate) {
-            startDate = getTodayString();
-            await db.collection('users').doc(currentUser.uid).set(
-                { startDate: startDate }, { merge: true }
-            );
-        }
-        const start = new Date(startDate);
-        const today = new Date();
-        const daysDiff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
-        const currentWeek = Math.floor(daysDiff / 7) + 1;
-        document.getElementById('current-week').textContent = currentWeek;
-        // ──────────────────────────────────────────────────
+        // ── SEMAINE STOCKÉE DANS FIREBASE ────────────────
+        // Tu avances la semaine manuellement avec le bouton
+        // "Semaine suivante". Remet tous les jours en rouge.
+        const currentWeek = data.currentWeek || 1;
+        document.getElementById("current-week").textContent = currentWeek;
+        // ─────────────────────────────────────────────────
 
         const completedDays = data.completedDays || [];
         document.getElementById('days-completed').textContent = `${completedDays.length}/72`;
@@ -1526,6 +1524,23 @@ function switchTab(tabName, e) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(`tab-${tabName}`).classList.add('active');
     if (e && e.target) e.target.classList.add('active');
+}
+
+// ============================================================
+// ADVANCE WEEK
+// ============================================================
+async function advanceWeek() {
+    const currentWeek = getCurrentWeek();
+    const nextWeek = currentWeek + 1;
+    if (!confirm(`Passer à la semaine ${nextWeek}?\n\nLes jours vont repasser en rouge (tes données restent intactes!)`)) return;
+    try {
+        await db.collection('users').doc(currentUser.uid).set({
+            currentWeek: nextWeek,
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        await loadAllData();
+        showQuickFeedback(`🗓 Semaine ${nextWeek}!`);
+    } catch (error) { console.error("Error advancing week:", error); }
 }
 
 // ============================================================
