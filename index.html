@@ -13,11 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --bg-dark: #0a0a0a;
@@ -44,864 +40,206 @@
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 51, 51, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+                radial-gradient(circle at 20% 50%, rgba(255,51,51,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,215,0,0.1) 0%, transparent 50%);
             pointer-events: none;
             z-index: 0;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 1;
-        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
 
-        /* Login Screen */
+        /* Login */
         .login-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            text-align: center;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; min-height: 100vh; text-align: center;
         }
-
         .login-screen h1 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 4rem;
+            font-family: 'Bebas Neue', sans-serif; font-size: 4rem;
             letter-spacing: 4px;
             background: linear-gradient(135deg, var(--accent-red), var(--accent-yellow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-transform: uppercase;
-            margin-bottom: 20px;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            text-transform: uppercase; margin-bottom: 20px;
             animation: glow 3s ease-in-out infinite;
         }
-
         @keyframes glow {
-            0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 51, 51, 0.5)); }
-            50% { filter: drop-shadow(0 0 40px rgba(255, 215, 0, 0.5)); }
+            0%,100% { filter: drop-shadow(0 0 20px rgba(255,51,51,0.5)); }
+            50% { filter: drop-shadow(0 0 40px rgba(255,215,0,0.5)); }
         }
-
         .login-btn {
             font-family: 'Space Mono', monospace;
-            background: var(--accent-red);
-            color: var(--text-primary);
-            border: none;
-            padding: 20px 50px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: all 0.3s;
-            font-size: 1rem;
-            margin-top: 30px;
+            background: var(--accent-red); color: var(--text-primary);
+            border: none; padding: 20px 50px; border-radius: 8px;
+            cursor: pointer; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 2px; transition: all 0.3s; font-size: 1rem; margin-top: 30px;
         }
-
         .login-btn:hover {
-            background: var(--accent-yellow);
-            color: var(--bg-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+            background: var(--accent-yellow); color: var(--bg-dark);
+            transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,215,0,0.4);
         }
-
-        .app-content {
-            display: none;
-        }
-
-        .app-content.active {
-            display: block;
-        }
+        .app-content { display: none; }
+        .app-content.active { display: block; }
 
         /* Header */
-        header {
-            text-align: center;
-            padding: 40px 20px;
-            position: relative;
-        }
-
+        header { text-align: center; padding: 40px 20px; position: relative; }
         h1 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 4rem;
-            letter-spacing: 4px;
+            font-family: 'Bebas Neue', sans-serif; font-size: 4rem; letter-spacing: 4px;
             background: linear-gradient(135deg, var(--accent-red), var(--accent-yellow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-transform: uppercase;
-            margin-bottom: 10px;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            text-transform: uppercase; margin-bottom: 10px;
         }
-
-        .subtitle {
-            font-family: 'Space Mono', monospace;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        .user-email {
-            color: var(--accent-green);
-            font-size: 0.85rem;
-        }
-
+        .subtitle { font-family: 'Space Mono', monospace; color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 3px; }
+        .user-info { display: flex; align-items: center; gap: 15px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+        .user-email { color: var(--accent-green); font-size: 0.85rem; }
         .logout-btn {
-            font-family: 'Space Mono', monospace;
-            background: transparent;
-            border: 2px solid var(--border);
-            color: var(--text-secondary);
-            padding: 8px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
+            font-family: 'Space Mono', monospace; background: transparent;
+            border: 2px solid var(--border); color: var(--text-secondary);
+            padding: 8px 20px; border-radius: 6px; cursor: pointer;
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s;
         }
-
-        .logout-btn:hover {
-            border-color: var(--accent-red);
-            color: var(--accent-red);
-        }
+        .logout-btn:hover { border-color: var(--accent-red); color: var(--accent-red); }
 
         /* Stats Bar */
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 30px 0;
-        }
-
+        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 30px 0; }
         .stat-card {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            padding: 20px;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
+            background: var(--bg-card); border: 2px solid var(--border);
+            padding: 20px; border-radius: 8px; position: relative;
+            overflow: hidden; transition: all 0.3s;
         }
-
         .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 100%; height: 3px;
             background: linear-gradient(90deg, var(--accent-red), var(--accent-yellow));
         }
+        .stat-card:hover { border-color: var(--accent-red); transform: translateY(-2px); }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600; }
+        .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--accent-yellow); letter-spacing: 2px; }
 
-        .stat-card:hover {
-            border-color: var(--accent-red);
-            transform: translateY(-2px);
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .stat-value {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2rem;
-            color: var(--accent-yellow);
-            letter-spacing: 2px;
-        }
-
-        /* Tab Navigation */
-        .tab-nav {
-            display: flex;
-            gap: 10px;
-            margin: 30px 0;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 2px;
-            flex-wrap: wrap;
-        }
-
+        /* Tabs */
+        .tab-nav { display: flex; gap: 10px; margin: 30px 0; border-bottom: 2px solid var(--border); padding-bottom: 2px; flex-wrap: wrap; }
         .tab-btn {
-            font-family: 'Space Mono', monospace;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            padding: 15px 25px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 2px;
-            transition: all 0.3s;
-            position: relative;
-            font-weight: 700;
+            font-family: 'Space Mono', monospace; background: transparent; border: none;
+            color: var(--text-secondary); padding: 15px 25px; cursor: pointer;
+            text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px;
+            transition: all 0.3s; position: relative; font-weight: 700;
         }
+        .tab-btn.active { color: var(--accent-red); }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: var(--accent-red); }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
 
-        .tab-btn.active {
-            color: var(--accent-red);
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { transform: translate(-50%,-50%) scale(0); opacity: 0; } 100% { transform: translate(-50%,-50%) scale(1); opacity: 1; } }
+        @keyframes popOut { 0% { transform: translate(-50%,-50%) scale(1); opacity: 1; } 100% { transform: translate(-50%,-50%) scale(0); opacity: 0; } }
 
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--accent-red);
-        }
-
-        .tab-btn:hover {
-            color: var(--text-primary);
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes popIn {
-            0% { 
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0;
-            }
-            100% { 
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes popOut {
-            0% { 
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-            100% { 
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0;
-            }
-        }
-
-        /* Session Training */
+        /* Session */
         .session-controls {
-            background: var(--bg-elevated);
-            border: 2px solid var(--accent-yellow);
-            border-radius: 12px;
-            padding: 30px;
-            margin: 30px 0;
-            text-align: center;
+            background: var(--bg-elevated); border: 2px solid var(--accent-yellow);
+            border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center;
         }
+        .session-timer { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: var(--accent-green); letter-spacing: 4px; margin: 20px 0; }
+        .session-timer.running { animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .session-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        .category-select { background: var(--bg-dark); color: var(--text-primary); border: 2px solid var(--border); padding: 10px 20px; border-radius: 6px; font-size: 1rem; margin: 15px 0; width: 100%; max-width: 400px; }
 
-        .session-timer {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 4rem;
-            color: var(--accent-green);
-            letter-spacing: 4px;
-            margin: 20px 0;
-        }
+        /* Today sessions */
+        .today-sessions { background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; padding: 25px; margin: 20px 0; }
+        .session-item { background: var(--bg-elevated); padding: 15px; margin-bottom: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent-blue); }
+        .session-info { flex: 1; }
+        .session-category { font-weight: 600; color: var(--accent-yellow); margin-bottom: 5px; }
+        .session-time { font-size: 0.85rem; color: var(--text-secondary); }
+        .session-delete { background: transparent; border: 1px solid var(--accent-red); color: var(--accent-red); padding: 5px 15px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s; }
+        .session-delete:hover { background: var(--accent-red); color: var(--text-primary); }
 
-        .session-timer.running {
-            animation: pulse 2s ease-in-out infinite;
-        }
+        /* Manual entry */
+        .manual-entry { background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; padding: 30px; margin: 30px 0; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600; }
+        .form-input, .form-select, .form-textarea { width: 100%; background: var(--bg-elevated); border: 2px solid var(--border); color: var(--text-primary); padding: 12px 15px; border-radius: 6px; font-size: 1rem; font-family: 'Inter', sans-serif; transition: all 0.3s; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent-yellow); }
+        .form-textarea { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
+        /* Category stats */
+        .category-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 30px 0; }
+        .category-stat-card { background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 8px; padding: 20px; position: relative; }
+        .category-name { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .category-time { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--accent-green); }
 
-        .session-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
+        /* History */
+        .history-filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .history-list { background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; padding: 20px; }
+        .history-item { background: var(--bg-elevated); padding: 15px; margin-bottom: 10px; border-radius: 6px; border-left: 4px solid var(--accent-purple); display: flex; justify-content: space-between; align-items: center; }
+        .history-date { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px; }
+        .history-details { font-size: 0.9rem; }
 
-        .category-select {
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            border: 2px solid var(--border);
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 1rem;
-            margin: 15px 0;
-            width: 100%;
-            max-width: 400px;
-        }
+        /* Day selector */
+        .day-selector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin: 30px 0; }
+        .day-btn { background: var(--bg-card); border: 2px solid var(--border); padding: 15px 10px; border-radius: 8px; cursor: pointer; transition: all 0.3s; text-align: center; }
+        .day-btn:hover { border-color: var(--accent-yellow); transform: scale(1.05); }
+        .day-btn.active { border-color: var(--accent-red); background: rgba(255,51,51,0.1); }
+        .day-btn.completed { border-color: var(--accent-green); background: rgba(0,255,136,0.1); }
+        .day-btn.rest { opacity: 0.5; }
+        .day-name { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .day-label { font-weight: 600; font-size: 0.9rem; }
 
-        /* Today's Sessions */
-        .today-sessions {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 25px;
-            margin: 20px 0;
-        }
-
-        .session-item {
-            background: var(--bg-elevated);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid var(--accent-blue);
-        }
-
-        .session-info {
-            flex: 1;
-        }
-
-        .session-category {
-            font-weight: 600;
-            color: var(--accent-yellow);
-            margin-bottom: 5px;
-        }
-
-        .session-time {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .session-delete {
-            background: transparent;
-            border: 1px solid var(--accent-red);
-            color: var(--accent-red);
-            padding: 5px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            transition: all 0.3s;
-        }
-
-        .session-delete:hover {
-            background: var(--accent-red);
-            color: var(--text-primary);
-        }
-
-        /* Manual Entry Form */
-        .manual-entry {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 30px;
-            margin: 30px 0;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            background: var(--bg-elevated);
-            border: 2px solid var(--border);
-            color: var(--text-primary);
-            padding: 12px 15px;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s;
-        }
-
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--accent-yellow);
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 15px;
-        }
-
-        /* Category Stats */
-        .category-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 30px 0;
-        }
-
-        .category-stat-card {
-            background: var(--bg-elevated);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            position: relative;
-        }
-
-        .category-name {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-
-        .category-time {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.8rem;
-            color: var(--accent-green);
-        }
-
-        /* History List */
-        .history-filters {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .history-list {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .history-item {
-            background: var(--bg-elevated);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            border-left: 4px solid var(--accent-purple);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .history-date {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
-        }
-
-        .history-details {
-            font-size: 0.9rem;
-        }
-
-        /* Day Selector */
-        .day-selector {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
-            margin: 30px 0;
-        }
-
-        .day-btn {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            padding: 15px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .day-btn:hover {
-            border-color: var(--accent-yellow);
-            transform: scale(1.05);
-        }
-
-        .day-btn.active {
-            border-color: var(--accent-red);
-            background: rgba(255, 51, 51, 0.1);
-        }
-
-        .day-btn.completed {
-            border-color: var(--accent-green);
-            background: rgba(0, 255, 136, 0.1);
-        }
-
-        .day-btn.rest {
-            opacity: 0.5;
-        }
-
-        .day-name {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-        }
-
-        .day-label {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        /* Exercise Block */
-        .exercise-block {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .exercise-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .exercise-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.8rem;
-            letter-spacing: 2px;
-            color: var(--accent-yellow);
-        }
-
-        .exercise-timer {
-            background: var(--bg-elevated);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-family: 'Space Mono', monospace;
-            font-weight: 700;
-            color: var(--accent-green);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Generator Button */
-        .generator-btn {
-            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-red));
-            color: var(--bg-dark);
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            margin: 15px 0;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .generator-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
-        }
-
-        .generated-subject {
-            background: var(--bg-elevated);
-            border-left: 4px solid var(--accent-yellow);
-            padding: 15px 20px;
-            border-radius: 6px;
-            margin: 15px 0;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--accent-green);
-            display: none;
-        }
-
-        .generated-subject.show {
-            display: block;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .exercise-list {
-            list-style: none;
-        }
-
-        .exercise-item {
-            background: var(--bg-elevated);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            border-left: 4px solid var(--accent-red);
-            position: relative;
-            padding-left: 40px;
-        }
-
-        .exercise-item::before {
-            content: '→';
-            position: absolute;
-            left: 15px;
-            color: var(--accent-red);
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
+        /* Exercise block */
+        .exercise-block { background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; padding: 25px; margin-bottom: 20px; position: relative; }
+        .exercise-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .exercise-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 2px; color: var(--accent-yellow); }
+        .exercise-timer { background: var(--bg-elevated); padding: 10px 20px; border-radius: 20px; font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent-green); display: flex; align-items: center; gap: 10px; }
+        .generator-btn { background: linear-gradient(135deg, var(--accent-yellow), var(--accent-red)); color: var(--bg-dark); border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; margin: 15px 0; display: inline-flex; align-items: center; gap: 8px; }
+        .generator-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(255,215,0,0.5); }
+        .generated-subject { background: var(--bg-elevated); border-left: 4px solid var(--accent-yellow); padding: 15px 20px; border-radius: 6px; margin: 15px 0; font-size: 1.1rem; font-weight: 600; color: var(--accent-green); display: none; }
+        .generated-subject.show { display: block; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .exercise-list { list-style: none; }
+        .exercise-item { background: var(--bg-elevated); padding: 15px; margin-bottom: 10px; border-radius: 6px; border-left: 4px solid var(--accent-red); position: relative; padding-left: 40px; }
+        .exercise-item::before { content: '→'; position: absolute; left: 15px; color: var(--accent-red); font-weight: 700; font-size: 1.2rem; }
 
         /* Buttons */
-        .btn {
-            font-family: 'Space Mono', monospace;
-            background: var(--accent-red);
-            color: var(--text-primary);
-            border: none;
-            padding: 15px 40px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .btn:hover {
-            background: var(--accent-yellow);
-            color: var(--bg-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid var(--accent-yellow);
-            color: var(--accent-yellow);
-        }
-
-        .btn-secondary:hover {
-            background: var(--accent-yellow);
-            color: var(--bg-dark);
-        }
-
-        .btn-stop {
-            background: transparent;
-            border: 2px solid var(--accent-red);
-            color: var(--accent-red);
-        }
-
-        .btn-stop:hover {
-            background: var(--accent-red);
-            color: var(--text-primary);
-        }
-
-        .btn-green {
-            background: var(--accent-green);
-            color: var(--bg-dark);
-        }
-
-        .btn-green:hover {
-            background: var(--accent-yellow);
-        }
-
-        .btn-small {
-            padding: 10px 25px;
-            font-size: 0.8rem;
-        }
+        .btn { font-family: 'Space Mono', monospace; background: var(--accent-red); color: var(--text-primary); border: none; padding: 15px 40px; border-radius: 6px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s; font-size: 0.9rem; }
+        .btn:hover { background: var(--accent-yellow); color: var(--bg-dark); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,215,0,0.4); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: transparent; border: 2px solid var(--accent-yellow); color: var(--accent-yellow); }
+        .btn-secondary:hover { background: var(--accent-yellow); color: var(--bg-dark); }
+        .btn-stop { background: transparent; border: 2px solid var(--accent-red); color: var(--accent-red); }
+        .btn-stop:hover { background: var(--accent-red); color: var(--text-primary); }
+        .btn-green { background: var(--accent-green); color: var(--bg-dark); }
+        .btn-green:hover { background: var(--accent-yellow); }
+        .btn-small { padding: 10px 25px; font-size: 0.8rem; }
 
         /* Generator */
-        .generator-container {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 40px;
-            text-align: center;
-        }
+        .generator-container { background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; padding: 40px; text-align: center; }
+        .dice-container { display: flex; justify-content: center; gap: 30px; margin: 40px 0; flex-wrap: wrap; }
+        .dice { width: 100px; height: 100px; background: var(--bg-elevated); border: 3px solid var(--accent-yellow); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--accent-yellow); cursor: pointer; transition: all 0.3s; position: relative; padding: 10px; text-align: center; line-height: 1.2; }
+        .dice:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 0 30px rgba(255,215,0,0.5); }
+        .dice.rolling { animation: rollDice 0.5s ease-in-out; }
+        @keyframes rollDice { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(90deg) scale(1.2); } 50% { transform: rotate(180deg) scale(0.9); } 75% { transform: rotate(270deg) scale(1.2); } }
+        .dice-label { position: absolute; bottom: -25px; font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        .result-box { background: var(--bg-elevated); padding: 30px; border-radius: 8px; margin-top: 30px; border-left: 4px solid var(--accent-red); }
+        .result-text { font-size: 1.3rem; line-height: 1.8; color: var(--text-primary); font-weight: 500; }
 
-        .dice-container {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin: 40px 0;
-            flex-wrap: wrap;
-        }
-
-        .dice {
-            width: 100px;
-            height: 100px;
-            background: var(--bg-elevated);
-            border: 3px solid var(--accent-yellow);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.2rem;
-            color: var(--accent-yellow);
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            padding: 10px;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        .dice:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-        }
-
-        .dice.rolling {
-            animation: rollDice 0.5s ease-in-out;
-        }
-
-        @keyframes rollDice {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(90deg) scale(1.2); }
-            50% { transform: rotate(180deg) scale(0.9); }
-            75% { transform: rotate(270deg) scale(1.2); }
-        }
-
-        .dice-label {
-            position: absolute;
-            bottom: -25px;
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .result-box {
-            background: var(--bg-elevated);
-            padding: 30px;
-            border-radius: 8px;
-            margin-top: 30px;
-            border-left: 4px solid var(--accent-red);
-        }
-
-        .result-text {
-            font-size: 1.3rem;
-            line-height: 1.8;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        /* Timer Widget */
-        .timer-widget {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .timer-display {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 4rem;
-            color: var(--accent-green);
-            margin: 20px 0;
-            letter-spacing: 4px;
-        }
-
-        .timer-controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
+        /* Timer */
+        .timer-widget { background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; padding: 30px; text-align: center; max-width: 600px; margin: 0 auto; }
+        .timer-display { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: var(--accent-green); margin: 20px 0; letter-spacing: 4px; }
+        .timer-controls { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
 
         /* Progress */
-        .progress-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
+        .progress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0; }
+        .progress-card { background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; padding: 25px; }
+        .progress-label { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .progress-bar { width: 100%; height: 30px; background: var(--bg-elevated); border-radius: 15px; overflow: hidden; position: relative; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-red), var(--accent-yellow)); transition: width 0.5s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 15px; font-weight: 700; font-size: 0.85rem; }
 
-        .progress-card {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 25px;
-        }
+        /* Misc */
+        .loading { text-align: center; padding: 40px; color: var(--accent-yellow); }
+        .empty-state { text-align: center; padding: 40px; color: var(--text-secondary); font-style: italic; }
 
-        .progress-label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 30px;
-            background: var(--bg-elevated);
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-red), var(--accent-yellow));
-            transition: width 0.5s ease;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 15px;
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             .day-selector { grid-template-columns: repeat(4, 1fr); }
@@ -909,19 +247,6 @@
             .dice { width: 80px; height: 80px; font-size: 1rem; }
             .session-timer { font-size: 3rem; }
             .form-row { grid-template-columns: 1fr; }
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--accent-yellow);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-secondary);
-            font-style: italic;
         }
     </style>
 </head>
@@ -932,9 +257,7 @@
         <p style="color: var(--text-secondary); margin-top: 20px; max-width: 500px;">
             Connecte-toi avec Google pour sauvegarder tes données! 🚀
         </p>
-        <button class="login-btn" onclick="loginWithGoogle()">
-            🔐 Connexion avec Google
-        </button>
+        <button class="login-btn" onclick="loginWithGoogle()">🔐 Connexion avec Google</button>
     </div>
 
     <div id="app-content" class="app-content container">
@@ -971,28 +294,24 @@
         </div>
 
         <div class="tab-nav">
-            <button class="tab-btn active" onclick="switchTab('programme')">Programme</button>
-            <button class="tab-btn" onclick="switchTab('tracking')">Tracking</button>
-            <button class="tab-btn" onclick="switchTab('historique')">Historique</button>
-            <button class="tab-btn" onclick="switchTab('generator')">Générateur</button>
-            <button class="tab-btn" onclick="switchTab('timer')">Timer</button>
-            <button class="tab-btn" onclick="switchTab('progress')">Progrès</button>
+            <button class="tab-btn active" onclick="switchTab('programme', event)">Programme</button>
+            <button class="tab-btn" onclick="switchTab('tracking', event)">Tracking</button>
+            <button class="tab-btn" onclick="switchTab('historique', event)">Historique</button>
+            <button class="tab-btn" onclick="switchTab('generator', event)">Générateur</button>
+            <button class="tab-btn" onclick="switchTab('timer', event)">Timer</button>
+            <button class="tab-btn" onclick="switchTab('progress', event)">Progrès</button>
         </div>
 
         <!-- TAB: PROGRAMME -->
         <div id="tab-programme" class="tab-content active">
             <div class="day-selector" id="day-selector"></div>
             
-            <!-- Session Training Controls -->
             <div class="session-controls">
-                <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 3px; margin-bottom: 10px;">Session Training</h2>
-                
-                <div style="background: rgba(255, 215, 0, 0.1); border: 2px solid var(--accent-yellow); border-radius: 8px; padding: 15px; margin: 15px 0; font-size: 0.85rem;">
+                <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;margin-bottom:10px;">Session Training</h2>
+                <div style="background:rgba(255,215,0,0.1);border:2px solid var(--accent-yellow);border-radius:8px;padding:15px;margin:15px 0;font-size:0.85rem;">
                     ⚠️ <strong>Note:</strong> Le chrono se met en pause si tu changes d'onglet. Si tu fais autre chose en même temps, utilise plutôt l'<strong>Ajout Rapide</strong> dans l'onglet Tracking!
                 </div>
-                
                 <div class="session-timer" id="session-timer">00:00:00</div>
-                
                 <select class="category-select" id="session-category">
                     <option value="Programme Rocky">Programme Rocky</option>
                     <option value="Peinture">Peinture</option>
@@ -1011,17 +330,13 @@
                     <option value="Vidéos/Cours">📹 Vidéos/Cours</option>
                     <option value="Autre">Autre</option>
                 </select>
-                
                 <div class="session-buttons">
                     <button class="btn btn-green" id="btn-start" onclick="startSession()">🟢 START</button>
                     <button class="btn btn-secondary" id="btn-pause" onclick="pauseSession()" style="display:none;">⏸️ PAUSE</button>
                     <button class="btn btn-secondary" id="btn-reset" onclick="resetSession()" style="display:none;">🔄 RESET</button>
                     <button class="btn btn-stop" id="btn-save" onclick="saveSession()" style="display:none;">💾 SAUVEGARDER</button>
                 </div>
-                
-                <button class="btn" onclick="markDayCompleted()" style="margin-top: 20px; display: none;" id="btn-complete-day">
-                    ✅ TERMINER LA JOURNÉE
-                </button>
+                <button class="btn" onclick="markDayCompleted()" style="margin-top:20px;display:none;" id="btn-complete-day">✅ TERMINER LA JOURNÉE</button>
             </div>
 
             <div id="exercises-container"></div>
@@ -1029,21 +344,15 @@
 
         <!-- TAB: TRACKING -->
         <div id="tab-tracking" class="tab-content">
-            <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 3px; margin-bottom: 20px;">Tracking Pratique</h2>
+            <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:20px;">Tracking Pratique</h2>
             
-            <!-- Quick Add Section -->
-            <div style="background: linear-gradient(135deg, rgba(255, 51, 51, 0.1), rgba(255, 215, 0, 0.1)); border: 2px solid var(--accent-yellow); border-radius: 12px; padding: 30px; margin-bottom: 30px;">
-                <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 2px; margin-bottom: 20px; color: var(--accent-yellow); text-align: center;">
-                    ⚡ AJOUT RAPIDE
-                </h3>
-                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">
-                    Pour ajouter du temps facilement pendant que tu fais autre chose!
-                </p>
-                
-                <div style="max-width: 600px; margin: 0 auto;">
+            <div style="background:linear-gradient(135deg,rgba(255,51,51,0.1),rgba(255,215,0,0.1));border:2px solid var(--accent-yellow);border-radius:12px;padding:30px;margin-bottom:30px;">
+                <h3 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;margin-bottom:20px;color:var(--accent-yellow);text-align:center;">⚡ AJOUT RAPIDE</h3>
+                <p style="text-align:center;color:var(--text-secondary);margin-bottom:20px;font-size:0.9rem;">Pour ajouter du temps facilement pendant que tu fais autre chose!</p>
+                <div style="max-width:600px;margin:0 auto;">
                     <div class="form-group">
-                        <label class="form-label" style="text-align: center; display: block;">Catégorie</label>
-                        <select class="form-select" id="quick-category" style="text-align: center; font-weight: 600;">
+                        <label class="form-label" style="text-align:center;display:block;">Catégorie</label>
+                        <select class="form-select" id="quick-category" style="text-align:center;font-weight:600;">
                             <option value="Programme Rocky">Programme Rocky</option>
                             <option value="Peinture">Peinture</option>
                             <option value="Gouache">Gouache</option>
@@ -1062,8 +371,7 @@
                             <option value="Autre">Autre</option>
                         </select>
                     </div>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin: 20px 0;">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin:20px 0;">
                         <button class="btn btn-green" onclick="quickAddTime(15)">+15 min</button>
                         <button class="btn btn-green" onclick="quickAddTime(30)">+30 min</button>
                         <button class="btn btn-green" onclick="quickAddTime(45)">+45 min</button>
@@ -1071,34 +379,26 @@
                         <button class="btn btn-green" onclick="quickAddTime(90)">+90 min</button>
                         <button class="btn btn-green" onclick="quickAddTime(120)">+2h</button>
                     </div>
-                    
-                    <div style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 20px;">
-                        <input type="number" class="form-input" id="quick-minutes" placeholder="Minutes" min="1" style="max-width: 150px; text-align: center; font-weight: 600; font-size: 1.1rem;">
+                    <div style="display:flex;gap:10px;align-items:center;justify-content:center;margin-top:20px;">
+                        <input type="number" class="form-input" id="quick-minutes" placeholder="Minutes" min="1" style="max-width:150px;text-align:center;font-weight:600;font-size:1.1rem;">
                         <button class="btn" onclick="quickAddCustomTime()">➕ AJOUTER</button>
                     </div>
                 </div>
             </div>
             
-            <!-- Today's Sessions -->
             <div class="today-sessions">
-                <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 20px; color: var(--accent-yellow);">
-                    📅 Sessions d'aujourd'hui
-                </h3>
+                <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;margin-bottom:20px;color:var(--accent-yellow);">📅 Sessions d'aujourd'hui</h3>
                 <div id="today-sessions-list"></div>
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border);">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 1.2rem; font-weight: 600;">Total aujourd'hui:</span>
-                        <span style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--accent-green);" id="today-sessions-total">0 min</span>
+                <div style="margin-top:20px;padding-top:20px;border-top:2px solid var(--border);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:1.2rem;font-weight:600;">Total aujourd'hui:</span>
+                        <span style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent-green);" id="today-sessions-total">0 min</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Manual Entry Form -->
             <div class="manual-entry">
-                <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 20px; color: var(--accent-yellow);">
-                    ✏️ Ajouter une pratique manuellement
-                </h3>
-                
+                <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;margin-bottom:20px;color:var(--accent-yellow);">✏️ Ajouter une pratique manuellement</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Catégorie</label>
@@ -1127,35 +427,28 @@
                         <input type="number" class="form-input" id="manual-duration" min="1" value="30">
                     </div>
                 </div>
-                
                 <div class="form-group">
                     <label class="form-label">Note / Description (optionnel)</label>
                     <textarea class="form-textarea" id="manual-note" placeholder="Ex: Pratique portraits au fusain"></textarea>
                 </div>
-                
                 <div class="form-group">
                     <label class="form-label">Date</label>
                     <input type="date" class="form-input" id="manual-date">
                 </div>
-                
                 <button class="btn btn-green" onclick="addManualSession()">➕ AJOUTER</button>
             </div>
 
-            <!-- Category Stats -->
-            <div style="margin-top: 40px;">
-                <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 20px; color: var(--accent-yellow);">
-                    📊 Stats par catégorie
-                </h3>
+            <div style="margin-top:40px;">
+                <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;margin-bottom:20px;color:var(--accent-yellow);">📊 Stats par catégorie</h3>
                 <div class="category-stats" id="category-stats"></div>
             </div>
         </div>
 
         <!-- TAB: HISTORIQUE -->
         <div id="tab-historique" class="tab-content">
-            <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 3px; margin-bottom: 20px;">Historique Complet</h2>
-            
+            <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:20px;">Historique Complet</h2>
             <div class="history-filters">
-                <select class="form-select" id="filter-category" style="max-width: 250px;" onchange="filterHistory()">
+                <select class="form-select" id="filter-category" style="max-width:250px;" onchange="filterHistory()">
                     <option value="all">Toutes les catégories</option>
                     <option value="Programme Rocky">Programme Rocky</option>
                     <option value="Peinture">Peinture</option>
@@ -1174,45 +467,27 @@
                     <option value="Vidéos/Cours">📹 Vidéos/Cours</option>
                     <option value="Autre">Autre</option>
                 </select>
-                
-                <input type="date" class="form-input" id="filter-date-from" style="max-width: 200px;" onchange="filterHistory()">
-                <span style="padding: 10px; color: var(--text-secondary);">à</span>
-                <input type="date" class="form-input" id="filter-date-to" style="max-width: 200px;" onchange="filterHistory()">
-                
+                <input type="date" class="form-input" id="filter-date-from" style="max-width:200px;" onchange="filterHistory()">
+                <span style="padding:10px;color:var(--text-secondary);">à</span>
+                <input type="date" class="form-input" id="filter-date-to" style="max-width:200px;" onchange="filterHistory()">
                 <button class="btn btn-secondary btn-small" onclick="clearFilters()">Effacer filtres</button>
             </div>
-            
             <div class="history-list" id="history-list"></div>
         </div>
 
         <!-- TAB: GÉNÉRATEUR -->
         <div id="tab-generator" class="tab-content">
             <div class="generator-container">
-                <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 3px; margin-bottom: 20px;">Générateur d'idées</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 30px;">Lance les dés pour obtenir une combinaison créative!</p>
-                
+                <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:20px;">Générateur d'idées</h2>
+                <p style="color:var(--text-secondary);margin-bottom:30px;">Lance les dés pour obtenir une combinaison créative!</p>
                 <div class="dice-container">
-                    <div class="dice" onclick="rollDice('subject')" id="dice-subject">
-                        <span>?</span>
-                        <div class="dice-label">Sujet</div>
-                    </div>
-                    <div class="dice" onclick="rollDice('style')" id="dice-style">
-                        <span>?</span>
-                        <div class="dice-label">Style</div>
-                    </div>
-                    <div class="dice" onclick="rollDice('emotion')" id="dice-emotion">
-                        <span>?</span>
-                        <div class="dice-label">Émotion</div>
-                    </div>
-                    <div class="dice" onclick="rollDice('constraint')" id="dice-constraint">
-                        <span>?</span>
-                        <div class="dice-label">Contrainte</div>
-                    </div>
+                    <div class="dice" onclick="rollDice('subject')" id="dice-subject"><span>?</span><div class="dice-label">Sujet</div></div>
+                    <div class="dice" onclick="rollDice('style')" id="dice-style"><span>?</span><div class="dice-label">Style</div></div>
+                    <div class="dice" onclick="rollDice('emotion')" id="dice-emotion"><span>?</span><div class="dice-label">Émotion</div></div>
+                    <div class="dice" onclick="rollDice('constraint')" id="dice-constraint"><span>?</span><div class="dice-label">Contrainte</div></div>
                 </div>
-
                 <button class="btn" onclick="rollAllDice()">Lancer tous les dés</button>
-
-                <div class="result-box" id="result-box" style="display: none;">
+                <div class="result-box" id="result-box" style="display:none;">
                     <div class="result-text" id="result-text"></div>
                 </div>
             </div>
@@ -1221,9 +496,9 @@
         <!-- TAB: TIMER -->
         <div id="tab-timer" class="tab-content">
             <div class="timer-widget">
-                <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 3px; margin-bottom: 20px;">Timer d'exercice</h2>
+                <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;margin-bottom:20px;">Timer d'exercice</h2>
                 <div>
-                    <select id="timer-preset" style="background: var(--bg-elevated); color: var(--text-primary); border: 2px solid var(--border); padding: 10px 20px; border-radius: 6px; font-size: 1rem; margin-bottom: 20px;">
+                    <select id="timer-preset" style="background:var(--bg-elevated);color:var(--text-primary);border:2px solid var(--border);padding:10px 20px;border-radius:6px;font-size:1rem;margin-bottom:20px;">
                         <option value="300">5 minutes</option>
                         <option value="600">10 minutes</option>
                         <option value="900" selected>15 minutes</option>
@@ -1243,1280 +518,1022 @@
 
         <!-- TAB: PROGRÈS -->
         <div id="tab-progress" class="tab-content">
-            <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 3px; margin-bottom: 30px;">Ton Progrès</h2>
-            
+            <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:30px;">Ton Progrès</h2>
             <div class="progress-grid">
                 <div class="progress-card">
                     <div class="progress-label">Fluidité des poses</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fluidity" style="width: 0%">0</div>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <input type="range" min="0" max="10" value="0" id="fluidity-slider" oninput="updateProgress('fluidity', this.value)" style="width: 100%;">
-                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="progress-fluidity" style="width:0%">0</div></div>
+                    <div style="margin-top:15px;"><input type="range" min="0" max="10" value="0" id="fluidity-slider" oninput="updateProgress('fluidity',this.value)" style="width:100%;"></div>
                 </div>
-
                 <div class="progress-card">
                     <div class="progress-label">Originalité</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-originality" style="width: 0%">0</div>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <input type="range" min="0" max="10" value="0" id="originality-slider" oninput="updateProgress('originality', this.value)" style="width: 100%;">
-                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="progress-originality" style="width:0%">0</div></div>
+                    <div style="margin-top:15px;"><input type="range" min="0" max="10" value="0" id="originality-slider" oninput="updateProgress('originality',this.value)" style="width:100%;"></div>
                 </div>
-
                 <div class="progress-card">
                     <div class="progress-label">Composition</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-composition" style="width: 0%">0</div>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <input type="range" min="0" max="10" value="0" id="composition-slider" oninput="updateProgress('composition', this.value)" style="width: 100%;">
-                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="progress-composition" style="width:0%">0</div></div>
+                    <div style="margin-top:15px;"><input type="range" min="0" max="10" value="0" id="composition-slider" oninput="updateProgress('composition',this.value)" style="width:100%;"></div>
                 </div>
-
                 <div class="progress-card">
                     <div class="progress-label">Confiance</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-confidence" style="width: 0%">0</div>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <input type="range" min="0" max="10" value="0" id="confidence-slider" oninput="updateProgress('confidence', this.value)" style="width: 100%;">
-                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="progress-confidence" style="width:0%">0</div></div>
+                    <div style="margin-top:15px;"><input type="range" min="0" max="10" value="0" id="confidence-slider" oninput="updateProgress('confidence',this.value)" style="width:100%;"></div>
                 </div>
             </div>
-
             <button class="btn" onclick="saveProgressToCloud()">💾 Sauvegarder le progrès</button>
         </div>
     </div>
 
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyA1y7_GRSPmSCsgMu-8aGhCtcMxMzIdtiQ",
-            authDomain: "drawing-rocky-training.firebaseapp.com",
-            projectId: "drawing-rocky-training",
-            storageBucket: "drawing-rocky-training.firebasestorage.app",
-            messagingSenderId: "106676074989",
-            appId: "1:106676074989:web:1c23055e796e6d21653078",
-            measurementId: "G-YYHWCKFTKD"
-        };
+<script>
+// ============================================================
+// FIREBASE CONFIG
+// ============================================================
+const firebaseConfig = {
+    apiKey: "AIzaSyA1y7_GRSPmSCsgMu-8aGhCtcMxMzIdtiQ",
+    authDomain: "drawing-rocky-training.firebaseapp.com",
+    projectId: "drawing-rocky-training",
+    storageBucket: "drawing-rocky-training.firebasestorage.app",
+    messagingSenderId: "106676074989",
+    appId: "1:106676074989:web:1c23055e796e6d21653078",
+    measurementId: "G-YYHWCKFTKD"
+};
 
-        // Initialize Firebase
-        let db, auth, currentUser;
-        
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            auth = firebase.auth();
-        } catch (error) {
-            console.error("Erreur Firebase:", error);
-        }
+let db, auth, currentUser;
+try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    auth = firebase.auth();
+} catch (error) { console.error("Erreur Firebase:", error); }
 
-        // Auth state observer
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-content').classList.add('active');
-                document.getElementById('user-email').textContent = user.email;
-                
-                document.getElementById('manual-date').valueAsDate = new Date();
-                
-                loadAllData();
-            } else {
-                document.getElementById('login-screen').style.display = 'flex';
-                document.getElementById('app-content').classList.remove('active');
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        currentUser = user;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-content').classList.add('active');
+        document.getElementById('user-email').textContent = user.email;
+        document.getElementById('manual-date').valueAsDate = new Date();
+        loadAllData();
+    } else {
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app-content').classList.remove('active');
+    }
+});
+
+function loginWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch((error) => {
+        console.error("Login error:", error);
+        alert("Erreur de connexion: " + error.message);
+    });
+}
+function logout() { auth.signOut(); }
+
+// ============================================================
+// GLOBAL STATE
+// ============================================================
+let allSessions = [];
+let currentDay = 0;
+let sessionInterval = null;
+let sessionSeconds = 0;
+let sessionRunning = false;
+let sessionPaused = false;
+let timerInterval = null;
+let timerSeconds = 900;
+let timerRunning = false;
+
+// ============================================================
+// ██████╗ ██████╗  ██████╗  ██████╗ ██████╗  █████╗ ███╗   ███╗███╗   ███╗███████╗
+// ██╔══██╗██╔══██╗██╔═══██╗██╔════╝ ██╔══██╗██╔══██╗████╗ ████║████╗ ████║██╔════╝
+// ██████╔╝██████╔╝██║   ██║██║  ███╗██████╔╝███████║██╔████╔██║██╔████╔██║█████╗
+// ██╔═══╝ ██╔══██╗██║   ██║██║   ██║██╔══██╗██╔══██║██║╚██╔╝██║██║╚██╔╝██║██╔══╝
+// ██║     ██║  ██║╚██████╔╝╚██████╔╝██║  ██║██║  ██║██║ ╚═╝ ██║██║ ╚═╝ ██║███████╗
+// ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝     ╚═╝╚══════╝
+//
+// ✅ ZONE PROGRAMME — SAFE TO MODIFY
+// Tout ce qui est dans programData définit les exercices affichés.
+// Tes sessions, stats et données Firebase ne sont PAS touchées quand tu changes ça.
+// Tu peux demander à Claude de modifier n'importe quel bloc ici sans risque!
+// ============================================================
+
+const programData = {
+    // ── LUNDI ──────────────────────────────────────────────
+    0: {
+        name: "Lundi - Mix équilibré",
+        total: "65 min",
+        blocks: [
+            {
+                title: "Block 1: Fondamentaux",
+                time: "15 min",
+                exercises: [
+                    "5 min: Cubes en perspective - 20 cubes sous différents angles",
+                    "5 min: Cylindres - 15 cylindres dans l'espace",
+                    "5 min: Grille de perspective - Dessine une grille 2-point perspective"
+                ],
+                hasGenerator: false
+            },
+            {
+                title: "Block 2: Warm-up fluidité",
+                time: "10 min",
+                exercises: [
+                    "20 gestures de 30 secondes - RAPIDE et FLUIDE",
+                    "Focus: ligne d'action en C ou S AVANT tout",
+                    "Ne pas lever le crayon"
+                ],
+                hasGenerator: false
+            },
+            {
+                title: "Block 3: Créativité éclair (Mash-ups)",
+                time: "15 min",
+                exercises: [
+                    "3 combinaisons impossibles",
+                    "5 min par combo, thumbnails rapides",
+                    "Ne pas censurer les idées bizarres"
+                ],
+                hasGenerator: true,
+                generatorType: 'mashup'
+            },
+            {
+                title: "Block 4: Composition thumbnails",
+                time: "15 min",
+                exercises: [
+                    "Une scène, 12 thumbnails (3x3cm max)",
+                    "Varie les angles: plongée, contre-plongée, profil",
+                    "Objectif: 3 doivent te surprendre"
+                ],
+                hasGenerator: true,
+                generatorType: 'composition'
+            },
+            {
+                title: "Block 5: Cool-down poses",
+                time: "10 min",
+                exercises: [
+                    "5 poses dynamiques avec exagération",
+                    "Exagère le mouvement de 30%",
+                    "Focus sur les courbes S et C"
+                ],
+                hasGenerator: false
             }
-        });
+        ]
+    },
+    // ── MARDI ──────────────────────────────────────────────
+    1: {
+        name: "Mardi - Mix varié",
+        total: "65 min",
+        blocks: [
+            {
+                title: "Block 1: Fondamentaux",
+                time: "15 min",
+                exercises: [
+                    "5 min: Formes en perspective oblique",
+                    "5 min: Ellipses et volumes cylindriques",
+                    "5 min: Construction de boîtes complexes"
+                ],
+                hasGenerator: false
+            },
+            {
+                title: "Block 2: Storytelling poses",
+                time: "15 min",
+                exercises: [
+                    "10 poses qui racontent une émotion",
+                    "1 minute par pose",
+                    "Pas de visage - juste le langage corporel"
+                ],
+                hasGenerator: true,
+                generatorType: 'storytelling'
+            },
+            {
+                title: "Block 3: Angle challenges",
+                time: "15 min",
+                exercises: [
+                    "Même sujet, 6 angles différents",
+                    "Plongée extrême, contre-plongée, vue de dessous",
+                    "Cherche l'angle le plus dramatique"
+                ],
+                hasGenerator: true,
+                generatorType: 'angleChallenge'
+            },
+            {
+                title: "Block 4: Contrainte créative",
+                time: "15 min",
+                exercises: [
+                    "Dessine avec une contrainte spécifique",
+                    "5 créatures ou personnages",
+                    "Varie les proportions"
+                ],
+                hasGenerator: true,
+                generatorType: 'constraint'
+            },
+            {
+                title: "Block 5: Flow gestures",
+                time: "5 min",
+                exercises: [
+                    "15 gestures de 20 secondes",
+                    "Focus: fluidité totale",
+                    "Ligne continue sans lever le crayon"
+                ],
+                hasGenerator: false
+            }
+        ]
+    },
+    // ── MERCREDI ───────────────────────────────────────────
+    2: {
+        name: "Mercredi - Mix intense",
+        total: "70 min",
+        blocks: [
+            {
+                title: "Block 1: Fondamentaux",
+                time: "15 min",
+                exercises: [
+                    "5 min: Architecture en perspective 3-points",
+                    "5 min: Formes organiques en volume",
+                    "5 min: Construction de véhicules"
+                ],
+                hasGenerator: false
+            },
+            {
+                title: "Block 2: Speed shapes",
+                time: "10 min",
+                exercises: [
+                    "30 secondes: dessine une silhouette reconnaissable",
+                    "20 répétitions",
+                    "Varie: humain, animal, objet, créature"
+                ],
+                hasGenerator: true,
+                generatorType: 'speedShape'
+            },
+            {
+                title: "Block 3: Combo challenge",
+                time: "20 min",
+                exercises: [
+                    "Fusionne 3 éléments en une image cohérente",
+                    "Cherche le lien narratif"
+                ],
+                hasGenerator: true,
+                generatorType: 'mashup'
+            },
+            {
+                title: "Block 4: Rule of thirds practice",
+                time: "15 min",
+                exercises: [
+                    "6 compositions avec règle des tiers",
+                    "Place les éléments clés sur les intersections",
+                    "Varie les centres d'intérêt"
+                ],
+                hasGenerator: true,
+                generatorType: 'composition'
+            },
+            {
+                title: "Block 5: Dynamic figures",
+                time: "10 min",
+                exercises: [
+                    "6 figures en mouvement extrême",
+                    "Sports, danse, combat",
+                    "Exagère les lignes d'action"
+                ],
+                hasGenerator: false
+            }
+        ]
+    },
+    // ── JEUDI ──────────────────────────────────────────────
+    3: {
+        name: "Jeudi - Focus technique",
+        total: "75 min",
+        blocks: [
+            {
+                title: "Block 1: Fondamentaux",
+                time: "15 min",
+                exercises: [
+                    "5 min: Perspective à 1 point - intérieurs",
+                    "5 min: Perspective à 2 points - extérieurs",
+                    "5 min: Perspective à 3 points - vues extrêmes"
+                ],
+                hasGenerator: false
+            },
+            {
+                title: "Block 2: Contrapposto mastery",
+                time: "20 min",
+                exercises: [
+                    "8 poses avec contrapposto prononcé",
+                    "Focus: poids sur une jambe",
+                    "Observe les hanches et épaules"
+                ],
+                hasGenerator: false
+            },
+            {
+                title: "Block 3: Negative space",
+                time: "20 min",
+                exercises: [
+                    "Dessine les espaces négatifs autour du sujet",
+                    "6 compositions",
+                    "Le vide est aussi important que le plein"
+                ],
+                hasGenerator: true,
+                generatorType: 'angleChallenge'
+            },
+            {
+                title: "Block 4: Scene construction",
+                time: "20 min",
+                exercises: [
+                    "Construis une scène complète avec plusieurs personnages",
+                    "Perspective cohérente",
+                    "Interaction entre les éléments"
+                ],
+                hasGenerator: true,
+                generatorType: 'composition'
+            }
+        ]
+    },
+    // ── VENDREDI ───────────────────────────────────────────
+    4: {
+        name: "Vendredi - Intégration",
+        total: "75 min",
+        blocks: [
+            {
+                title: "Block 1: Fondamentaux",
+                time: "15 min",
+                exercises: [
+                    "5 min: Révision des bases - cubes et cylindres",
+                    "5 min: Formes complexes en perspective",
+                    "5 min: Construction rapide d'environnements"
+                ],
+                hasGenerator: false
+            },
+            {
+                title: "Block 2: Projet créatif",
+                time: "60 min",
+                exercises: [
+                    "Crée une illustration complète",
+                    "Intègre: pose dynamique + composition originale + histoire",
+                    "Utilise tout ce que tu as pratiqué cette semaine",
+                    "Ne pas se censurer - expérimente!",
+                    "Vise le fun, pas la perfection"
+                ],
+                hasGenerator: true,
+                generatorType: 'mashup'
+            }
+        ]
+    },
+    // ── SAMEDI ─────────────────────────────────────────────
+    5: {
+        name: "Samedi - Repos",
+        total: "0 min",
+        blocks: [
+            {
+                title: "Jour de repos",
+                time: "0 min",
+                exercises: [
+                    "PAS DE DESSIN AUJOURD'HUI",
+                    "Repos = partie de l'entraînement",
+                    "Laisse ton cerveau assimiler",
+                    "Regarde de l'art, des films, va marcher",
+                    "Reviens frais lundi!"
+                ],
+                hasGenerator: false
+            }
+        ]
+    },
+    // ── DIMANCHE ───────────────────────────────────────────
+    6: {
+        name: "Dimanche - Pratique libre",
+        total: "Variable",
+        blocks: [
+            {
+                title: "Session libre",
+                time: "À ton rythme",
+                exercises: [
+                    "Dessine ce que TU veux",
+                    "Aucune contrainte",
+                    "Explore, expérimente, joue",
+                    "C'est TON temps créatif",
+                    "Si tu veux ne rien faire, c'est OK aussi!"
+                ],
+                hasGenerator: false
+            }
+        ]
+    }
+};
 
-        function loginWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch((error) => {
-                console.error("Login error:", error);
-                alert("Erreur de connexion: " + error.message);
+// ============================================================
+// ✅ FIN ZONE PROGRAMME — Ne pas modifier en dessous
+// ============================================================
+
+
+// ============================================================
+// GENERATORS DATA
+// ============================================================
+const subjectGenerators = {
+    angleChallenges: [
+        "Une chaise","Une lampe","Un vélo","Une tasse","Une bouteille","Un livre ouvert","Des lunettes","Une clé","Un marteau","Des ciseaux",
+        "Un parapluie","Une montre","Un sac à dos","Des écouteurs","Un téléphone","Un appareil photo","Une guitare","Un skateboard","Un casque","Des bottes",
+        "Un chapeau","Un ballon","Une chaussure","Une plante en pot","Un vase","Un couteau","Une fourchette","Une cuillère","Un pot de peinture","Un pinceau",
+        "Un personnage debout","Un personnage assis","Un personnage accroupi","Un personnage à genoux","Un personnage les bras croisés",
+        "Un personnage mains dans les poches","Un personnage appuyé contre un mur","Un personnage les bras levés","Un personnage penché en avant","Un personnage étiré",
+        "Un robot humanoïde","Une silhouette encapuchonnée","Un guerrier au repos","Un mage en méditation","Un archer bandant son arc",
+        "Un ninja en position neutre","Un samouraï à genoux","Un chevalier en armure","Un astronaute flottant","Un plongeur sous-marin",
+        "Un alpiniste en escalade","Un danseur en équilibre","Un gymnaste en préparation","Un boxeur en garde","Un escrimeur en position",
+        "Une voiture de sport","Une moto","Un vaisseau spatial","Un avion","Un hélicoptère","Un sous-marin","Un tank","Un vélo futuriste",
+        "Un scooter","Une fusée","Un planeur","Un drone","Un jet","Un bolide de course","Une navette spatiale","Un mecha","Un exosquelette",
+        "Une maison simple","Une tour","Un pont suspendu","Un château fort","Une cabane","Un phare","Un moulin à vent","Une pyramide",
+        "Un temple grec","Une arche","Un portail","Une fontaine","Un puits","Une grange","Une serre","Un silo","Une tour de guet",
+        "Un arbre solitaire","Un rocher imposant","Un coquillage","Un cristal","Un tronc d'arbre mort","Une souche","Une branche tordue",
+        "Un champignon géant","Un cactus","Un bambou","Un palmier","Un pin tordu","Un bonsaï","Une fougère","Une fleur géante",
+        "Une épée plantée","Un bouclier","Une hache","Un crâne","Une lance","Un arc","Une arbalète","Une masse d'armes",
+        "Un fléau","Une dague","Un katana","Un bâton de combat","Une hallebarde","Une armure complète","Un casque cornu",
+        "Un loup hurlant","Un dragon enroulé","Un oiseau perché","Un serpent lovés","Un félin accroupi","Un ours debout",
+        "Un aigle majestueux","Un corbeau observateur","Une panthère tapis","Un lion au repos","Un tigre couché",
+        "Un renard rusé","Un hibou vigilant","Un faucon en chasse","Un phénix perché",
+        "Un robot sentinelle","Un droïde sphérique","Un mecha bipède","Un android humanoïde","Un exosquelette militaire",
+        "Un robot araignée","Un drone volant","Un golem mécanique","Un robot ouvrier","Un cyborg"
+    ],
+    storytelling: [
+        "Quelqu'un qui vient d'apprendre une excellente nouvelle","Quelqu'un qui vient d'apprendre une mauvaise nouvelle",
+        "Quelqu'un submergé par la peur","Quelqu'un rayonnant de joie","Quelqu'un accablé par la tristesse",
+        "Quelqu'un bouillonnant de colère","Quelqu'un paralysé par la surprise","Quelqu'un submergé par le doute",
+        "Quelqu'un brillant de confiance","Quelqu'un écrasé par la honte","Quelqu'un transporté par l'espoir",
+        "Quelqu'un rongé par le regret","Quelqu'un dévoré par la jalousie","Quelqu'un éclatant de fierté",
+        "Quelqu'un saisi par la nostalgie","Quelqu'un empli d'émerveillement","Quelqu'un torturé par l'anxiété",
+        "Quelqu'un baigné de sérénité","Quelqu'un consumé par la frustration","Quelqu'un illuminé par l'inspiration",
+        "Quelqu'un découvrant un secret","Quelqu'un prenant une décision difficile","Quelqu'un se préparant au combat",
+        "Quelqu'un protégeant quelque chose","Quelqu'un fuyant un danger","Quelqu'un cherchant quelque chose de perdu",
+        "Quelqu'un confrontant son ennemi","Quelqu'un aidant un allié blessé","Quelqu'un escaladant un obstacle",
+        "Quelqu'un franchissant un seuil","Quelqu'un contemplant un paysage","Quelqu'un lisant une lettre importante",
+        "Quelqu'un réparant quelque chose","Quelqu'un créant une œuvre","Quelqu'un enseignant à un élève",
+        "Quelqu'un apprenant quelque chose de nouveau","Quelqu'un célébrant une victoire","Quelqu'un pleurant une défaite",
+        "Quelqu'un offrant un cadeau","Quelqu'un recevant une récompense","Quelqu'un payant le prix de ses actions",
+        "Quelqu'un se souvenant du passé","Quelqu'un imaginant le futur","Quelqu'un vivant l'instant présent",
+        "Quelqu'un disant au revoir","Quelqu'un accueillant quelqu'un","Quelqu'un seul dans la foule",
+        "Quelqu'un trouvant le courage","Quelqu'un perdant espoir","Quelqu'un reprenant espoir",
+        "Quelqu'un s'écroulant d'épuisement","Quelqu'un bondissant de surprise","Quelqu'un reculant de dégoût",
+        "Quelqu'un se figeant de terreur","Quelqu'un s'élançant avec enthousiasme","Quelqu'un se repliant sur soi",
+        "Quelqu'un se redressant avec défi","Quelqu'un s'effondrant de chagrin","Quelqu'un se contorsionnant de douleur",
+        "Quelqu'un se détendant avec soulagement","Quelqu'un tremblant de froid","Quelqu'un suant sous l'effort",
+        "Quelqu'un chancelant de fatigue","Quelqu'un jubilant de triomphe","Quelqu'un frissonnant d'anticipation",
+        "Quelqu'un perdu dans ses pensées","Quelqu'un concentré sur une tâche","Quelqu'un distrait par quelque chose",
+        "Quelqu'un méditant en silence","Quelqu'un réfléchissant intensément","Quelqu'un priant avec ferveur",
+        "Quelqu'un rêvassant éveillé","Quelqu'un calculant mentalement","Quelqu'un se remémorant un souvenir",
+        "Quelqu'un anticipant un événement","Quelqu'un observant attentivement","Quelqu'un écoutant avec attention",
+        "Quelqu'un imaginant des possibilités","Quelqu'un analysant une situation","Quelqu'un cherchant l'inspiration"
+    ],
+    composition: [
+        "Forêt mystérieuse au crépuscule","Montagne enneigée sous les étoiles","Plage déserte au lever du soleil",
+        "Canyon profond avec une rivière","Vallée verdoyante parsemée de fleurs","Grotte illuminée par des cristaux",
+        "Cascade tombant d'une falaise","Marais brumeux avec des arbres morts","Désert de dunes sous la lune",
+        "Falaises rocheuses battues par les vagues","Prairie ondulante sous l'orage","Jungle dense et luxuriante",
+        "Toundra gelée avec aurore boréale","Oasis dans le désert","Lac de montagne reflétant les pics",
+        "Forêt de bambous traversée par la lumière","Champs de lavande au coucher du soleil","Fjord majestueux",
+        "Geysers crachant de la vapeur","Mangrove au bord de l'eau","Savane avec acacias isolés",
+        "Récif de corail sous-marin","Glacier éclatant sous le soleil","Volcan en éruption au loin",
+        "Archipel d'îles volcaniques",
+        "Ruelle sombre dans une ville cyberpunk","Place médiévale bondée de marchands","Toit de gratte-ciel futuriste",
+        "Métro abandonné envahi par la végétation","Marché nocturne illuminé de lanternes","Port spatial avec vaisseaux",
+        "Bibliothèque ancienne aux rayonnages infinis","Atelier d'artisan encombré d'outils","Salle de trône majestueuse",
+        "Laboratoire high-tech rempli d'écrans","Dojo traditionnel zen","Cathédrale gothique baignée de lumière colorée",
+        "Station spatiale en orbite","Arena de combat futuriste","Jardin japonais avec pont rouge",
+        "Hangar industriel désaffecté","Salon victorien élégant","Forge de forgeron avec feu ardent",
+        "Observatoire astronomique","Temple en ruines recouvert de lierre",
+        "Tempête de sable balayant le paysage","Brouillard épais masquant les formes","Pluie torrentielle dans la ville",
+        "Neige tombant doucement dans la forêt","Éclair zébrant le ciel nocturne","Arc-en-ciel après la pluie",
+        "Vent violent courbant les arbres","Nuages dramatiques au coucher du soleil","Givre cristallisant chaque surface",
+        "Chaleur écrasante faisant trembler l'air",
+        "Pont suspendu au-dessus d'un gouffre","Phare solitaire sur un rocher","Moulin à vent sur une colline",
+        "Ruines d'un château fort","Camp nomade dans le désert","Village de pêcheurs au bord de l'eau",
+        "Monastère perché sur la montagne","Campement militaire fortifié","Ferme isolée dans la plaine",
+        "Mine abandonnée dans les montagnes","Sanctuaire caché dans la jungle","Avant-poste frontière dans la neige",
+        "Caravane traversant les dunes","Navire échoué sur la plage","Citadelle flottante dans les nuages"
+    ],
+    speedShapes: [
+        "Guerrier","Mage","Voleur","Archer","Paladin","Nécromancien","Druide","Moine","Berserk","Assassin",
+        "Prêtre","Sorcière","Chevalier","Ninja","Samouraï","Gladiateur","Pirate","Viking","Spartiate","Ronin",
+        "Dragon","Phénix","Griffon","Chimère","Hydre","Basilic","Sphinx","Minotaure","Centaure","Licorne",
+        "Pégase","Cerbère","Kraken","Léviathan","Béhémoth","Golem","Élémentaire","Djinn","Gargoyle","Wyvern",
+        "Loup","Ours","Aigle","Serpent","Tigre","Lion","Panthère","Faucon","Corbeau","Renard",
+        "Hibou","Requin","Baleine","Araignée","Scorpion",
+        "Robot","Cyborg","Android","Droïde","Mecha","Exosquelette","Drone","IA","Hologramme","Clone",
+        "Mutant","Bioform","Nanobot","Synthétique","Augmenté",
+        "Démon","Ange déchu","Ombre vivante","Esprit","Spectre","Zombie","Vampire","Loup-garou","Liche",
+        "Momie","Goule","Banshee","Wraith","Revenant","Aberration",
+        "Armure vivante","Arme consciente","Livre maudit","Statue animée","Arbre ancien","Cristal pulsant",
+        "Flamme vivante","Eau consciente","Nuage pensant","Roche flottante",
+        "Forgeron","Alchimiste","Marchand","Barde","Érudit","Explorateur","Mercenaire","Garde","Noble","Sage"
+    ],
+    constraints: [
+        "Uniquement des triangles","Uniquement des cercles","Uniquement des carrés","Formes organiques uniquement",
+        "Formes géométriques uniquement","Lignes droites seulement","Courbes fluides seulement","Zigzags et angles",
+        "Spirales et tourbillons","Grilles et motifs répétitifs","Asymétrie extrême","Symétrie parfaite",
+        "Fractales et récursion","Formes qui se chevauchent","Formes séparées sans contact","Forme principale en négatif",
+        "Silhouette pure sans détails","Maximum 5 formes","Maximum 3 lignes","Une seule forme répétée",
+        "Monochrome noir et blanc","Camaïeu de bleus","Camaïeu de rouges","Palette de 3 couleurs max",
+        "Couleurs complémentaires uniquement","Couleurs analogues uniquement","Tons chauds seulement",
+        "Tons froids seulement","Couleurs désaturées","Couleurs saturées au max","Niveaux de gris avec un accent",
+        "Palette rétro années 80","Palette pastel douce","Palette néon cyberpunk","Sépia et vintage",
+        "Ligne continue sans lever","Pointillisme uniquement","Hachures croisées","Traits courts et rapides",
+        "Taches et éclaboussures","Dégradés doux","Contrastes forts","Contours épais","Pas de contours",
+        "Textures uniquement","Motifs décoratifs","Style minimaliste","Style maximaliste","Abstraction géométrique","Réalisme strict",
+        "Vue de dessus uniquement","Vue de dessous uniquement","Profil strict","Face frontale","Vue isométrique",
+        "Perspective exagérée","Pas de perspective","Gros plan extrême","Plan large panoramique","Point de vue d'insecte",
+        "Point de vue d'oiseau","Reflet dans l'eau","Vu à travers un objet","Partiellement caché","Fragmenté et dispersé",
+        "Mouvement figé","Action explosive","Calme avant la tempête","Moment de tension","Instant de repos",
+        "Transformation en cours","Début d'une histoire","Fin d'une aventure","Moment décisif","Point de non-retour",
+        "Révélation surprise","Secret caché","Double sens visuel","Métaphore visuelle","Symbolisme fort"
+    ]
+};
+
+const ideaData = {
+    subject: ["Guerrier","Robot","Dragon","Sorcière","Astronaute","Pirate","Ninja","Créature","Chevalier","Magicien","Démon","Ange","Samurai","Viking","Cyborg","Alien","Fantôme","Vampire","Nécromancien","Druide","Assassin","Paladin","Barde","Moine"],
+    style: ["Cyberpunk","Steampunk","Fantasy","Sci-fi","Médiéval","Futuriste","Baroque","Minimaliste","Art Nouveau","Gothique","Tribal","Aztèque","Japonais","Égyptien","Nordique","Biomécanique","Post-apocalyptique","Rétro-futuriste","Dark Fantasy","High Fantasy"],
+    emotion: ["Furieux","Serein","Mélancolique","Triomphant","Terrifié","Confiant","Mystérieux","Joueur","Déterminé","Épuisé","Émerveillé","Menaçant","Protecteur","Désespéré","Victorieux","Calculateur","Nostalgique","Inspiré","Torturé","Sage"],
+    constraint: ["Vue de dessous","Silhouette pure","Palette 3 couleurs","Formes triangulaires","Symétrie parfaite","Asymétrie extrême","Contre-jour","Gros plan","Vue aérienne","Reflet dans l'eau","Fumée/brouillard","Composition circulaire","Diagonales fortes","Espace négatif dominant","Perspective forcée","Point de fuite multiple"]
+};
+
+// ============================================================
+// SUBJECT GENERATOR
+// ============================================================
+function generateSubject(type, blockId) {
+    let subject = '';
+    switch(type) {
+        case 'angleChallenge':
+            subject = subjectGenerators.angleChallenges[Math.floor(Math.random() * subjectGenerators.angleChallenges.length)]; break;
+        case 'storytelling':
+            subject = subjectGenerators.storytelling[Math.floor(Math.random() * subjectGenerators.storytelling.length)]; break;
+        case 'composition':
+            subject = subjectGenerators.composition[Math.floor(Math.random() * subjectGenerators.composition.length)]; break;
+        case 'speedShape':
+            subject = subjectGenerators.speedShapes[Math.floor(Math.random() * subjectGenerators.speedShapes.length)]; break;
+        case 'constraint':
+            subject = subjectGenerators.constraints[Math.floor(Math.random() * subjectGenerators.constraints.length)]; break;
+        case 'mashup':
+            const s = ideaData.subject[Math.floor(Math.random() * ideaData.subject.length)];
+            const st = ideaData.style[Math.floor(Math.random() * ideaData.style.length)];
+            const e = ideaData.emotion[Math.floor(Math.random() * ideaData.emotion.length)];
+            subject = `${s} + ${st} + ${e}`; break;
+    }
+    const el = document.getElementById(`generated-${blockId}`);
+    if (el) { el.textContent = `💡 ${subject}`; el.classList.add('show'); }
+}
+
+// ============================================================
+// FIRESTORE — LOAD DATA
+// ============================================================
+async function loadAllData() {
+    if (!currentUser) return;
+    try {
+        const docRef = db.collection('users').doc(currentUser.uid);
+        const doc = await docRef.get();
+        const data = doc.exists ? doc.data() : {};
+
+        // ── AUTO-WEEK CALCULATION ──────────────────────────
+        // La semaine s'incrémente automatiquement toutes les 7 jours
+        // depuis la date de début du programme enregistrée dans Firebase.
+        let startDate = data.startDate;
+        if (!startDate) {
+            startDate = getTodayString();
+            await db.collection('users').doc(currentUser.uid).set(
+                { startDate: startDate }, { merge: true }
+            );
+        }
+        const start = new Date(startDate);
+        const today = new Date();
+        const daysDiff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+        const currentWeek = Math.floor(daysDiff / 7) + 1;
+        document.getElementById('current-week').textContent = currentWeek;
+        // ──────────────────────────────────────────────────
+
+        const completedDays = data.completedDays || [];
+        document.getElementById('days-completed').textContent = `${completedDays.length}/72`;
+
+        const totalMinutes = data.totalMinutes || 0;
+        document.getElementById('total-time').textContent = `${Math.floor(totalMinutes / 60)}h`;
+        document.getElementById('streak').textContent = `${data.streak || 0} 🔥`;
+
+        allSessions = data.sessions || [];
+
+        updateTodayDisplay();
+        updateCategoryStats();
+        renderHistory();
+        updateDayButtons(completedDays, currentWeek);
+
+        if (data.progress) {
+            ['fluidity','originality','composition','confidence'].forEach(type => {
+                const val = data.progress[type] || 0;
+                updateProgress(type, val);
+                document.getElementById(`${type}-slider`).value = val;
             });
         }
+    } catch (error) { console.error("Error loading data:", error); }
+}
 
-        function logout() {
-            auth.signOut();
-        }
+function getTodayString() {
+    return new Date().toISOString().split('T')[0];
+}
 
-        // Global variables
-        let allSessions = [];
-        let currentDay = 0;
+function getTodaySessions() {
+    const today = getTodayString();
+    return allSessions.filter(s => s.date === today);
+}
 
-        // Session Training Variables
-        let sessionInterval = null;
-        let sessionSeconds = 0;
-        let sessionRunning = false;
-        let sessionPaused = false;
+function updateTodayDisplay() {
+    const todaySessions = getTodaySessions();
+    const totalMinutes = todaySessions.reduce((sum, s) => sum + s.minutes, 0);
+    document.getElementById('today-total').textContent = `${totalMinutes}min`;
 
-        // SUBJECT GENERATORS DATA - 500+ subjects total!
-        const subjectGenerators = {
-            angleChallenges: [
-                // Objects quotidiens (30)
-                "Une chaise", "Une lampe", "Un vélo", "Une tasse", "Une bouteille", "Un livre ouvert", "Des lunettes", "Une clé", "Un marteau", "Des ciseaux",
-                "Un parapluie", "Une montre", "Un sac à dos", "Des écouteurs", "Un téléphone", "Un appareil photo", "Une guitare", "Un skateboard", "Un casque", "Des bottes",
-                "Un chapeau", "Un ballon", "Une chaussure", "Une plante en pot", "Un vase", "Un couteau", "Une fourchette", "Une cuillère", "Un pot de peinture", "Un pinceau",
-                
-                // Personnages neutres (25)
-                "Un personnage debout", "Un personnage assis", "Un personnage accroupi", "Un personnage à genoux", "Un personnage les bras croisés",
-                "Un personnage mains dans les poches", "Un personnage appuyé contre un mur", "Un personnage les bras levés", "Un personnage penché en avant", "Un personnage étiré",
-                "Un robot humanoïde", "Une silhouette encapuchonnée", "Un guerrier au repos", "Un mage en méditation", "Un archer bandant son arc",
-                "Un ninja en position neutre", "Un samouraï à genoux", "Un chevalier en armure", "Un astronaute flottant", "Un plongeur sous-marin",
-                "Un alpiniste en escalade", "Un danseur en équilibre", "Un gymnaste en préparation", "Un boxeur en garde", "Un escrimeur en position",
-                
-                // Véhicules (20)
-                "Une voiture de sport", "Une moto", "Un vaisseau spatial", "Un avion", "Un hélicoptère", "Un sous-marin", "Un tank", "Un vélo futuriste",
-                "Un scooter", "Une fusée", "Un planeur", "Un drone", "Un jet", "Un bolide de course", "Une navette spatiale", "Un mecha", "Un exosquelette",
-                "Un chariot", "Une carriole", "Un traineau",
-                
-                // Architecture/Structures (20)
-                "Une maison simple", "Une tour", "Un pont suspendu", "Un château fort", "Une cabane", "Un phare", "Un moulin à vent", "Une pyramide",
-                "Un temple grec", "Une arche", "Un portail", "Une fontaine", "Un puits", "Une grange", "Une serre", "Un silo", "Une tour de guet",
-                "Un beffroi", "Un donjon", "Un campanile",
-                
-                // Nature (15)
-                "Un arbre solitaire", "Un rocher imposant", "Un coquillage", "Un cristal", "Un tronc d'arbre mort", "Une souche", "Une branche tordue",
-                "Un champignon géant", "Un cactus", "Un bambou", "Un palmier", "Un pin tordu", "Un bonsaï", "Une fougère", "Une fleur géante",
-                
-                // Armes/Équipement (20)
-                "Une épée plantée", "Un bouclier", "Une hache", "Un crâne", "Une lance", "Un arc", "Une arbalète", "Une masse d'armes",
-                "Un fléau", "Une dague", "Un katana", "Un bâton de combat", "Une hallebarde", "Une armure complète", "Un casque cornu",
-                "Un gantelet", "Des gantelets blindés", "Une bannière", "Un étendard", "Une torche enflammée",
-                
-                // Animaux (15)
-                "Un loup hurlant", "Un dragon enroulé", "Un oiseau perché", "Un serpent lovés", "Un félin accroupi", "Un ours debout",
-                "Un aigle majestueux", "Un corbeau observateur", "Une panthère tapis", "Un lion au repos", "Un tigre couché",
-                "Un renard rusé", "Un hibou vigilant", "Un faucon en chasse", "Un phénix perché",
-                
-                // Robots/Méchas (10)
-                "Un robot sentinelle", "Un droïde sphérique", "Un mecha bipède", "Un android humanoïde", "Un exosquelette militaire",
-                "Un robot araignée", "Un drone volant", "Un golem mécanique", "Un robot ouvrier", "Un cyborg",
-            ],
-            
-            storytelling: [
-                // Émotions pures (20)
-                "Quelqu'un qui vient d'apprendre une excellente nouvelle", "Quelqu'un qui vient d'apprendre une mauvaise nouvelle",
-                "Quelqu'un submergé par la peur", "Quelqu'un rayonnant de joie", "Quelqu'un accablé par la tristesse",
-                "Quelqu'un bouillonnant de colère", "Quelqu'un paralysé par la surprise", "Quelqu'un submergé par le doute",
-                "Quelqu'un brillant de confiance", "Quelqu'un écrasé par la honte", "Quelqu'un transporté par l'espoir",
-                "Quelqu'un rongé par le regret", "Quelqu'un dévoré par la jalousie", "Quelqu'un éclatant de fierté",
-                "Quelqu'un saisi par la nostalgie", "Quelqu'un empli d'émerveillement", "Quelqu'un torturé par l'anxiété",
-                "Quelqu'un baigné de sérénité", "Quelqu'un consumé par la frustration", "Quelqu'un illuminé par l'inspiration",
-                
-                // Situations narratives (30)
-                "Quelqu'un découvrant un secret", "Quelqu'un prenant une décision difficile", "Quelqu'un se préparant au combat",
-                "Quelqu'un protégeant quelque chose", "Quelqu'un fuyant un danger", "Quelqu'un cherchant quelque chose de perdu",
-                "Quelqu'un confrontant son ennemi", "Quelqu'un aidant un allié blessé", "Quelqu'un escaladant un obstacle",
-                "Quelqu'un franchissant un seuil", "Quelqu'un contemplant un paysage", "Quelqu'un lisant une lettre importante",
-                "Quelqu'un réparant quelque chose", "Quelqu'un créant une œuvre", "Quelqu'un enseignant à un élève",
-                "Quelqu'un apprenant quelque chose de nouveau", "Quelqu'un célébrant une victoire", "Quelqu'un pleurant une défaite",
-                "Quelqu'un offrant un cadeau", "Quelqu'un recevant une récompense", "Quelqu'un payant le prix de ses actions",
-                "Quelqu'un se souvenant du passé", "Quelqu'un imaginant le futur", "Quelqu'un vivant l'instant présent",
-                "Quelqu'un disant au revoir", "Quelqu'un accueillant quelqu'un", "Quelqu'un seul dans la foule",
-                "Quelqu'un trouvant le courage", "Quelqu'un perdant espoir", "Quelqu'un reprenant espoir",
-                
-                // Réactions physiques (15)
-                "Quelqu'un s'écroulant d'épuisement", "Quelqu'un bondir de surprise", "Quelqu'un reculer de dégoût",
-                "Quelqu'un se figer de terreur", "Quelqu'un s'élancer avec enthousiasme", "Quelqu'un se replier sur soi",
-                "Quelqu'un se redresser avec défi", "Quelqu'un s'effondrer de chagrin", "Quelqu'un se contorsionner de douleur",
-                "Quelqu'un se détendre avec soulagement", "Quelqu'un trembler de froid", "Quelqu'un suer sous l'effort",
-                "Quelqu'un chanceler de fatigue", "Quelqu'un jubiler de triomphe", "Quelqu'un frissonner d'anticipation",
-                
-                // États mentaux (15)
-                "Quelqu'un perdu dans ses pensées", "Quelqu'un concentré sur une tâche", "Quelqu'un distrait par quelque chose",
-                "Quelqu'un méditant en silence", "Quelqu'un réfléchissant intensément", "Quelqu'un priant avec ferveur",
-                "Quelqu'un rêvassant éveillé", "Quelqu'un calculant mentalement", "Quelqu'un se remémorant un souvenir",
-                "Quelqu'un anticipant un événement", "Quelqu'un observant attentivement", "Quelqu'un écoutant avec attention",
-                "Quelqu'un imaginant des possibilités", "Quelqu'un analysant une situation", "Quelqu'un cherchant l'inspiration",
-            ],
-            
-            composition: [
-                // Environnements naturels (25)
-                "Forêt mystérieuse au crépuscule", "Montagne enneigée sous les étoiles", "Plage déserte au lever du soleil",
-                "Canyon profond avec une rivière", "Vallée verdoyante parsemée de fleurs", "Grotte illuminée par des cristaux",
-                "Cascade tombant d'une falaise", "Marais brumeux avec des arbres morts", "Désert de dunes sous la lune",
-                "Falaises rocheuses battues par les vagues", "Prairie ondulante sous l'orage", "Jungle dense et luxuriante",
-                "Toundra gelée avec aurore boréale", "Oasis dans le désert", "Lac de montagne reflétant les pics",
-                "Forêt de bambous traversée par la lumière", "Champs de lavande au coucher du soleil", "Fjord majestueux",
-                "Geysers crachant de la vapeur", "Mangrove au bord de l'eau", "Savane avec acacias isolés",
-                "Récif de corail sous-marin", "Glacier éclatant sous le soleil", "Volcan en éruption au loin",
-                "Archipel d'îles volcaniques",
-                
-                // Environnements urbains (20)
-                "Ruelle sombre dans une ville cyberpunk", "Place médiévale bondée de marchands", "Toit de gratte-ciel futuriste",
-                "Métro abandonné envahi par la végétation", "Marché nocturne illuminé de lanternes", "Port spatial avec vaisseaux",
-                "Bibliothèque ancienne aux rayonnages infinis", "Atelier d'artisan encombré d'outils", "Salle de trône majestueuse",
-                "Laboratoire high-tech rempli d'écrans", "Dojo traditionnel zen", "Cathédrale gothique baignée de lumière colorée",
-                "Station spatiale en orbite", "Arena de combat futuriste", "Jardin japonais avec pont rouge",
-                "Hangar industriel désaffecté", "Salon victorien élégant", "Forge de forgeron avec feu ardent",
-                "Observatoire astronomique", "Temple en ruines recouvert de lierre",
-                
-                // Conditions atmosphériques (15)
-                "Tempête de sable balayant le paysage", "Brouillard épais masquant les formes", "Pluie torrentielle dans la ville",
-                "Neige tombant doucement dans la forêt", "Éclair zébrant le ciel nocturne", "Arc-en-ciel après la pluie",
-                "Vent violent courbant les arbres", "Nuages dramatiques au coucher du soleil", "Givre cristallisant chaque surface",
-                "Chaleur écrasante faisant trembler l'air", "Grêle tambourinant sur les toits", "Tornade se formant au loin",
-                "Bourrasque de feuilles d'automne", "Bruine fine créant un halo", "Ciel étoilé infiniment clair",
-                
-                // Moments de la journée (10)
-                "Aube naissante peignant le ciel", "Midi éclatant de lumière crue", "Après-midi doré et paisible",
-                "Crépuscule violet et orange", "Nuit tombante enveloppant le monde", "Minuit sous la pleine lune",
-                "Heure bleue avant l'aube", "Golden hour baignant tout d'or", "Nuit noire sans étoiles",
-                "Lever de soleil perçant les nuages",
-                
-                // Lieux spécifiques (15)
-                "Pont suspendu au-dessus d'un gouffre", "Phare solitaire sur un rocher", "Moulin à vent sur une colline",
-                "Ruines d'un château fort", "Camp nomade dans le désert", "Village de pêcheurs au bord de l'eau",
-                "Monastère perché sur la montagne", "Campement militaire fortifié", "Ferme isolée dans la plaine",
-                "Mine abandonnée dans les montagnes", "Sanctuaire caché dans la jungle", "Avant-poste frontière dans la neige",
-                "Caravane traversant les dunes", "Navire échoué sur la plage", "Citadelle flottante dans les nuages",
-                
-                // Ambiances narratives (15)
-                "Lieu hanté par les fantômes", "Endroit oublié par le temps", "Refuge chaleureux et accueillant",
-                "Territoire hostile et dangereux", "Sanctuaire de paix et méditation", "Champ de bataille après la guerre",
-                "Jardin secret et enchanteur", "Prison sombre et oppressante", "Palais opulent et décadent",
-                "Laboratoire fou et chaotique", "Temple sacré et vénéré", "Taverne animée et bruyante",
-                "Cimetière ancien et solennel", "Arsenal rempli d'armes", "Salle du trésor étincelante",
-            ],
-            
-            speedShapes: [
-                // Mix humains (20)
-                "Guerrier", "Mage", "Voleur", "Archer", "Paladin", "Nécromancien", "Druide", "Moine", "Berserk", "Assassin",
-                "Prêtre", "Sorcière", "Chevalier", "Ninja", "Samouraï", "Gladiateur", "Pirate", "Viking", "Spartiate", "Ronin",
-                
-                // Créatures fantastiques (20)
-                "Dragon", "Phénix", "Griffon", "Chimère", "Hydre", "Basilic", "Sphinx", "Minotaure", "Centaure", "Licorne",
-                "Pégase", "Cerbère", "Kraken", "Léviathan", "Béhémoth", "Golem", "Élémentaire", "Djinn", "Gargoyle", "Wyvern",
-                
-                // Animaux (15)
-                "Loup", "Ours", "Aigle", "Serpent", "Tigre", "Lion", "Panthère", "Faucon", "Corbeau", "Renard",
-                "Hibou", "Requin", "Baleine", "Araignée", "Scorpion",
-                
-                // Tech/Sci-fi (15)
-                "Robot", "Cyborg", "Android", "Droïde", "Mecha", "Exosquelette", "Drone", "IA", "Hologramme", "Clone",
-                "Mutant", "Bioform", "Nanobot", "Synthétique", "Augmenté",
-                
-                // Monstres (15)
-                "Démon", "Ange déchu", "Ombre vivante", "Esprit", "Spectre", "Zombie", "Vampire", "Loup-garou", "Liche",
-                "Momie", "Goule", "Banshee", "Wraith", "Revenant", "Aberration",
-                
-                // Objets animés (10)
-                "Armure vivante", "Arme consciente", "Livre maudit", "Statue animée", "Arbre ancien",  "Cristal pulsant",
-                "Flamme vivante", "Eau consciente", "Nuage pensant", "Roche flottante",
-                
-                // Professions/Archétypes (10)
-                "Forgeron", "Alchimiste", "Marchand", "Barde", "Érudit", "Explorateur", "Mercenaire", "Garde", "Noble", "Sage",
-            ],
-            
-            constraints: [
-                // Contraintes de forme (20)
-                "Uniquement des triangles", "Uniquement des cercles", "Uniquement des carrés", "Formes organiques uniquement",
-                "Formes géométriques uniquement", "Lignes droites seulement", "Courbes fluides seulement", "Zigzags et angles",
-                "Spirales et tourbillons", "Grilles et motifs répétitifs", "Asymétrie extrême", "Symétrie parfaite",
-                "Fractales et récursion", "Formes qui se chevauchent", "Formes séparées sans contact", "Forme principale en négatif",
-                "Silhouette pure sans détails", "Maximum 5 formes", "Maximum 3 lignes", "Une seule forme répétée",
-                
-                // Contraintes de couleur (15)
-                "Monochrome noir et blanc", "Camaïeu de bleus", "Camaïeu de rouges", "Palette de 3 couleurs max",
-                "Couleurs complémentaires uniquement", "Couleurs analogues uniquement", "Tons chauds seulement",
-                "Tons froids seulement", "Couleurs désaturées", "Couleurs saturées au max", "Niveaux de gris avec un accent",
-                "Palette rétro années 80", "Palette pastel douce", "Palette néon cyberpunk", "Sépia et vintage",
-                
-                // Contraintes de technique (15)
-                "Ligne continue sans lever", "Pointillisme uniquement", "Hachures croisées", "Traits courts et rapides",
-                "Taches et éclaboussures", "Dégradés doux", "Contrastes forts", "Contours épais", "Pas de contours",
-                "Textures uniquement", "Motifs décoratifs", "Style minimaliste", "Style maximaliste", "Abstraction géométrique",
-                "Réalisme strict",
-                
-                // Contraintes conceptuelles (15)
-                "Vue de dessus uniquement", "Vue de dessous uniquement", "Profil strict", "Face frontale", "Vue isométrique",
-                "Perspective exagérée", "Pas de perspective", "Gros plan extrême", "Plan large panoramique", "Point de vue d'insecte",
-                "Point de vue d'oiseau", "Reflet dans l'eau", "Vu à travers un objet", "Partiellement caché", "Fragmenté et dispersé",
-                
-                // Contraintes narratives (15)
-                "Mouvement figé", "Action explosive", "Calme avant la tempête", "Moment de tension", "Instant de repos",
-                "Transformation en cours", "Début d'une histoire", "Fin d'une aventure", "Moment décisif", "Point de non-retour",
-                "Révélation surprise", "Secret caché", "Double sens visuel", "Métaphore visuelle", "Symbolisme fort",
-            ]
-        };
+    const listContainer = document.getElementById('today-sessions-list');
+    if (todaySessions.length === 0) {
+        listContainer.innerHTML = '<div class="empty-state">Aucune session aujourd\'hui. Lance-toi! 💪</div>';
+    } else {
+        listContainer.innerHTML = todaySessions.map(session => `
+            <div class="session-item">
+                <div class="session-info">
+                    <div class="session-category">${session.category}</div>
+                    <div class="session-time">${session.minutes} min${session.note ? ' - ' + session.note : ''}</div>
+                </div>
+                <button class="session-delete" onclick="deleteSession('${session.id}')">🗑️</button>
+            </div>
+        `).join('');
+    }
+    document.getElementById('today-sessions-total').textContent = `${totalMinutes} min`;
+    document.getElementById('btn-complete-day').style.display = todaySessions.length > 0 ? 'block' : 'none';
+}
 
-        // Existing generator data for mash-ups
-        const ideaData = {
-            subject: ["Guerrier", "Robot", "Dragon", "Sorcière", "Astronaute", "Pirate", "Ninja", "Créature", "Chevalier", "Magicien", "Démon", "Ange", "Samurai", "Viking", "Cyborg", "Alien", "Fantôme", "Vampire", "Nécromancien", "Druide", "Assassin", "Paladin", "Barde", "Moine"],
-            style: ["Cyberpunk", "Steampunk", "Fantasy", "Sci-fi", "Médiéval", "Futuriste", "Baroque", "Minimaliste", "Art Nouveau", "Gothique", "Tribal", "Aztèque", "Japonais", "Égyptien", "Nordique", "Biomécanique", "Post-apocalyptique", "Rétro-futuriste", "Dark Fantasy", "High Fantasy"],
-            emotion: ["Furieux", "Serein", "Mélancolique", "Triomphant", "Terrifié", "Confiant", "Mystérieux", "Joueur", "Déterminé", "Épuisé", "Émerveillé", "Menaçant", "Protecteur", "Désespéré", "Victorieux", "Calculateur", "Nostalgique", "Inspiré", "Torturé", "Sage"],
-            constraint: ["Vue de dessous", "Silhouette pure", "Palette 3 couleurs", "Formes triangulaires", "Symétrie parfaite", "Asymétrie extrême", "Contre-jour", "Gros plan", "Vue aérienne", "Reflet dans l'eau", "Fumée/brouillard", "Composition circulaire", "Diagonales fortes", "Espace négatif dominant", "Perspective forcée", "Point de fuite multiple"]
-        };
+function updateCategoryStats() {
+    const categoryTotals = {};
+    allSessions.forEach(session => {
+        if (!categoryTotals[session.category]) categoryTotals[session.category] = 0;
+        categoryTotals[session.category] += session.minutes;
+    });
+    const sorted = Object.entries(categoryTotals).sort((a,b) => b[1]-a[1]).slice(0, 8);
+    const container = document.getElementById('category-stats');
+    if (sorted.length === 0) {
+        container.innerHTML = '<div class="empty-state">Commence à pratiquer pour voir tes stats! 🎨</div>';
+    } else {
+        container.innerHTML = sorted.map(([cat, mins]) => `
+            <div class="category-stat-card">
+                <div class="category-name">${cat}</div>
+                <div class="category-time">${Math.floor(mins/60)}h${mins%60>0?' '+(mins%60)+'m':''}</div>
+            </div>
+        `).join('');
+    }
+}
 
-        let timerInterval = null;
-        let timerSeconds = 900;
-        let timerRunning = false;
-
-        // Program data with generator integration
-        const programData = {
-            0: {
-                name: "Lundi - Mix équilibré",
-                total: "65 min",
-                blocks: [
-                    {
-                        title: "Block 1: Fondamentaux",
-                        time: "15 min",
-                        exercises: [
-                            "5 min: Cubes en perspective - 20 cubes sous différents angles",
-                            "5 min: Cylindres - 15 cylindres dans l'espace",
-                            "5 min: Grille de perspective - Dessine une grille 2-point perspective"
-                        ],
-                        hasGenerator: false
-                    },
-                    {
-                        title: "Block 2: Warm-up fluidité",
-                        time: "10 min",
-                        exercises: [
-                            "20 gestures de 30 secondes - RAPIDE et FLUIDE",
-                            "Focus: ligne d'action en C ou S AVANT tout",
-                            "Ne pas lever le crayon"
-                        ],
-                        hasGenerator: false
-                    },
-                    {
-                        title: "Block 3: Créativité éclair (Mash-ups)",
-                        time: "15 min",
-                        exercises: [
-                            "3 combinaisons impossibles",
-                            "5 min par combo, thumbnails rapides",
-                            "Ne pas censurer les idées bizarres"
-                        ],
-                        hasGenerator: true,
-                        generatorType: 'mashup'
-                    },
-                    {
-                        title: "Block 4: Composition thumbnails",
-                        time: "15 min",
-                        exercises: [
-                            "Une scène, 12 thumbnails (3x3cm max)",
-                            "Varie les angles: plongée, contre-plongée, profil",
-                            "Objectif: 3 doivent te surprendre"
-                        ],
-                        hasGenerator: true,
-                        generatorType: 'composition'
-                    },
-                    {
-                        title: "Block 5: Cool-down poses",
-                        time: "10 min",
-                        exercises: [
-                            "5 poses dynamiques avec exagération",
-                            "Exagère le mouvement de 30%",
-                            "Focus sur les courbes S et C"
-                        ],
-                        hasGenerator: false
-                    }
-                ]
-            },
-            1: {
-                name: "Mardi - Mix varié",
-                total: "65 min",
-                blocks: [
-                    {
-                        title: "Block 1: Fondamentaux",
-                        time: "15 min",
-                        exercises: [
-                            "5 min: Formes en perspective oblique",
-                            "5 min: Ellipses et volumes cylindriques",
-                            "5 min: Construction de boîtes complexes"
-                        ],
-                        hasGenerator: false
-                    },
-                    {
-                        title: "Block 2: Storytelling poses",
-                        time: "15 min",
-                        exercises: [
-                            "10 poses qui racontent une émotion",
-                            "1 minute par pose",
-                            "Pas de visage - juste le langage corporel"
-                        ],
-                        hasGenerator: true,
-                        generatorType: 'storytelling'
-                    },
-                    {
-                        title: "Block 3: Angle challenges",
-                        time: "15 min",
-                        exercises: [
-                            "Même sujet, 6 angles différents",
-                            "Plongée extrême, contre-plongée, vue de dessous",
-                            "Cherche l'angle le plus dramatique"
-                        ],
-                        hasGenerator: true,
-                        generatorType: 'angleChallenge'
-                    },
-                    {
-                        title: "Block 4: Contrainte créative",
-                        time: "15 min",
-                        exercises: [
-                            "Dessine avec une contrainte spécifique",
-                            "5 créatures ou personnages",
-                            "Varie les proportions"
-                        ],
-                        hasGenerator: true,
-                        generatorType: 'constraint'
-                    },
-                    {
-                        title: "Block 5: Flow gestures",
-                        time: "5 min",
-                        exercises: [
-                            "15 gestures de 20 secondes",
-                            "Focus: fluidité totale",
-                            "Ligne continue sans lever le crayon"
-                        ],
-                        hasGenerator: false
-                    }
-                ]
-            },
-            2: {
-                name: "Mercredi - Mix intense",
-                total: "70 min",
-                blocks: [
-                    {
-                        title: "Block 1: Fondamentaux",
-                        time: "15 min",
-                        exercises: [
-                            "5 min: Architecture en perspective 3-points",
-                            "5 min: Formes organiques en volume",
-                            "5 min: Construction de véhicules"
-                        ],
-                        hasGenerator: false
-                    },
-                    {
-                        title: "Block 2: Speed shapes",
-                        time: "10 min",
-                        exercises: [
-                            "30 secondes: dessine une silhouette reconnaissable",
-                            "20 répétitions",
-                            "Varie: humain, animal, objet, créature"
-                        ],
-                        hasGenerator: true,
-                        generatorType: 'speedShape'
-                    },
-                    {
-                        title: "Block 3: Combo challenge",
-                        time: "20 min",
-                        exercises: [
-                            "Fusionne 3 éléments en une image cohérente",
-                            "Cherche le lien narratif"
-                        ],
-                        hasGenerator: true,
-                        generatorType: 'mashup'
-                    },
-                    {
-                        title: "Block 4: Rule of thirds practice",
-                        time: "15 min",
-                        exercises: [
-                            "6 compositions avec règle des tiers",
-                            "Place les éléments clés sur les intersections",
-                            "Varie les centres d'intérêt"
-                        ],
-                        hasGenerator: true,
-                        generatorType: 'composition'
-                    },
-                    {
-                        title: "Block 5: Dynamic figures",
-                        time: "10 min",
-                        exercises: [
-                            "6 figures en mouvement extrême",
-                            "Sports, danse, combat",
-                            "Exagère les lignes d'action"
-                        ],
-                        hasGenerator: false
-                    }
-                ]
-            },
-            3: {
-                name: "Jeudi - Focus technique",
-                total: "75 min",
-                blocks: [
-                    {
-                        title: "Block 1: Fondamentaux",
-                        time: "15 min",
-                        exercises: [
-                            "5 min: Perspective à 1 point - intérieurs",
-                            "5 min: Perspective à 2 points - extérieurs",
-                            "5 min: Perspective à 3 points - vues extrêmes"
-                        ],
-                        hasGenerator: false
-                    },
-                    {
-                        title: "Block 2: Contrapposto mastery",
-                        time: "20 min",
-                        exercises: [
-                            "8 poses avec contrapposto prononcé",
-                            "Focus: poids sur une jambe",
-                            "Observe les hanches et épaules"
-                        ],
-                        hasGenerator: false
-                    },
-                    {
-                        title: "Block 3: Negative space",
-                        time: "20 min",
-                        exercises: [
-                            "Dessine les espaces négatifs autour du sujet",
-                            "6 compositions",
-                            "Le vide est aussi important que le plein"
-                        ],
-                        hasGenerator: true,
-                        generatorType: 'angleChallenge'
-                    },
-                    {
-                        title: "Block 4: Scene construction",
-                        time: "20 min",
-                        exercises: [
-                            "Construis une scène complète avec plusieurs personnages",
-                            "Perspective cohérente",
-                            "Interaction entre les éléments"
-                        ],
-                        hasGenerator: true,
-                        generatorType: 'composition'
-                    }
-                ]
-            },
-            4: {
-                name: "Vendredi - Intégration",
-                total: "75 min",
-                blocks: [
-                    {
-                        title: "Block 1: Fondamentaux",
-                        time: "15 min",
-                        exercises: [
-                            "5 min: Révision des bases - cubes et cylindres",
-                            "5 min: Formes complexes en perspective",
-                            "5 min: Construction rapide d'environnements"
-                        ],
-                        hasGenerator: false
-                    },
-                    {
-                        title: "Block 2: Projet créatif",
-                        time: "60 min",
-                        exercises: [
-                            "Crée une illustration complète",
-                            "Intègre: pose dynamique + composition originale + histoire",
-                            "Utilise tout ce que tu as pratiqué cette semaine",
-                            "Ne pas se censurer - expérimente!",
-                            "Vise le fun, pas la perfection"
-                        ],
-                        hasGenerator: true,
-                        generatorType: 'mashup'
-                    }
-                ]
-            },
-            5: {
-                name: "Samedi - Repos",
-                total: "0 min",
-                blocks: [
-                    {
-                        title: "Jour de repos",
-                        time: "0 min",
-                        exercises: [
-                            "PAS DE DESSIN AUJOURD'HUI",
-                            "Repos = partie de l'entraînement",
-                            "Laisse ton cerveau assimiler",
-                            "Regarde de l'art, des films, va marcher",
-                            "Reviens frais lundi!"
-                        ],
-                        hasGenerator: false
-                    }
-                ]
-            },
-            6: {
-                name: "Dimanche - Pratique libre",
-                total: "Variable",
-                blocks: [
-                    {
-                        title: "Session libre",
-                        time: "À ton rythme",
-                        exercises: [
-                            "Dessine ce que TU veux",
-                            "Aucune contrainte",
-                            "Explore, expérimente, joue",
-                            "C'est TON temps créatif",
-                            "Si tu veux ne rien faire, c'est OK aussi!"
-                        ],
-                        hasGenerator: false
-                    }
-                ]
-            }
-        };
-
-        // Generator functions
-        function generateSubject(type, blockId) {
-            let subject = '';
-            
-            switch(type) {
-                case 'angleChallenge':
-                    const angles = subjectGenerators.angleChallenges;
-                    subject = angles[Math.floor(Math.random() * angles.length)];
-                    break;
-                case 'storytelling':
-                    const stories = subjectGenerators.storytelling;
-                    subject = stories[Math.floor(Math.random() * stories.length)];
-                    break;
-                case 'composition':
-                    const comps = subjectGenerators.composition;
-                    subject = comps[Math.floor(Math.random() * comps.length)];
-                    break;
-                case 'speedShape':
-                    const speeds = subjectGenerators.speedShapes;
-                    subject = speeds[Math.floor(Math.random() * speeds.length)];
-                    break;
-                case 'constraint':
-                    const constraints = subjectGenerators.constraints;
-                    subject = constraints[Math.floor(Math.random() * constraints.length)];
-                    break;
-                case 'mashup':
-                    const subj = ideaData.subject[Math.floor(Math.random() * ideaData.subject.length)];
-                    const style = ideaData.style[Math.floor(Math.random() * ideaData.style.length)];
-                    const emotion = ideaData.emotion[Math.floor(Math.random() * ideaData.emotion.length)];
-                    subject = `${subj} + ${style} + ${emotion}`;
-                    break;
-            }
-            
-            const displayEl = document.getElementById(`generated-${blockId}`);
-            if (displayEl) {
-                displayEl.textContent = `💡 ${subject}`;
-                displayEl.classList.add('show');
-            }
-        }
-
-        // ============================================
-        // FIRESTORE FUNCTIONS
-        // ============================================
-
-        async function loadAllData() {
-            if (!currentUser) return;
-            
-            try {
-                const docRef = db.collection('users').doc(currentUser.uid);
-                const doc = await docRef.get();
-                
-                if (doc.exists) {
-                    const data = doc.data();
-                    
-                    document.getElementById('current-week').textContent = data.week || 1;
-                    
-                    const completedDays = data.completedDays || [];
-                    document.getElementById('days-completed').textContent = `${completedDays.length}/72`;
-                    
-                    const totalMinutes = data.totalMinutes || 0;
-                    const hours = Math.floor(totalMinutes / 60);
-                    document.getElementById('total-time').textContent = `${hours}h`;
-                    
-                    document.getElementById('streak').textContent = `${data.streak || 0} 🔥`;
-                    
-                    allSessions = data.sessions || [];
-                    
-                    updateTodayDisplay();
-                    updateCategoryStats();
-                    renderHistory();
-                    updateDayButtons(completedDays);
-                    
-                    if (data.progress) {
-                        ['fluidity', 'originality', 'composition', 'confidence'].forEach(type => {
-                            const val = data.progress[type] || 0;
-                            updateProgress(type, val);
-                            document.getElementById(`${type}-slider`).value = val;
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error("Error loading data:", error);
-            }
-        }
-
-        function getTodayString() {
-            const today = new Date();
-            return today.toISOString().split('T')[0];
-        }
-
-        function getTodaySessions() {
-            const today = getTodayString();
-            return allSessions.filter(s => s.date === today);
-        }
-
-        function updateTodayDisplay() {
-            const todaySessions = getTodaySessions();
-            const totalMinutes = todaySessions.reduce((sum, s) => sum + s.minutes, 0);
-            
-            document.getElementById('today-total').textContent = `${totalMinutes}min`;
-            
-            const listContainer = document.getElementById('today-sessions-list');
-            if (todaySessions.length === 0) {
-                listContainer.innerHTML = '<div class="empty-state">Aucune session aujourd\'hui. Lance-toi! 💪</div>';
-            } else {
-                listContainer.innerHTML = todaySessions.map(session => `
-                    <div class="session-item">
-                        <div class="session-info">
-                            <div class="session-category">${session.category}</div>
-                            <div class="session-time">${session.minutes} min${session.note ? ' - ' + session.note : ''}</div>
-                        </div>
-                        <button class="session-delete" onclick="deleteSession('${session.id}')">🗑️</button>
+function renderHistory() {
+    const filteredSessions = getFilteredSessions();
+    const container = document.getElementById('history-list');
+    if (filteredSessions.length === 0) {
+        container.innerHTML = '<div class="empty-state">Aucune session trouvée.</div>';
+        return;
+    }
+    container.innerHTML = filteredSessions.map(session => {
+        const date = new Date(session.date);
+        const dateStr = date.toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+        return `
+            <div class="history-item">
+                <div>
+                    <div class="history-date">${dateStr}</div>
+                    <div class="history-details">
+                        <strong>${session.category}</strong> - ${session.minutes} min
+                        ${session.note ? `<br><em>${session.note}</em>` : ''}
                     </div>
-                `).join('');
-            }
-            
-            document.getElementById('today-sessions-total').textContent = `${totalMinutes} min`;
-            
-            document.getElementById('btn-complete-day').style.display = todaySessions.length > 0 ? 'block' : 'none';
-        }
+                </div>
+                <button class="session-delete" onclick="deleteSession('${session.id}')">🗑️</button>
+            </div>
+        `;
+    }).join('');
+}
 
-        function updateCategoryStats() {
-            const categoryTotals = {};
-            
-            allSessions.forEach(session => {
-                if (!categoryTotals[session.category]) {
-                    categoryTotals[session.category] = 0;
-                }
-                categoryTotals[session.category] += session.minutes;
-            });
-            
-            const sorted = Object.entries(categoryTotals)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 8);
-            
-            const container = document.getElementById('category-stats');
-            if (sorted.length === 0) {
-                container.innerHTML = '<div class="empty-state">Commence à pratiquer pour voir tes stats! 🎨</div>';
-            } else {
-                container.innerHTML = sorted.map(([cat, mins]) => `
-                    <div class="category-stat-card">
-                        <div class="category-name">${cat}</div>
-                        <div class="category-time">${Math.floor(mins / 60)}h${mins % 60 > 0 ? ' ' + (mins % 60) + 'm' : ''}</div>
-                    </div>
-                `).join('');
-            }
-        }
+function getFilteredSessions() {
+    let filtered = [...allSessions];
+    const category = document.getElementById('filter-category')?.value;
+    if (category && category !== 'all') filtered = filtered.filter(s => s.category === category);
+    const dateFrom = document.getElementById('filter-date-from')?.value;
+    if (dateFrom) filtered = filtered.filter(s => s.date >= dateFrom);
+    const dateTo = document.getElementById('filter-date-to')?.value;
+    if (dateTo) filtered = filtered.filter(s => s.date <= dateTo);
+    return filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+}
 
-        function renderHistory() {
-            const filteredSessions = getFilteredSessions();
-            const container = document.getElementById('history-list');
-            
-            if (filteredSessions.length === 0) {
-                container.innerHTML = '<div class="empty-state">Aucune session trouvée.</div>';
-                return;
-            }
-            
-            container.innerHTML = filteredSessions.map(session => {
-                const date = new Date(session.date);
-                const dateStr = date.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                
-                return `
-                    <div class="history-item">
-                        <div>
-                            <div class="history-date">${dateStr}</div>
-                            <div class="history-details">
-                                <strong>${session.category}</strong> - ${session.minutes} min
-                                ${session.note ? `<br><em>${session.note}</em>` : ''}
-                            </div>
-                        </div>
-                        <button class="session-delete" onclick="deleteSession('${session.id}')">🗑️</button>
-                    </div>
-                `;
-            }).join('');
-        }
+function filterHistory() { renderHistory(); }
 
-        function getFilteredSessions() {
-            let filtered = [...allSessions];
-            
-            const category = document.getElementById('filter-category')?.value;
-            if (category && category !== 'all') {
-                filtered = filtered.filter(s => s.category === category);
-            }
-            
-            const dateFrom = document.getElementById('filter-date-from')?.value;
-            if (dateFrom) {
-                filtered = filtered.filter(s => s.date >= dateFrom);
-            }
-            
-            const dateTo = document.getElementById('filter-date-to')?.value;
-            if (dateTo) {
-                filtered = filtered.filter(s => s.date <= dateTo);
-            }
-            
-            return filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-        }
+function clearFilters() {
+    document.getElementById('filter-category').value = 'all';
+    document.getElementById('filter-date-from').value = '';
+    document.getElementById('filter-date-to').value = '';
+    renderHistory();
+}
 
-        function filterHistory() {
-            renderHistory();
-        }
+async function saveSessions() {
+    if (!currentUser) return;
+    try {
+        await db.collection('users').doc(currentUser.uid).set({
+            sessions: allSessions,
+            totalMinutes: allSessions.reduce((sum,s) => sum + s.minutes, 0),
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+    } catch (error) { console.error("Error saving sessions:", error); }
+}
 
-        function clearFilters() {
-            document.getElementById('filter-category').value = 'all';
-            document.getElementById('filter-date-from').value = '';
-            document.getElementById('filter-date-to').value = '';
-            renderHistory();
-        }
+async function deleteSession(sessionId) {
+    if (!confirm('Supprimer cette session?')) return;
+    allSessions = allSessions.filter(s => s.id !== sessionId);
+    await saveSessions();
+    await loadAllData();
+}
 
-        async function saveSessions() {
-            if (!currentUser) return;
-            
-            try {
-                await db.collection('users').doc(currentUser.uid).set({
-                    sessions: allSessions,
-                    totalMinutes: allSessions.reduce((sum, s) => sum + s.minutes, 0),
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-            } catch (error) {
-                console.error("Error saving sessions:", error);
-            }
-        }
+// updateDayButtons reçoit maintenant le week courant en paramètre
+// → filtre correctement par semaine, donc les jours d'une semaine passée
+// reviennent automatiquement en rouge pour la nouvelle semaine.
+function updateDayButtons(completedDays, currentWeek) {
+    const week = currentWeek || getCurrentWeek();
+    document.querySelectorAll('.day-btn').forEach((btn, index) => {
+        btn.classList.remove('completed');
+        const dayKey = `day${index}_week${week}`;
+        if (completedDays.includes(dayKey)) btn.classList.add('completed');
+    });
+}
 
-        async function deleteSession(sessionId) {
-            if (!confirm('Supprimer cette session?')) return;
-            
-            allSessions = allSessions.filter(s => s.id !== sessionId);
-            await saveSessions();
-            await loadAllData();
-        }
+function getCurrentWeek() {
+    return parseInt(document.getElementById('current-week').textContent) || 1;
+}
 
-        function updateDayButtons(completedDays) {
-            const buttons = document.querySelectorAll('.day-btn');
-            buttons.forEach((btn, index) => {
-                const dayKey = `day${index}_week${getCurrentWeek()}`;
-                if (completedDays.includes(dayKey)) {
-                    btn.classList.add('completed');
-                }
-            });
-        }
+// ============================================================
+// SESSION TRAINING
+// ============================================================
+function startSession() {
+    if (!sessionRunning) {
+        sessionRunning = true; sessionPaused = false;
+        sessionInterval = setInterval(() => { sessionSeconds++; updateSessionDisplay(); }, 1000);
+        document.getElementById('btn-start').style.display = 'none';
+        document.getElementById('btn-pause').style.display = 'inline-block';
+        document.getElementById('btn-reset').style.display = 'inline-block';
+        document.getElementById('btn-save').style.display = 'inline-block';
+        document.getElementById('session-timer').classList.add('running');
+    }
+}
 
-        function getCurrentWeek() {
-            return parseInt(document.getElementById('current-week').textContent);
-        }
+function pauseSession() {
+    if (sessionRunning && !sessionPaused) {
+        clearInterval(sessionInterval); sessionPaused = true;
+        document.getElementById('btn-pause').textContent = '▶️ REPRENDRE';
+        document.getElementById('session-timer').classList.remove('running');
+    } else if (sessionPaused) {
+        sessionInterval = setInterval(() => { sessionSeconds++; updateSessionDisplay(); }, 1000);
+        sessionPaused = false;
+        document.getElementById('btn-pause').textContent = '⏸️ PAUSE';
+        document.getElementById('session-timer').classList.add('running');
+    }
+}
 
-        // ============================================
-        // SESSION TRAINING
-        // ============================================
+function resetSession() {
+    if (!confirm('Reset le chrono? (Le temps actuel sera perdu si non sauvegardé)')) return;
+    clearInterval(sessionInterval);
+    sessionSeconds = 0; sessionRunning = false; sessionPaused = false;
+    updateSessionDisplay();
+    document.getElementById('btn-start').style.display = 'inline-block';
+    document.getElementById('btn-pause').style.display = 'none';
+    document.getElementById('btn-reset').style.display = 'none';
+    document.getElementById('btn-save').style.display = 'none';
+    document.getElementById('btn-pause').textContent = '⏸️ PAUSE';
+    document.getElementById('session-timer').classList.remove('running');
+}
 
-        function startSession() {
-            if (!sessionRunning) {
-                sessionRunning = true;
-                sessionPaused = false;
-                sessionInterval = setInterval(() => {
-                    sessionSeconds++;
-                    updateSessionDisplay();
-                }, 1000);
-                
-                document.getElementById('btn-start').style.display = 'none';
-                document.getElementById('btn-pause').style.display = 'inline-block';
-                document.getElementById('btn-reset').style.display = 'inline-block';
-                document.getElementById('btn-save').style.display = 'inline-block';
-                document.getElementById('session-timer').classList.add('running');
-            }
-        }
+async function saveSession() {
+    if (sessionSeconds === 0) { alert('Aucun temps à sauvegarder!'); return; }
+    const minutes = Math.floor(sessionSeconds / 60);
+    const category = document.getElementById('session-category').value;
+    if (!confirm(`Sauvegarder cette session?\n\nCatégorie: ${category}\nDurée: ${minutes} min`)) return;
+    const session = { id:'session_'+Date.now(), date:getTodayString(), category, minutes, note:'', timestamp:Date.now() };
+    allSessions.push(session);
+    await saveSessions();
+    await loadAllData();
+    alert(`✅ Session sauvegardée!\n\n+${minutes} minutes ajoutées`);
+    sessionSeconds = 0; updateSessionDisplay();
+}
 
-        function pauseSession() {
-            if (sessionRunning && !sessionPaused) {
-                clearInterval(sessionInterval);
-                sessionPaused = true;
-                document.getElementById('btn-pause').textContent = '▶️ REPRENDRE';
-                document.getElementById('session-timer').classList.remove('running');
-            } else if (sessionPaused) {
-                sessionInterval = setInterval(() => {
-                    sessionSeconds++;
-                    updateSessionDisplay();
-                }, 1000);
-                sessionPaused = false;
-                document.getElementById('btn-pause').textContent = '⏸️ PAUSE';
-                document.getElementById('session-timer').classList.add('running');
-            }
-        }
+function updateSessionDisplay() {
+    const h = Math.floor(sessionSeconds/3600);
+    const m = Math.floor((sessionSeconds%3600)/60);
+    const s = sessionSeconds%60;
+    document.getElementById('session-timer').textContent =
+        `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}
 
-        function resetSession() {
-            if (!confirm('Reset le chrono? (Le temps actuel sera perdu si non sauvegardé)')) return;
-            
-            clearInterval(sessionInterval);
-            sessionSeconds = 0;
-            sessionRunning = false;
-            sessionPaused = false;
-            updateSessionDisplay();
-            
-            document.getElementById('btn-start').style.display = 'inline-block';
-            document.getElementById('btn-pause').style.display = 'none';
-            document.getElementById('btn-reset').style.display = 'none';
-            document.getElementById('btn-save').style.display = 'none';
-            document.getElementById('btn-pause').textContent = '⏸️ PAUSE';
-            document.getElementById('session-timer').classList.remove('running');
-        }
-
-        async function saveSession() {
-            if (sessionSeconds === 0) {
-                alert('Aucun temps à sauvegarder!');
-                return;
-            }
-            
-            const minutes = Math.floor(sessionSeconds / 60);
-            const category = document.getElementById('session-category').value;
-            
-            if (!confirm(`Sauvegarder cette session?\n\nCatégorie: ${category}\nDurée: ${minutes} min`)) {
-                return;
-            }
-            
-            const session = {
-                id: 'session_' + Date.now(),
-                date: getTodayString(),
-                category: category,
-                minutes: minutes,
-                note: '',
-                timestamp: Date.now()
-            };
-            
-            allSessions.push(session);
-            await saveSessions();
-            await loadAllData();
-            
-            alert(`✅ Session sauvegardée!\n\n+${minutes} minutes ajoutées`);
-            
-            sessionSeconds = 0;
-            updateSessionDisplay();
-        }
-
-        function updateSessionDisplay() {
-            const hours = Math.floor(sessionSeconds / 3600);
-            const minutes = Math.floor((sessionSeconds % 3600) / 60);
-            const seconds = sessionSeconds % 60;
-            
-            document.getElementById('session-timer').textContent = 
-                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        async function markDayCompleted() {
-            if (!confirm('Marquer ce jour comme complété?')) return;
-            
-            try {
-                const docRef = db.collection('users').doc(currentUser.uid);
-                const doc = await docRef.get();
-                const data = doc.exists ? doc.data() : {};
-                
-                const completedDays = data.completedDays || [];
-                const currentWeek = getCurrentWeek();
-                const dayKey = `day${currentDay}_week${currentWeek}`;
-                
-                if (!completedDays.includes(dayKey)) {
-                    completedDays.push(dayKey);
-                    
-                    const newStreak = calculateStreak(completedDays);
-                    
-                    await db.collection('users').doc(currentUser.uid).set({
-                        completedDays: completedDays,
-                        streak: newStreak,
-                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
-                    
-                    alert(`✅ Jour complété!\n\nStreak: ${newStreak} jours 🔥`);
-                    loadAllData();
-                }
-            } catch (error) {
-                console.error("Error marking day:", error);
-            }
-        }
-
-        function calculateStreak(completedDays) {
-            return completedDays.length;
-        }
-
-        // ============================================
-        // MANUAL ENTRY
-        // ============================================
-
-        async function quickAddTime(minutes) {
-            const category = document.getElementById('quick-category').value;
-            
-            const session = {
-                id: 'session_' + Date.now(),
-                date: getTodayString(),
-                category: category,
-                minutes: minutes,
-                note: '',
-                timestamp: Date.now()
-            };
-            
-            allSessions.push(session);
-            await saveSessions();
-            await loadAllData();
-            
-            showQuickFeedback(`✅ +${minutes} min ajoutées!`);
-        }
-
-        async function quickAddCustomTime() {
-            const minutes = parseInt(document.getElementById('quick-minutes').value);
-            const category = document.getElementById('quick-category').value;
-            
-            if (!minutes || minutes <= 0) {
-                alert('Entre un nombre de minutes valide!');
-                return;
-            }
-            
-            const session = {
-                id: 'session_' + Date.now(),
-                date: getTodayString(),
-                category: category,
-                minutes: minutes,
-                note: '',
-                timestamp: Date.now()
-            };
-            
-            allSessions.push(session);
-            await saveSessions();
-            await loadAllData();
-            
-            document.getElementById('quick-minutes').value = '';
-            
-            showQuickFeedback(`✅ +${minutes} min ajoutées!`);
-        }
-
-        function showQuickFeedback(message) {
-            const feedback = document.createElement('div');
-            feedback.textContent = message;
-            feedback.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: linear-gradient(135deg, var(--accent-green), var(--accent-yellow));
-                color: var(--bg-dark);
-                padding: 30px 60px;
-                border-radius: 12px;
-                font-family: 'Bebas Neue', sans-serif;
-                font-size: 2rem;
-                letter-spacing: 2px;
-                z-index: 10000;
-                box-shadow: 0 10px 40px rgba(0, 255, 136, 0.5);
-                animation: popIn 0.3s ease-out;
-            `;
-            
-            document.body.appendChild(feedback);
-            
-            setTimeout(() => {
-                feedback.style.animation = 'popOut 0.3s ease-out';
-                setTimeout(() => feedback.remove(), 300);
-            }, 1500);
-        }
-
-        async function addManualSession() {
-            const category = document.getElementById('manual-category').value;
-            const duration = parseInt(document.getElementById('manual-duration').value);
-            const note = document.getElementById('manual-note').value.trim();
-            const date = document.getElementById('manual-date').value;
-            
-            if (!duration || duration <= 0) {
-                alert('Durée invalide!');
-                return;
-            }
-            
-            const session = {
-                id: 'session_' + Date.now(),
-                date: date,
-                category: category,
-                minutes: duration,
-                note: note,
-                timestamp: Date.now()
-            };
-            
-            allSessions.push(session);
-            await saveSessions();
-            await loadAllData();
-            
-            document.getElementById('manual-duration').value = '30';
-            document.getElementById('manual-note').value = '';
-            
-            alert(`✅ Pratique ajoutée!\n\n${category} - ${duration} min`);
-        }
-
-        // ============================================
-        // PROGRESS
-        // ============================================
-
-        async function saveProgressToCloud() {
-            if (!currentUser) return;
-            
-            const progress = {
-                fluidity: parseInt(document.getElementById('fluidity-slider').value),
-                originality: parseInt(document.getElementById('originality-slider').value),
-                composition: parseInt(document.getElementById('composition-slider').value),
-                confidence: parseInt(document.getElementById('confidence-slider').value)
-            };
-            
+async function markDayCompleted() {
+    if (!confirm('Marquer ce jour comme complété?')) return;
+    try {
+        const docRef = db.collection('users').doc(currentUser.uid);
+        const doc = await docRef.get();
+        const data = doc.exists ? doc.data() : {};
+        const completedDays = data.completedDays || [];
+        const week = getCurrentWeek();
+        const dayKey = `day${currentDay}_week${week}`;
+        if (!completedDays.includes(dayKey)) {
+            completedDays.push(dayKey);
+            const newStreak = completedDays.length;
             await db.collection('users').doc(currentUser.uid).set({
-                progress: progress,
+                completedDays, streak: newStreak,
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
-            
-            alert('Progrès sauvegardé! 💪☁️');
+            alert(`✅ Jour complété!\n\nStreak: ${newStreak} jours 🔥`);
+            loadAllData();
         }
+    } catch (error) { console.error("Error marking day:", error); }
+}
 
-        function updateProgress(type, value) {
-            const fill = document.getElementById(`progress-${type}`);
-            const percentage = (value / 10) * 100;
-            fill.style.width = `${percentage}%`;
-            fill.textContent = value;
-        }
+// ============================================================
+// MANUAL ENTRY & QUICK ADD
+// ============================================================
+async function quickAddTime(minutes) {
+    const category = document.getElementById('quick-category').value;
+    const session = { id:'session_'+Date.now(), date:getTodayString(), category, minutes, note:'', timestamp:Date.now() };
+    allSessions.push(session);
+    await saveSessions();
+    await loadAllData();
+    showQuickFeedback(`✅ +${minutes} min ajoutées!`);
+}
 
-        // ============================================
-        // DAY SELECTOR & EXERCISES
-        // ============================================
+async function quickAddCustomTime() {
+    const minutes = parseInt(document.getElementById('quick-minutes').value);
+    const category = document.getElementById('quick-category').value;
+    if (!minutes || minutes <= 0) { alert('Entre un nombre de minutes valide!'); return; }
+    const session = { id:'session_'+Date.now(), date:getTodayString(), category, minutes, note:'', timestamp:Date.now() };
+    allSessions.push(session);
+    await saveSessions();
+    await loadAllData();
+    document.getElementById('quick-minutes').value = '';
+    showQuickFeedback(`✅ +${minutes} min ajoutées!`);
+}
 
-        function initDaySelector() {
-            const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-            const labels = ['Mix 1', 'Mix 2', 'Mix 3', 'Focus', 'Intégré', 'Repos', 'Libre'];
-            const container = document.getElementById('day-selector');
-            
-            days.forEach((day, index) => {
-                const btn = document.createElement('div');
-                btn.className = `day-btn ${index === 5 ? 'rest' : ''} ${index === currentDay ? 'active' : ''}`;
-                btn.onclick = () => selectDay(index);
-                btn.innerHTML = `
-                    <div class="day-name">${day}</div>
-                    <div class="day-label">${labels[index]}</div>
-                `;
-                container.appendChild(btn);
-            });
-        }
+function showQuickFeedback(message) {
+    const feedback = document.createElement('div');
+    feedback.textContent = message;
+    feedback.style.cssText = `
+        position:fixed;top:50%;left:50%;
+        transform:translate(-50%,-50%);
+        background:linear-gradient(135deg,var(--accent-green),var(--accent-yellow));
+        color:var(--bg-dark);padding:30px 60px;border-radius:12px;
+        font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;
+        z-index:10000;box-shadow:0 10px 40px rgba(0,255,136,0.5);
+        animation:popIn 0.3s ease-out;
+    `;
+    document.body.appendChild(feedback);
+    setTimeout(() => { feedback.style.animation='popOut 0.3s ease-out'; setTimeout(() => feedback.remove(), 300); }, 1500);
+}
 
-        function selectDay(day) {
-            currentDay = day;
-            document.querySelectorAll('.day-btn').forEach((btn, index) => {
-                btn.classList.toggle('active', index === day);
-            });
-            loadExercises(day);
-        }
+async function addManualSession() {
+    const category = document.getElementById('manual-category').value;
+    const duration = parseInt(document.getElementById('manual-duration').value);
+    const note = document.getElementById('manual-note').value.trim();
+    const date = document.getElementById('manual-date').value;
+    if (!duration || duration <= 0) { alert('Durée invalide!'); return; }
+    const session = { id:'session_'+Date.now(), date, category, minutes:duration, note, timestamp:Date.now() };
+    allSessions.push(session);
+    await saveSessions();
+    await loadAllData();
+    document.getElementById('manual-duration').value = '30';
+    document.getElementById('manual-note').value = '';
+    alert(`✅ Pratique ajoutée!\n\n${category} - ${duration} min`);
+}
 
-        function loadExercises(day) {
-            const container = document.getElementById('exercises-container');
-            const data = programData[day];
-            
-            let html = `<h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 3px; margin: 30px 0 20px;">${data.name}</h2>`;
-            html += `<p style="color: var(--text-secondary); margin-bottom: 30px;">Durée totale: ${data.total}</p>`;
-            
-            data.blocks.forEach((block, blockIndex) => {
-                const blockId = `day${day}_block${blockIndex}`;
-                html += `
-                    <div class="exercise-block">
-                        <div class="exercise-header">
-                            <div class="exercise-title">${block.title}</div>
-                            <div class="exercise-timer">⏱ ${block.time}</div>
-                        </div>
-                        ${block.hasGenerator ? `
-                            <button class="generator-btn" onclick="generateSubject('${block.generatorType}', '${blockId}')">
-                                🎲 Générer un sujet
-                            </button>
-                            <div class="generated-subject" id="generated-${blockId}"></div>
-                        ` : ''}
-                        <ul class="exercise-list">
-                            ${block.exercises.map(ex => `<li class="exercise-item">${ex}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
+// ============================================================
+// PROGRESS
+// ============================================================
+async function saveProgressToCloud() {
+    if (!currentUser) return;
+    const progress = {
+        fluidity: parseInt(document.getElementById('fluidity-slider').value),
+        originality: parseInt(document.getElementById('originality-slider').value),
+        composition: parseInt(document.getElementById('composition-slider').value),
+        confidence: parseInt(document.getElementById('confidence-slider').value)
+    };
+    await db.collection('users').doc(currentUser.uid).set({
+        progress, lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    alert('Progrès sauvegardé! 💪☁️');
+}
 
-        // ============================================
-        // GENERATOR
-        // ============================================
+function updateProgress(type, value) {
+    const fill = document.getElementById(`progress-${type}`);
+    fill.style.width = `${(value/10)*100}%`;
+    fill.textContent = value;
+}
 
-        function rollDice(category) {
-            const dice = document.getElementById(`dice-${category}`);
-            dice.classList.add('rolling');
-            
-            setTimeout(() => {
-                const items = ideaData[category];
-                const result = items[Math.floor(Math.random() * items.length)];
-                dice.querySelector('span').textContent = result;
-                dice.classList.remove('rolling');
-                updateResult();
-            }, 500);
-        }
+// ============================================================
+// DAY SELECTOR & EXERCISES
+// ============================================================
+function initDaySelector() {
+    const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+    const labels = ['Mix 1','Mix 2','Mix 3','Focus','Intégré','Repos','Libre'];
+    const container = document.getElementById('day-selector');
+    days.forEach((day, index) => {
+        const btn = document.createElement('div');
+        btn.className = `day-btn ${index === 5 ? 'rest' : ''} ${index === currentDay ? 'active' : ''}`;
+        btn.onclick = () => selectDay(index);
+        btn.innerHTML = `<div class="day-name">${day}</div><div class="day-label">${labels[index]}</div>`;
+        container.appendChild(btn);
+    });
+}
 
-        function rollAllDice() {
-            Object.keys(ideaData).forEach(category => rollDice(category));
-        }
+function selectDay(day) {
+    currentDay = day;
+    document.querySelectorAll('.day-btn').forEach((btn, index) => btn.classList.toggle('active', index === day));
+    loadExercises(day);
+}
 
-        function updateResult() {
-            const subject = document.querySelector('#dice-subject span').textContent;
-            const style = document.querySelector('#dice-style span').textContent;
-            const emotion = document.querySelector('#dice-emotion span').textContent;
-            const constraint = document.querySelector('#dice-constraint span').textContent;
-            
-            if (subject !== '?' && style !== '?' && emotion !== '?' && constraint !== '?') {
-                const resultBox = document.getElementById('result-box');
-                const resultText = document.getElementById('result-text');
-                resultText.textContent = `Dessine un ${subject} en style ${style}, avec une émotion ${emotion}, en utilisant ${constraint}`;
-                resultBox.style.display = 'block';
-            }
-        }
+function loadExercises(day) {
+    const container = document.getElementById('exercises-container');
+    const data = programData[day];
+    let html = `<h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin:30px 0 20px;">${data.name}</h2>`;
+    html += `<p style="color:var(--text-secondary);margin-bottom:30px;">Durée totale: ${data.total}</p>`;
+    data.blocks.forEach((block, blockIndex) => {
+        const blockId = `day${day}_block${blockIndex}`;
+        html += `
+            <div class="exercise-block">
+                <div class="exercise-header">
+                    <div class="exercise-title">${block.title}</div>
+                    <div class="exercise-timer">⏱ ${block.time}</div>
+                </div>
+                ${block.hasGenerator ? `
+                    <button class="generator-btn" onclick="generateSubject('${block.generatorType}','${blockId}')">
+                        🎲 Générer un sujet
+                    </button>
+                    <div class="generated-subject" id="generated-${blockId}"></div>
+                ` : ''}
+                <ul class="exercise-list">
+                    ${block.exercises.map(ex => `<li class="exercise-item">${ex}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
 
-        // ============================================
-        // TIMER
-        // ============================================
+// ============================================================
+// DICE GENERATOR
+// ============================================================
+function rollDice(category) {
+    const dice = document.getElementById(`dice-${category}`);
+    dice.classList.add('rolling');
+    setTimeout(() => {
+        const result = ideaData[category][Math.floor(Math.random() * ideaData[category].length)];
+        dice.querySelector('span').textContent = result;
+        dice.classList.remove('rolling');
+        updateResult();
+    }, 500);
+}
 
-        function startTimer() {
-            if (!timerRunning) {
-                timerRunning = true;
-                const preset = document.getElementById('timer-preset').value;
-                timerSeconds = parseInt(preset);
-                timerInterval = setInterval(() => {
-                    if (timerSeconds > 0) {
-                        timerSeconds--;
-                        updateTimerDisplay();
-                    } else {
-                        pauseTimer();
-                        alert('Temps écoulé! 🔔');
-                    }
-                }, 1000);
-            }
-        }
+function rollAllDice() { Object.keys(ideaData).forEach(category => rollDice(category)); }
 
-        function pauseTimer() {
-            timerRunning = false;
-            clearInterval(timerInterval);
-        }
+function updateResult() {
+    const subject = document.querySelector('#dice-subject span').textContent;
+    const style   = document.querySelector('#dice-style span').textContent;
+    const emotion = document.querySelector('#dice-emotion span').textContent;
+    const constraint = document.querySelector('#dice-constraint span').textContent;
+    if (subject!=='?' && style!=='?' && emotion!=='?' && constraint!=='?') {
+        document.getElementById('result-text').textContent = `Dessine un ${subject} en style ${style}, avec une émotion ${emotion}, en utilisant ${constraint}`;
+        document.getElementById('result-box').style.display = 'block';
+    }
+}
 
-        function resetTimer() {
-            pauseTimer();
-            const preset = document.getElementById('timer-preset').value;
-            timerSeconds = parseInt(preset);
-            updateTimerDisplay();
-        }
+// ============================================================
+// TIMER
+// ============================================================
+function startTimer() {
+    if (!timerRunning) {
+        timerRunning = true;
+        timerSeconds = parseInt(document.getElementById('timer-preset').value);
+        timerInterval = setInterval(() => {
+            if (timerSeconds > 0) { timerSeconds--; updateTimerDisplay(); }
+            else { pauseTimer(); alert('Temps écoulé! 🔔'); }
+        }, 1000);
+    }
+}
+function pauseTimer() { timerRunning = false; clearInterval(timerInterval); }
+function resetTimer() {
+    pauseTimer();
+    timerSeconds = parseInt(document.getElementById('timer-preset').value);
+    updateTimerDisplay();
+}
+function updateTimerDisplay() {
+    const m = Math.floor(timerSeconds/60);
+    const s = timerSeconds%60;
+    document.getElementById('timer-display').textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}
 
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timerSeconds / 60);
-            const seconds = timerSeconds % 60;
-            document.getElementById('timer-display').textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function switchTab(tabName, e) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+    if (e && e.target) e.target.classList.add('active');
+}
 
-        // ============================================
-        // TAB SWITCHING
-        // ============================================
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // ============================================
-        // INITIALIZE
-        // ============================================
-
-        initDaySelector();
-        loadExercises(0);
-        updateTimerDisplay();
-    </script>
+// ============================================================
+// INIT
+// ============================================================
+initDaySelector();
+loadExercises(0);
+updateTimerDisplay();
+</script>
 </body>
 </html>
