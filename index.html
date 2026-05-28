@@ -849,7 +849,7 @@ async function quickCoach(msg){
                 'anthropic-version':'2023-06-01',
                 'anthropic-dangerous-direct-browser-access':'true'
             },
-            body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:coachHistory})
+            body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:coachHistory})
         });
         const data=await res.json();
         const reply=data.content?.[0]?.text||"Desole, une erreur s est produite.";
