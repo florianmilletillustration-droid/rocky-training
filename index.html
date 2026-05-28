@@ -766,11 +766,11 @@ function renderHeatmap(){
     startDate.setDate(startDate.getDate()-(dow===0?6:dow-1));
     const totalDays=Math.max(72,Math.floor((today-startDate)/86400000)+1);
     const weeks=Math.ceil(totalDays/7);
-    function getColor(m){if(!m)return '#1a1a1a';if(m<=30)return '#0d3320';if(m<=60)return '#1a6640';if(m<=120)return '#00cc66';return '#00ff88';}
+    const getColor=m=>!m?'#1a1a1a':m<=30?'#0d3320':m<=60?'#1a6640':m<=120?'#00cc66':'#00ff88';
     const dayLabels=['L','M','M','J','V','S','D'];
     let html='<div style="display:flex;gap:3px;">';
     html+='<div style="display:flex;flex-direction:column;gap:3px;padding-top:22px;">';
-    dayLabels.forEach(d=>html+='<div style="width:16px;height:14px;font-size:.6rem;color:var(--text-secondary);display:flex;align-items:center;justify-content:flex-end;padding-right:4px;">'+d+'</div>');
+    dayLabels.forEach(d=>{html+='<div style="width:16px;height:14px;font-size:.6rem;color:var(--text-secondary);display:flex;align-items:center;justify-content:flex-end;padding-right:4px;">'+d+'</div>';});
     html+='</div>';
     const weekData=[];
     for(let w=0;w<weeks;w++){
@@ -791,8 +791,9 @@ function renderHeatmap(){
             const color=future?'transparent':getColor(mins);
             const border=isToday?'2px solid var(--accent-yellow)':'1px solid rgba(255,255,255,.06)';
             const lbl=cell.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
-            const tip=future?'':(mins>0?lbl+' — '+mins+' min':lbl+' — repos');
-            html+='<div style="width:14px;height:14px;border-radius:2px;background:'+color+';border:'+border+';cursor:'+(future?'default':'pointer')+';box-sizing:border-box;" onmouseenter="showHeatTip(event,''+tip.replace(/'/g,'\x27')+'')" onmouseleave="hideHeatTip()"></div>';
+            const tip=future?'':(mins>0?lbl+' - '+mins+' min':lbl+' - repos');
+            const div='<div style="width:14px;height:14px;border-radius:2px;background:'+color+';border:'+border+';cursor:'+(future?'default':'pointer')+';box-sizing:border-box;" onmouseenter="showHeatTip(event,this.dataset.tip)" onmouseleave="hideHeatTip()" data-tip="'+tip+'"></div>';
+            html+=div;
         }
         html+='</div>';
         weekData.push({wStart,wEnd:new Date(wStart.getTime()+6*86400000),total:wTot.total,w});
@@ -800,17 +801,18 @@ function renderHeatmap(){
     html+='</div>';
     container.innerHTML=html;
     weeklySummary.innerHTML=weekData.length===0
-        ?'<div class="empty-state">Commence à pratiquer! 🎨</div>'
-        :weekData.map(({wStart,wEnd,total,w})=>{
-            const h=Math.floor(total/60),m=total%60;
-            const color=total===0?'#333':total<120?'#0d3320':total<300?'#1a6640':total<600?'#00cc66':'#00ff88';
+        ?'<div class="empty-state">Commence a pratiquer!</div>'
+        :weekData.map(function(item){
+            var h=Math.floor(item.total/60),m=item.total%60;
+            var color=item.total===0?'#333':item.total<120?'#0d3320':item.total<300?'#1a6640':item.total<600?'#00cc66':'#00ff88';
             return '<div style="background:var(--bg-elevated);border:2px solid '+color+';border-radius:8px;padding:15px;text-align:center;">'
-                +'<div style="font-size:.7rem;color:var(--text-secondary);margin-bottom:5px;">Semaine '+(w+1)+'</div>'
-                +'<div style="font-family:Bebas Neue,sans-serif;font-size:1.6rem;color:'+(total>0?'var(--accent-green)':'var(--text-secondary)')+';">'+(total>0?(h>0?h+'h'+(m>0?m+'m':''):m+'m'):'—')+'</div>'
-                +'<div style="font-size:.7rem;color:var(--text-secondary);margin-top:4px;">'+wStart.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' - '+wEnd.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+'</div>'
+                +'<div style="font-size:.7rem;color:var(--text-secondary);margin-bottom:5px;">Semaine '+(item.w+1)+'</div>'
+                +'<div style="font-family:Bebas Neue,sans-serif;font-size:1.6rem;color:'+(item.total>0?'var(--accent-green)':'var(--text-secondary)')+';">'+(item.total>0?(h>0?h+'h'+(m>0?m+'m':''):m+'m'):'—')+'</div>'
+                +'<div style="font-size:.7rem;color:var(--text-secondary);margin-top:4px;">'+item.wStart.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' - '+item.wEnd.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+'</div>'
                 +'</div>';
         }).join('');
 }
+
 function showHeatTip(e,text){if(!text)return;const t=document.getElementById('heatmap-tooltip');t.textContent=text;t.style.display='block';t.style.left=(e.clientX+12)+'px';t.style.top=(e.clientY-10)+'px';}
 function hideHeatTip(){document.getElementById('heatmap-tooltip').style.display='none';}
 
