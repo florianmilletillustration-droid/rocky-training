@@ -120,13 +120,11 @@
         .progress-label{font-size:.9rem;color:var(--text-secondary);margin-bottom:15px;text-transform:uppercase;letter-spacing:1px;}
         .progress-bar{width:100%;height:30px;background:var(--bg-elevated);border-radius:15px;overflow:hidden;}
         .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent-red),var(--accent-yellow));transition:width .5s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:15px;font-weight:700;font-size:.85rem;}
-        /* Coach IA */
         .coach-msg-user{background:rgba(255,215,0,.08);border-left:4px solid var(--accent-yellow);padding:15px;border-radius:6px;}
         .coach-msg-ai{background:rgba(153,102,255,.1);border-left:4px solid var(--accent-purple);padding:15px;border-radius:6px;}
         .coach-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
         .coach-quick-btn{background:var(--bg-elevated);border:1px solid var(--accent-purple);color:var(--accent-purple);padding:8px 15px;border-radius:20px;cursor:pointer;font-size:.8rem;transition:all .3s;}
         .coach-quick-btn:hover{background:var(--accent-purple);color:white;}
-        /* Heatmap */
         .heat-cell{width:14px;height:14px;border-radius:2px;cursor:pointer;display:inline-block;}
         .empty-state{text-align:center;padding:40px;color:var(--text-secondary);font-style:italic;}
         @media(max-width:768px){h1{font-size:2.5rem}.day-selector{grid-template-columns:repeat(4,1fr)}.dice{width:80px;height:80px;font-size:1rem}.session-timer{font-size:3rem}.form-row{grid-template-columns:1fr}}
@@ -134,7 +132,6 @@
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen" class="login-screen">
     <h1>Programme Rocky</h1>
     <p class="subtitle">Entraînement Intensif Cloud</p>
@@ -142,7 +139,6 @@
     <button class="login-btn" onclick="loginWithGoogle()">🔐 Connexion avec Google</button>
 </div>
 
-<!-- APP -->
 <div id="app-content" class="app-content container">
     <header>
         <h1>Programme Rocky</h1>
@@ -153,7 +149,6 @@
         </div>
     </header>
 
-    <!-- STATS -->
     <div class="stats-bar">
         <div class="stat-card" style="cursor:default;">
             <div class="stat-label">Semaine actuelle</div>
@@ -166,7 +161,6 @@
         <div class="stat-card"><div class="stat-label">Aujourd'hui</div><div class="stat-value" id="today-total">0min</div></div>
     </div>
 
-    <!-- TABS -->
     <div class="tab-nav">
         <button class="tab-btn active" onclick="switchTab('programme',event)">Programme</button>
         <button class="tab-btn" onclick="switchTab('tracking',event)">Tracking</button>
@@ -178,7 +172,6 @@
         <button class="tab-btn" onclick="switchTab('coach',event)" style="color:var(--accent-purple);">🤖 Coach IA</button>
     </div>
 
-    <!-- TAB: PROGRAMME -->
     <div id="tab-programme" class="tab-content active">
         <div class="day-selector" id="day-selector"></div>
         <div class="session-controls">
@@ -202,7 +195,6 @@
         <div id="exercises-container"></div>
     </div>
 
-    <!-- TAB: TRACKING -->
     <div id="tab-tracking" class="tab-content">
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:20px;">Tracking Pratique</h2>
         <div style="background:linear-gradient(135deg,rgba(255,51,51,.1),rgba(255,215,0,.1));border:2px solid var(--accent-yellow);border-radius:12px;padding:30px;margin-bottom:30px;">
@@ -273,7 +265,6 @@
         </div>
     </div>
 
-    <!-- TAB: HISTORIQUE -->
     <div id="tab-historique" class="tab-content">
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:20px;">Historique Complet</h2>
         <div class="history-filters">
@@ -292,7 +283,6 @@
         <div class="history-list" id="history-list"></div>
     </div>
 
-    <!-- TAB: GÉNÉRATEUR -->
     <div id="tab-generator" class="tab-content">
         <div class="generator-container">
             <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:20px;">Générateur d'idées</h2>
@@ -308,7 +298,6 @@
         </div>
     </div>
 
-    <!-- TAB: TIMER -->
     <div id="tab-timer" class="tab-content">
         <div class="timer-widget">
             <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;margin-bottom:20px;">Timer d'exercice</h2>
@@ -326,7 +315,6 @@
         </div>
     </div>
 
-    <!-- TAB: PROGRÈS -->
     <div id="tab-progress" class="tab-content">
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:30px;">Ton Progrès</h2>
         <div class="progress-grid">
@@ -354,7 +342,6 @@
         <button class="btn" onclick="saveProgressToCloud()">💾 Sauvegarder le progrès</button>
     </div>
 
-    <!-- TAB: HEATMAP -->
     <div id="tab-heatmap" class="tab-content">
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:10px;">Heatmap de pratique</h2>
         <p style="color:var(--text-secondary);margin-bottom:25px;">Chaque carré = un jour. Plus c'est vert, plus t'as pratiqué 💪</p>
@@ -376,7 +363,6 @@
         </div>
     </div>
 
-    <!-- TAB: COACH IA -->
     <div id="tab-coach" class="tab-content">
         <div style="max-width:800px;margin:0 auto;">
             <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:10px;">Coach IA</h2>
@@ -401,12 +387,9 @@
         </div>
     </div>
 
-</div><!-- end app-content -->
+</div>
 
 <script>
-// ============================================================
-// FIREBASE
-// ============================================================
 const firebaseConfig = {
     apiKey:"AIzaSyA1y7_GRSPmSCsgMu-8aGhCtcMxMzIdtiQ",
     authDomain:"drawing-rocky-training.firebaseapp.com",
@@ -416,6 +399,16 @@ const firebaseConfig = {
     appId:"1:106676074989:web:1c23055e796e6d21653078",
     measurementId:"G-YYHWCKFTKD"
 };
+// API Key — demandée à l'utilisateur au besoin
+let ANTHROPIC_API_KEY = '';
+function getApiKey(){
+    if(ANTHROPIC_API_KEY) return true;
+    const key = prompt('🔑 Entre ta clé API Anthropic:\n(commence par sk-ant-)');
+    if(!key || !key.startsWith('sk-')){alert('Clé invalide!'); return false;}
+    ANTHROPIC_API_KEY = key.trim();
+    return true;
+}
+
 let db,auth,currentUser;
 try{firebase.initializeApp(firebaseConfig);db=firebase.firestore();auth=firebase.auth();}catch(e){console.error(e);}
 
@@ -435,20 +428,11 @@ auth.onAuthStateChanged(user=>{
 function loginWithGoogle(){const p=new firebase.auth.GoogleAuthProvider();auth.signInWithPopup(p).catch(e=>alert('Erreur: '+e.message));}
 function logout(){auth.signOut();}
 
-// ============================================================
-// GLOBAL STATE
-// ============================================================
 let allSessions=[], currentDay=0;
 let sessionInterval=null, sessionSeconds=0, sessionRunning=false, sessionPaused=false;
 let timerInterval=null, timerSeconds=900, timerRunning=false;
 let coachHistory=[];
 
-// ============================================================
-// ██████╗ ██████╗  ██████╗  ██████╗ ██████╗  █████╗ ███╗   ███╗███╗   ███╗███████╗
-// ZONE PROGRAMME — SAFE TO MODIFY
-// Tout ce qui est dans programData = les exercices affichés.
-// Tes sessions/stats Firebase ne sont PAS touchées quand tu changes ça.
-// ============================================================
 const programData = {
     0:{name:"Lundi - Mix équilibré",total:"65 min",blocks:[
         {title:"Block 1: Fondamentaux",time:"15 min",hasGenerator:false,exercises:["5 min: Cubes en perspective - 20 cubes sous différents angles","5 min: Cylindres - 15 cylindres dans l'espace","5 min: Grille de perspective - Dessine une grille 2-point perspective"]},
@@ -484,13 +468,7 @@ const programData = {
     5:{name:"Samedi - Repos",total:"0 min",blocks:[{title:"Jour de repos",time:"0 min",hasGenerator:false,exercises:["PAS DE DESSIN AUJOURD'HUI","Repos = partie de l'entraînement","Laisse ton cerveau assimiler","Regarde de l'art, des films, va marcher","Reviens frais lundi!"]}]},
     6:{name:"Dimanche - Pratique libre",total:"Variable",blocks:[{title:"Session libre",time:"À ton rythme",hasGenerator:false,exercises:["Dessine ce que TU veux","Aucune contrainte","Explore, expérimente, joue","C'est TON temps créatif","Si tu veux ne rien faire, c'est OK aussi!"]}]}
 };
-// ============================================================
-// FIN ZONE PROGRAMME
-// ============================================================
 
-// ============================================================
-// GENERATORS DATA
-// ============================================================
 const subjectGenerators = {
     angleChallenges:["Une chaise","Une lampe","Un vélo","Une tasse","Une bouteille","Un livre ouvert","Des lunettes","Une clé","Un marteau","Des ciseaux","Un parapluie","Une montre","Un sac à dos","Des écouteurs","Un téléphone","Un appareil photo","Une guitare","Un skateboard","Un casque","Des bottes","Un personnage debout","Un personnage assis","Un personnage accroupi","Un personnage à genoux","Un guerrier au repos","Un mage en méditation","Un archer bandant son arc","Un ninja en position neutre","Un samouraï à genoux","Un chevalier en armure","Un astronaute flottant","Une voiture de sport","Une moto","Un vaisseau spatial","Un avion","Un hélicoptère","Un sous-marin","Un tank","Un phare","Un château fort","Une pyramide","Un temple grec","Un arbre solitaire","Un rocher imposant","Un cristal","Un cactus","Un bambou","Un bonsaï","Une épée plantée","Un bouclier","Une hache","Un katana","Un dragon enroulé","Un loup hurlant","Un aigle majestueux","Un corbeau observateur","Une panthère tapie","Un robot sentinelle","Un mecha bipède","Un android humanoïde"],
     storytelling:["Quelqu'un qui vient d'apprendre une excellente nouvelle","Quelqu'un submergé par la peur","Quelqu'un rayonnant de joie","Quelqu'un accablé par la tristesse","Quelqu'un bouillonnant de colère","Quelqu'un paralysé par la surprise","Quelqu'un brillant de confiance","Quelqu'un transporté par l'espoir","Quelqu'un rongé par le regret","Quelqu'un éclatant de fierté","Quelqu'un saisi par la nostalgie","Quelqu'un empli d'émerveillement","Quelqu'un baigné de sérénité","Quelqu'un illuminé par l'inspiration","Quelqu'un découvrant un secret","Quelqu'un prenant une décision difficile","Quelqu'un se préparant au combat","Quelqu'un protégeant quelque chose","Quelqu'un fuyant un danger","Quelqu'un confrontant son ennemi","Quelqu'un aidant un allié blessé","Quelqu'un escaladant un obstacle","Quelqu'un célébrant une victoire","Quelqu'un pleurant une défaite","Quelqu'un disant au revoir","Quelqu'un seul dans la foule","Quelqu'un trouvant le courage","Quelqu'un reprenant espoir","Quelqu'un s'écroulant d'épuisement","Quelqu'un se figeant de terreur","Quelqu'un jubilant de triomphe","Quelqu'un perdu dans ses pensées","Quelqu'un concentré sur une tâche","Quelqu'un méditant en silence","Quelqu'un observant attentivement"],
@@ -518,30 +496,23 @@ function generateSubject(type,blockId){
     if(el){el.textContent='💡 '+s;el.classList.add('show');}
 }
 
-// ============================================================
-// FIRESTORE
-// ============================================================
 async function loadAllData(){
     if(!currentUser) return;
     try{
         const doc=await db.collection('users').doc(currentUser.uid).get();
         const data=doc.exists?doc.data():{};
-
         const currentWeek=data.currentWeek||1;
         document.getElementById('current-week').textContent=currentWeek;
-
         const completedDays=data.completedDays||[];
         document.getElementById('days-completed').textContent=completedDays.length+'/72';
         const totalMins=data.totalMinutes||0;
         document.getElementById('total-time').textContent=Math.floor(totalMins/60)+'h';
         document.getElementById('streak').textContent=(data.streak||0)+' 🔥';
-
         allSessions=data.sessions||[];
         updateTodayDisplay();
         updateCategoryStats();
         renderHistory();
         updateDayButtons(completedDays,currentWeek);
-
         if(data.progress){
             ['fluidity','originality','composition','confidence'].forEach(t=>{
                 const v=data.progress[t]||0;
@@ -618,9 +589,6 @@ function updateDayButtons(completedDays,currentWeek){
 }
 function getCurrentWeek(){return parseInt(document.getElementById('current-week').textContent)||1;}
 
-// ============================================================
-// SESSION TRAINING
-// ============================================================
 function startSession(){
     if(sessionRunning) return;
     sessionRunning=true;sessionPaused=false;
@@ -674,9 +642,6 @@ async function markDayCompleted(){
     }
 }
 
-// ============================================================
-// QUICK ADD & MANUAL
-// ============================================================
 async function quickAddTime(mins){
     const cat=document.getElementById('quick-category').value;
     allSessions.push({id:'session_'+Date.now(),date:getTodayString(),category:cat,minutes:mins,note:'',timestamp:Date.now()});
@@ -712,9 +677,6 @@ async function addManualSession(){
     alert('✅ '+cat+' - '+dur+' min ajoutés!');
 }
 
-// ============================================================
-// PROGRESS
-// ============================================================
 async function saveProgressToCloud(){
     if(!currentUser) return;
     const p={fluidity:+document.getElementById('fluidity-slider').value,originality:+document.getElementById('originality-slider').value,composition:+document.getElementById('composition-slider').value,confidence:+document.getElementById('confidence-slider').value};
@@ -723,9 +685,6 @@ async function saveProgressToCloud(){
 }
 function updateProgress(type,value){const f=document.getElementById('progress-'+type);f.style.width=(value/10*100)+'%';f.textContent=value;}
 
-// ============================================================
-// DAY SELECTOR
-// ============================================================
 function initDaySelector(){
     const days=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
     const labels=['Mix 1','Mix 2','Mix 3','Focus','Intégré','Repos','Libre'];
@@ -757,9 +716,6 @@ function loadExercises(day){
     c.innerHTML=html;
 }
 
-// ============================================================
-// DICE GENERATOR
-// ============================================================
 function rollDice(cat){
     const dice=document.getElementById('dice-'+cat);
     dice.classList.add('rolling');
@@ -782,17 +738,11 @@ function updateResult(){
     }
 }
 
-// ============================================================
-// TIMER
-// ============================================================
-function startTimer(){if(timerRunning)return;timerRunning=true;timerSeconds=parseInt(document.getElementById('timer-preset').value);timerInterval=setInterval(()=>{if(timerSeconds>0){timerSeconds--;updateTimerDisplay();}else{pauseTimer();alert('Temps écoulé! 🔔');}},1000);}
+
 function pauseTimer(){timerRunning=false;clearInterval(timerInterval);}
 function resetTimer(){pauseTimer();timerSeconds=parseInt(document.getElementById('timer-preset').value);updateTimerDisplay();}
 function updateTimerDisplay(){const m=Math.floor(timerSeconds/60),s=timerSeconds%60;document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 
-// ============================================================
-// ADVANCE WEEK
-// ============================================================
 async function advanceWeek(){
     const next=getCurrentWeek()+1;
     if(!confirm('Passer à la semaine '+next+'?\n\nLes jours vont repasser en rouge (tes données restent intactes!)')) return;
@@ -801,40 +751,27 @@ async function advanceWeek(){
     showQuickFeedback('🗓 Semaine '+next+'!');
 }
 
-// ============================================================
-// 🔥 HEATMAP
-// ============================================================
 function renderHeatmap(){
     const container=document.getElementById('heatmap-container');
     const weeklySummary=document.getElementById('weekly-summary');
     if(!container) return;
-
-    // Build date → minutes map
     const dayMap={};
     allSessions.forEach(s=>{dayMap[s.date]=(dayMap[s.date]||0)+s.minutes;});
-
-    // Start from earliest session or 71 days ago
     const today=new Date(); today.setHours(0,0,0,0);
     let startDate;
     const dates=Object.keys(dayMap).sort();
     if(dates.length>0){startDate=new Date(dates[0]);}
     else{startDate=new Date(today);startDate.setDate(startDate.getDate()-71);}
-    // Align to Monday
     const dow=startDate.getDay();
     startDate.setDate(startDate.getDate()-(dow===0?6:dow-1));
-
     const totalDays=Math.max(72,Math.floor((today-startDate)/86400000)+1);
     const weeks=Math.ceil(totalDays/7);
-
     function getColor(m){if(!m)return '#1a1a1a';if(m<=30)return '#0d3320';if(m<=60)return '#1a6640';if(m<=120)return '#00cc66';return '#00ff88';}
     const dayLabels=['L','M','M','J','V','S','D'];
-
     let html='<div style="display:flex;gap:3px;">';
-    // Row labels
     html+='<div style="display:flex;flex-direction:column;gap:3px;padding-top:22px;">';
     dayLabels.forEach(d=>html+='<div style="width:16px;height:14px;font-size:.6rem;color:var(--text-secondary);display:flex;align-items:center;justify-content:flex-end;padding-right:4px;">'+d+'</div>');
     html+='</div>';
-
     const weekData=[];
     for(let w=0;w<weeks;w++){
         const wStart=new Date(startDate); wStart.setDate(wStart.getDate()+w*7);
@@ -842,10 +779,8 @@ function renderHeatmap(){
         const wTot={total:0};
         const showMonth=w===0||new Date(startDate.getTime()+(w-1)*7*86400000).getMonth()!==wStart.getMonth();
         const monthLbl=wStart.toLocaleDateString('fr-FR',{month:'short'});
-
         html+='<div style="display:flex;flex-direction:column;gap:3px;">';
-        html+='<div style="height:18px;font-size:.6rem;color:var(--text-secondary);white-space:nowrap;">'+( showMonth?monthLbl:'')+'</div>';
-
+        html+='<div style="height:18px;font-size:.6rem;color:var(--text-secondary);white-space:nowrap;">'+(showMonth?monthLbl:'')+'</div>';
         for(let d=0;d<7;d++){
             const cell=new Date(wStart); cell.setDate(cell.getDate()+d);
             const ds=cell.toISOString().split('T')[0];
@@ -857,15 +792,13 @@ function renderHeatmap(){
             const border=isToday?'2px solid var(--accent-yellow)':'1px solid rgba(255,255,255,.06)';
             const lbl=cell.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
             const tip=future?'':(mins>0?lbl+' — '+mins+' min':lbl+' — repos');
-            html+='<div style="width:14px;height:14px;border-radius:2px;background:'+color+';border:'+border+';cursor:'+(future?'default':'pointer')+';box-sizing:border-box;" onmouseenter="showHeatTip(event,\''+tip.replace(/'/g,'\\x27')+'\')" onmouseleave="hideHeatTip()"></div>';
+            html+='<div style="width:14px;height:14px;border-radius:2px;background:'+color+';border:'+border+';cursor:'+(future?'default':'pointer')+';box-sizing:border-box;" onmouseenter="showHeatTip(event,''+tip.replace(/'/g,'\x27')+'')" onmouseleave="hideHeatTip()"></div>';
         }
         html+='</div>';
         weekData.push({wStart,wEnd:new Date(wStart.getTime()+6*86400000),total:wTot.total,w});
     }
     html+='</div>';
     container.innerHTML=html;
-
-    // Weekly summary
     weeklySummary.innerHTML=weekData.length===0
         ?'<div class="empty-state">Commence à pratiquer! 🎨</div>'
         :weekData.map(({wStart,wEnd,total,w})=>{
@@ -878,18 +811,9 @@ function renderHeatmap(){
                 +'</div>';
         }).join('');
 }
-
-function showHeatTip(e,text){
-    if(!text) return;
-    const t=document.getElementById('heatmap-tooltip');
-    t.textContent=text;t.style.display='block';
-    t.style.left=(e.clientX+12)+'px';t.style.top=(e.clientY-10)+'px';
-}
+function showHeatTip(e,text){if(!text)return;const t=document.getElementById('heatmap-tooltip');t.textContent=text;t.style.display='block';t.style.left=(e.clientX+12)+'px';t.style.top=(e.clientY-10)+'px';}
 function hideHeatTip(){document.getElementById('heatmap-tooltip').style.display='none';}
 
-// ============================================================
-// 🤖 COACH IA
-// ============================================================
 async function sendToCoach(){
     const input=document.getElementById('coach-input');
     const msg=input.value.trim();
@@ -906,43 +830,34 @@ async function quickCoach(msg){
     const ct={};allSessions.forEach(s=>{ct[s.category]=(ct[s.category]||0)+s.minutes;});
     const catStr=Object.entries(ct).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([c,m])=>c+': '+Math.floor(m/60)+'h'+(m%60)+'m').join(', ');
     const week=getCurrentWeek();
-
     appendCoachMsg('user',msg);
     coachHistory.push({role:'user',content:msg});
-
     const loadId='load_'+Date.now();
     div.innerHTML+=`<div id="${loadId}" class="coach-msg-ai"><div class="coach-label" style="color:var(--accent-purple);">🤖 Coach Rocky</div><div style="color:var(--text-secondary);font-style:italic;">En train de réfléchir...</div></div>`;
     div.scrollTop=div.scrollHeight;
     btn.disabled=true;
-
+    if(!getApiKey()){btn.disabled=false;return;}
     try{
-        const sys=`Tu es le Coach Rocky, coach d'art et de dessin expert, enthousiaste et bienveillant.
-Tu accompagnes Florian dans son Programme Rocky — 72 jours d'entraînement intensif en dessin.
-
-STATS ACTUELLES DE FLORIAN:
-- Semaine: ${week}/10
-- Temps total: ${Math.floor(totalMins/60)}h${totalMins%60}m
-- Aujourd'hui: ${todayMins} min
-- Top catégories: ${catStr||'pas encore de données'}
-
-Le programme couvre: gestes dynamiques, perspective, composition, créativité, storytelling visuel.
-
-STYLE: Réponds en français, ton direct et motivant. Concis (3-6 phrases max). Conseils ACTIONNABLES et spécifiques. Référence les stats quand pertinent.`;
-
+        const sys=`Tu es le Coach Rocky, coach d art et de dessin expert, enthousiaste et bienveillant. Tu accompagnes Florian dans son Programme Rocky 72 jours. Semaine: ${week}/10. Temps total: ${Math.floor(totalMins/60)}h. Aujourd hui: ${todayMins} min. Top: ${catStr||'aucune donnee'}. Reponds en francais, ton direct et motivant, 3-6 phrases max, conseils actionnables.`;
         const res=await fetch('https://api.anthropic.com/v1/messages',{
             method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:coachHistory})
+            headers:{
+                'Content-Type':'application/json',
+                'x-api-key':ANTHROPIC_API_KEY,
+                'anthropic-version':'2023-06-01',
+                'anthropic-dangerous-direct-browser-access':'true'
+            },
+            body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:coachHistory})
         });
         const data=await res.json();
-        const reply=data.content?.[0]?.text||"Désolé, une erreur s'est produite.";
+        const reply=data.content?.[0]?.text||"Desole, une erreur s est produite.";
         document.getElementById(loadId)?.remove();
         appendCoachMsg('coach',reply);
         coachHistory.push({role:'assistant',content:reply});
         if(coachHistory.length>20) coachHistory=coachHistory.slice(-20);
     }catch(err){
         document.getElementById(loadId)?.remove();
-        appendCoachMsg('coach',"Erreur de connexion. Réessaie!");
+        appendCoachMsg('coach',"Erreur de connexion. Reessaie!");
         console.error(err);
     }
     btn.disabled=false;
@@ -959,9 +874,6 @@ function appendCoachMsg(role,text){
     div.scrollTop=div.scrollHeight;
 }
 
-// ============================================================
-// TAB SWITCHING
-// ============================================================
 function switchTab(name,e){
     document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -970,9 +882,6 @@ function switchTab(name,e){
     if(name==='heatmap') setTimeout(renderHeatmap,50);
 }
 
-// ============================================================
-// INIT
-// ============================================================
 initDaySelector();
 loadExercises(0);
 updateTimerDisplay();
