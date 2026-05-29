@@ -145,6 +145,7 @@
         <p class="subtitle">Entraînement Intensif - Florian Millet</p>
         <div class="user-info">
             <span class="user-email" id="user-email"></span>
+            <button class="logout-btn" onclick="changeApiKey()" style="border-color:var(--accent-purple);color:var(--accent-purple);">🔑 Clé API</button>
             <button class="logout-btn" onclick="logout()">Déconnexion</button>
         </div>
     </header>
@@ -399,14 +400,22 @@ const firebaseConfig = {
     appId:"1:106676074989:web:1c23055e796e6d21653078",
     measurementId:"G-YYHWCKFTKD"
 };
-// API Key — demandée à l'utilisateur au besoin
-let ANTHROPIC_API_KEY = '';
+let ANTHROPIC_API_KEY = localStorage.getItem('anthropic_api_key') || '';
 function getApiKey(){
     if(ANTHROPIC_API_KEY) return true;
-    const key = prompt('🔑 Entre ta clé API Anthropic:\n(commence par sk-ant-)');
+    const key = prompt('🔑 Entre ta clé API Anthropic:\n(commence par sk-ant-)\n\nElle sera sauvegardée localement dans ton navigateur.');
     if(!key || !key.startsWith('sk-')){alert('Clé invalide!'); return false;}
     ANTHROPIC_API_KEY = key.trim();
+    localStorage.setItem('anthropic_api_key', ANTHROPIC_API_KEY);
     return true;
+}
+function changeApiKey(){
+    const key = prompt('🔑 Nouvelle clé API Anthropic:\n(commence par sk-ant-)');
+    if(!key) return;
+    if(!key.startsWith('sk-')){alert('Clé invalide!'); return;}
+    ANTHROPIC_API_KEY = key.trim();
+    localStorage.setItem('anthropic_api_key', ANTHROPIC_API_KEY);
+    alert('✅ Clé API mise à jour!');
 }
 
 let db,auth,currentUser;
@@ -738,7 +747,14 @@ function updateResult(){
     }
 }
 
-
+function startTimer(){
+    if(timerRunning) return;
+    timerRunning=true;
+    timerInterval=setInterval(()=>{
+        if(timerSeconds>0){timerSeconds--;updateTimerDisplay();}
+        else{clearInterval(timerInterval);timerRunning=false;alert('⏰ Temps écoulé!');}
+    },1000);
+}
 function pauseTimer(){timerRunning=false;clearInterval(timerInterval);}
 function resetTimer(){pauseTimer();timerSeconds=parseInt(document.getElementById('timer-preset').value);updateTimerDisplay();}
 function updateTimerDisplay(){const m=Math.floor(timerSeconds/60),s=timerSeconds%60;document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
