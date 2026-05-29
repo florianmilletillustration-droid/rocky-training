@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         :root{
@@ -169,6 +170,7 @@
         <button class="tab-btn" onclick="switchTab('generator',event)">Générateur</button>
         <button class="tab-btn" onclick="switchTab('timer',event)">Timer</button>
         <button class="tab-btn" onclick="switchTab('progress',event)">Progrès</button>
+        <button class="tab-btn" onclick="switchTab('stats',event)" style="color:var(--accent-blue);">📊 Stats</button>
         <button class="tab-btn" onclick="switchTab('heatmap',event)" style="color:var(--accent-green);">🔥 Heatmap</button>
         <button class="tab-btn" onclick="switchTab('coach',event)" style="color:var(--accent-purple);">🤖 Coach IA</button>
     </div>
@@ -343,7 +345,40 @@
         <button class="btn" onclick="saveProgressToCloud()">💾 Sauvegarder le progrès</button>
     </div>
 
-    <div id="tab-heatmap" class="tab-content">
+    <div id="tab-stats" class="tab-content">
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:30px;">Statistiques</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:25px;margin-bottom:30px;">
+
+            <!-- Temps par catégorie -->
+            <div class="progress-card" style="grid-column:span 2;">
+                <div class="progress-label" style="font-size:1rem;margin-bottom:20px;">⏱ Temps total par catégorie</div>
+                <div id="chart-categories" style="width:100%;"></div>
+            </div>
+
+            <!-- Temps par semaine -->
+            <div class="progress-card" style="grid-column:span 2;">
+                <div class="progress-label" style="font-size:1rem;margin-bottom:20px;">📅 Temps par semaine (heures)</div>
+                <canvas id="chart-weekly" style="width:100%;max-height:220px;"></canvas>
+            </div>
+
+            <!-- Donut obligatoire vs boni -->
+            <div class="progress-card" style="text-align:center;">
+                <div class="progress-label" style="font-size:1rem;margin-bottom:20px;">⭐ Rocky vs Autres pratiques</div>
+                <canvas id="chart-donut" style="max-width:220px;max-height:220px;margin:0 auto;display:block;"></canvas>
+                <div id="chart-donut-legend" style="margin-top:15px;font-size:.85rem;"></div>
+            </div>
+
+            <!-- Courbe 30 jours -->
+            <div class="progress-card">
+                <div class="progress-label" style="font-size:1rem;margin-bottom:20px;">📈 Moyenne quotidienne — 30 derniers jours</div>
+                <canvas id="chart-trend" style="width:100%;max-height:200px;"></canvas>
+            </div>
+
+        </div>
+        <button class="btn btn-secondary btn-small" onclick="renderStats()">🔄 Actualiser</button>
+    </div>
+
+        <div id="tab-heatmap" class="tab-content">
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:10px;">Heatmap de pratique</h2>
         <p style="color:var(--text-secondary);margin-bottom:25px;">Chaque carré = un jour. Plus c'est vert, plus t'as pratiqué 💪</p>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:25px;flex-wrap:wrap;">
@@ -1170,12 +1205,134 @@ function appendCoachMsg(role,text){
     div.scrollTop=div.scrollHeight;
 }
 
+let chartInstances = {};
+function destroyChart(id) {
+    if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
+}
+
+function renderStats() {
+    if (!allSessions.length) return;
+
+    // ── 1. Temps par catégorie (barres horizontales) ──────────────────────
+    const catMap = {};
+    allSessions.forEach(s => { catMap[s.category] = (catMap[s.category] || 0) + s.minutes; });
+    const catSorted = Object.entries(catMap).sort((a,b) => b[1]-a[1]);
+    const catContainer = document.getElementById('chart-categories');
+    catContainer.innerHTML = '';
+    const maxMin = catSorted[0][1];
+    const colors = ['var(--accent-red)','var(--accent-yellow)','var(--accent-green)','var(--accent-blue)','var(--accent-purple)'];
+    catSorted.forEach(([cat, mins], i) => {
+        const h = Math.floor(mins/60), m = mins%60;
+        const label = h > 0 ? h+'h'+(m>0?m+'m':'') : m+'m';
+        const pct = Math.round(mins/maxMin*100);
+        const color = colors[i % colors.length];
+        catContainer.innerHTML += `
+        <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:.85rem;">
+                <span>${cat}</span>
+                <span style="color:${color};font-weight:700;">${label}</span>
+            </div>
+            <div style="background:var(--bg-elevated);border-radius:6px;height:18px;overflow:hidden;">
+                <div style="width:${pct}%;height:100%;background:${color};border-radius:6px;transition:width .6s ease;"></div>
+            </div>
+        </div>`;
+    });
+
+    // ── 2. Temps par semaine (barres verticales) ──────────────────────────
+    const weekMap = {};
+    allSessions.forEach(s => {
+        const d = new Date(s.date);
+        const jan = new Date(d.getFullYear(), 0, 1);
+        const wn = Math.ceil(((d - jan) / 86400000 + jan.getDay() + 1) / 7);
+        const key = d.getFullYear() + '-S' + String(wn).padStart(2,'0');
+        weekMap[key] = (weekMap[key] || 0) + s.minutes;
+    });
+    const weekKeys = Object.keys(weekMap).sort().slice(-12);
+    const weekVals = weekKeys.map(k => +(weekMap[k]/60).toFixed(1));
+    destroyChart('weekly');
+    const ctxW = document.getElementById('chart-weekly').getContext('2d');
+    chartInstances['weekly'] = new Chart(ctxW, {
+        type: 'bar',
+        data: {
+            labels: weekKeys.map(k => k.split('-')[1]),
+            datasets: [{
+                data: weekVals,
+                backgroundColor: weekVals.map(v => v >= 4 ? '#00ff88' : v >= 2 ? '#ffd700' : '#ff3333'),
+                borderRadius: 6, borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true, plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: '#aaa', font: { size: 11 } }, grid: { color: '#222' } },
+                y: { ticks: { color: '#aaa', font: { size: 11 }, callback: v => v+'h' }, grid: { color: '#222' }, beginAtZero: true }
+            }
+        }
+    });
+
+    // ── 3. Donut Rocky vs Autres ──────────────────────────────────────────
+    const rockyMins = allSessions.filter(s => s.category === 'Programme Rocky').reduce((t,s) => t+s.minutes, 0);
+    const otherMins = allSessions.reduce((t,s) => t+s.minutes, 0) - rockyMins;
+    destroyChart('donut');
+    const ctxD = document.getElementById('chart-donut').getContext('2d');
+    chartInstances['donut'] = new Chart(ctxD, {
+        type: 'doughnut',
+        data: {
+            labels: ['Programme Rocky', 'Autres pratiques'],
+            datasets: [{ data: [rockyMins, otherMins], backgroundColor: ['#ff3333','#3399ff'], borderWidth: 0, hoverOffset: 8 }]
+        },
+        options: {
+            responsive: true, cutout: '65%',
+            plugins: { legend: { display: false } }
+        }
+    });
+    const rockyH = Math.floor(rockyMins/60), rockyM = rockyMins%60;
+    const otherH = Math.floor(otherMins/60), otherM = otherMins%60;
+    document.getElementById('chart-donut-legend').innerHTML =
+        `<span style="color:#ff3333;">🟥 Rocky : ${rockyH}h${rockyM>0?rockyM+'m':''}</span>&nbsp;&nbsp;
+         <span style="color:#3399ff;">🟦 Autres : ${otherH}h${otherM>0?otherM+'m':''}</span>`;
+
+    // ── 4. Courbe moyenne quotidienne 30 jours ────────────────────────────
+    const today = new Date(); today.setHours(0,0,0,0);
+    const days30 = [];
+    const vals30 = [];
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date(today); d.setDate(d.getDate() - i);
+        const ds = d.toISOString().split('T')[0];
+        const mins = allSessions.filter(s => s.date === ds).reduce((t,s) => t+s.minutes, 0);
+        days30.push(d.toLocaleDateString('fr-FR', {day:'numeric', month:'short'}));
+        vals30.push(+(mins/60).toFixed(1));
+    }
+    destroyChart('trend');
+    const ctxT = document.getElementById('chart-trend').getContext('2d');
+    chartInstances['trend'] = new Chart(ctxT, {
+        type: 'line',
+        data: {
+            labels: days30,
+            datasets: [{
+                data: vals30,
+                borderColor: '#ffd700', backgroundColor: 'rgba(255,215,0,.08)',
+                borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#ffd700',
+                fill: true, tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true, plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: '#aaa', font: { size: 10 }, maxTicksLimit: 8 }, grid: { color: '#222' } },
+                y: { ticks: { color: '#aaa', font: { size: 11 }, callback: v => v+'h' }, grid: { color: '#222' }, beginAtZero: true }
+            }
+        }
+    });
+}
+
 function switchTab(name,e){
     document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     document.getElementById('tab-'+name).classList.add('active');
     if(e&&e.target) e.target.classList.add('active');
     if(name==='heatmap') setTimeout(renderHeatmap,50);
+    if(name==='stats') setTimeout(renderStats,50);
 }
 
 initDaySelector();
