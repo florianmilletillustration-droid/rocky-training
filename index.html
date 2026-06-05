@@ -348,37 +348,28 @@
     <div id="tab-stats" class="tab-content">
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:30px;">Statistiques</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:25px;margin-bottom:30px;">
-
-            <!-- Temps par catégorie -->
             <div class="progress-card" style="grid-column:span 2;">
                 <div class="progress-label" style="font-size:1rem;margin-bottom:20px;">⏱ Temps total par catégorie</div>
                 <div id="chart-categories" style="width:100%;"></div>
             </div>
-
-            <!-- Temps par semaine -->
             <div class="progress-card" style="grid-column:span 2;">
                 <div class="progress-label" style="font-size:1rem;margin-bottom:20px;">📅 Temps par semaine (heures)</div>
                 <canvas id="chart-weekly" style="width:100%;max-height:220px;"></canvas>
             </div>
-
-            <!-- Donut obligatoire vs boni -->
             <div class="progress-card" style="text-align:center;">
                 <div class="progress-label" style="font-size:1rem;margin-bottom:20px;">⭐ Rocky vs Autres pratiques</div>
                 <canvas id="chart-donut" style="max-width:220px;max-height:220px;margin:0 auto;display:block;"></canvas>
                 <div id="chart-donut-legend" style="margin-top:15px;font-size:.85rem;"></div>
             </div>
-
-            <!-- Courbe 30 jours -->
             <div class="progress-card">
                 <div class="progress-label" style="font-size:1rem;margin-bottom:20px;">📈 Moyenne quotidienne — 30 derniers jours</div>
                 <canvas id="chart-trend" style="width:100%;max-height:200px;"></canvas>
             </div>
-
         </div>
         <button class="btn btn-secondary btn-small" onclick="renderStats()">🔄 Actualiser</button>
     </div>
 
-        <div id="tab-heatmap" class="tab-content">
+    <div id="tab-heatmap" class="tab-content">
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:10px;">Heatmap de pratique</h2>
         <p style="color:var(--text-secondary);margin-bottom:25px;">Chaque carré = un jour. Plus c'est vert, plus t'as pratiqué 💪</p>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:25px;flex-wrap:wrap;">
@@ -477,7 +468,13 @@ let sessionInterval=null, sessionSeconds=0, sessionRunning=false, sessionPaused=
 let timerInterval=null, timerSeconds=900, timerRunning=false;
 let coachHistory=[];
 
-// Programme structuré par semaine. Chaque semaine = même exercice Lun-Ven + Dim. Sam = repos.
+// ── FIX: variable centralisée pour la semaine courante ──────────────────
+// On ne lit PLUS le DOM pour obtenir la semaine — on utilise cette variable.
+let _currentWeekNum = 1;
+
+// ── FIX: getCurrentWeek() utilise la variable, pas le DOM ───────────────
+function getCurrentWeek(){ return _currentWeekNum; }
+
 const weekProgram = {
     1: {
         theme: "Mois 1 — Le langage des formes",
@@ -743,8 +740,6 @@ const weekProgram = {
     }
 };
 
-const dayLabelsShort = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
-
 function getProgramForWeekDay(week, day) {
     const w = weekProgram[week];
     if (!w) return null;
@@ -752,15 +747,6 @@ function getProgramForWeekDay(week, day) {
     return w;
 }
 
-const programData = {};
-
-const subjectGenerators = {
-    angleChallenges:["Une chaise","Une lampe","Un vélo","Une tasse","Une bouteille","Un livre ouvert","Des lunettes","Une clé","Un marteau","Des ciseaux","Un parapluie","Une montre","Un sac à dos","Des écouteurs","Un téléphone","Un appareil photo","Une guitare","Un skateboard","Un casque","Des bottes","Un personnage debout","Un personnage assis","Un personnage accroupi","Un personnage à genoux","Un guerrier au repos","Un mage en méditation","Un archer bandant son arc","Un ninja en position neutre","Un samouraï à genoux","Un chevalier en armure","Un astronaute flottant","Une voiture de sport","Une moto","Un vaisseau spatial","Un avion","Un hélicoptère","Un sous-marin","Un tank","Un phare","Un château fort","Une pyramide","Un temple grec","Un arbre solitaire","Un rocher imposant","Un cristal","Un cactus","Un bambou","Un bonsaï","Une épée plantée","Un bouclier","Une hache","Un katana","Un dragon enroulé","Un loup hurlant","Un aigle majestueux","Un corbeau observateur","Une panthère tapie","Un robot sentinelle","Un mecha bipède","Un android humanoïde"],
-    storytelling:["Quelqu'un qui vient d'apprendre une excellente nouvelle","Quelqu'un submergé par la peur","Quelqu'un rayonnant de joie","Quelqu'un accablé par la tristesse","Quelqu'un bouillonnant de colère","Quelqu'un paralysé par la surprise","Quelqu'un brillant de confiance","Quelqu'un transporté par l'espoir","Quelqu'un rongé par le regret","Quelqu'un éclatant de fierté","Quelqu'un saisi par la nostalgie","Quelqu'un empli d'émerveillement","Quelqu'un baigné de sérénité","Quelqu'un illuminé par l'inspiration","Quelqu'un découvrant un secret","Quelqu'un prenant une décision difficile","Quelqu'un se préparant au combat","Quelqu'un protégeant quelque chose","Quelqu'un fuyant un danger","Quelqu'un confrontant son ennemi","Quelqu'un aidant un allié blessé","Quelqu'un escaladant un obstacle","Quelqu'un célébrant une victoire","Quelqu'un pleurant une défaite","Quelqu'un disant au revoir","Quelqu'un seul dans la foule","Quelqu'un trouvant le courage","Quelqu'un reprenant espoir","Quelqu'un s'écroulant d'épuisement","Quelqu'un se figeant de terreur","Quelqu'un jubilant de triomphe","Quelqu'un perdu dans ses pensées","Quelqu'un concentré sur une tâche","Quelqu'un méditant en silence","Quelqu'un observant attentivement"],
-    composition:["Forêt mystérieuse au crépuscule","Montagne enneigée sous les étoiles","Plage déserte au lever du soleil","Canyon profond avec une rivière","Grotte illuminée par des cristaux","Cascade tombant d'une falaise","Marais brumeux avec des arbres morts","Désert de dunes sous la lune","Prairie ondulante sous l'orage","Jungle dense et luxuriante","Toundra gelée avec aurore boréale","Lac de montagne reflétant les pics","Forêt de bambous traversée par la lumière","Ruelle sombre dans une ville cyberpunk","Place médiévale bondée de marchands","Toit de gratte-ciel futuriste","Métro abandonné envahi par la végétation","Marché nocturne illuminé de lanternes","Bibliothèque ancienne aux rayonnages infinis","Laboratoire high-tech rempli d'écrans","Cathédrale gothique baignée de lumière","Station spatiale en orbite","Jardin japonais avec pont rouge","Temple en ruines recouvert de lierre","Forge de forgeron avec feu ardent","Tempête de sable balayant le paysage","Neige tombant doucement dans la forêt","Éclair zébrant le ciel nocturne","Brouillard épais masquant les formes","Chaleur écrasante faisant trembler l'air","Phare solitaire sur un rocher","Ruines d'un château fort","Monastère perché sur la montagne","Navire échoué sur la plage","Citadelle flottante dans les nuages"],
-    speedShapes:["Guerrier","Mage","Voleur","Archer","Paladin","Nécromancien","Druide","Moine","Berserk","Assassin","Prêtre","Sorcière","Chevalier","Ninja","Samouraï","Gladiateur","Pirate","Viking","Spartiate","Ronin","Dragon","Phénix","Griffon","Chimère","Hydre","Sphinx","Minotaure","Centaure","Licorne","Pégase","Kraken","Golem","Gargoyle","Wyvern","Loup","Ours","Aigle","Serpent","Tigre","Lion","Panthère","Faucon","Corbeau","Renard","Hibou","Robot","Cyborg","Android","Mecha","Exosquelette","Démon","Ange déchu","Zombie","Vampire","Loup-garou","Liche","Forgeron","Alchimiste","Explorateur","Mercenaire"],
-    constraints:["Uniquement des triangles","Uniquement des cercles","Uniquement des carrés","Formes organiques uniquement","Lignes droites seulement","Courbes fluides seulement","Spirales et tourbillons","Asymétrie extrême","Symétrie parfaite","Silhouette pure sans détails","Maximum 5 formes","Une seule forme répétée","Monochrome noir et blanc","Camaïeu de bleus","Palette de 3 couleurs max","Tons chauds seulement","Tons froids seulement","Palette rétro années 80","Palette néon cyberpunk","Sépia et vintage","Ligne continue sans lever","Pointillisme uniquement","Hachures croisées","Contrastes forts","Pas de contours","Style minimaliste","Style maximaliste","Vue de dessus uniquement","Profil strict","Vue isométrique","Perspective exagérée","Gros plan extrême","Point de vue d'insecte","Mouvement figé","Action explosive","Métaphore visuelle","Symbolisme fort"]
-};
 const ideaData = {
     subject:["Guerrier","Robot","Dragon","Sorcière","Astronaute","Pirate","Ninja","Créature","Chevalier","Magicien","Démon","Ange","Samurai","Viking","Cyborg","Alien","Fantôme","Vampire","Nécromancien","Druide","Assassin","Paladin","Barde","Moine"],
     style:["Cyberpunk","Steampunk","Fantasy","Sci-fi","Médiéval","Futuriste","Baroque","Minimaliste","Art Nouveau","Gothique","Tribal","Aztèque","Japonais","Égyptien","Nordique","Biomécanique","Post-apocalyptique","Rétro-futuriste","Dark Fantasy","High Fantasy"],
@@ -768,36 +754,37 @@ const ideaData = {
     constraint:["Vue de dessous","Silhouette pure","Palette 3 couleurs","Formes triangulaires","Symétrie parfaite","Asymétrie extrême","Contre-jour","Gros plan","Vue aérienne","Reflet dans l'eau","Fumée/brouillard","Composition circulaire","Diagonales fortes","Espace négatif dominant","Perspective forcée","Point de fuite multiple"]
 };
 
-function generateSubject(type,blockId){
-    let s='';
-    const r=a=>a[Math.floor(Math.random()*a.length)];
-    if(type==='angleChallenge') s=r(subjectGenerators.angleChallenges);
-    else if(type==='storytelling') s=r(subjectGenerators.storytelling);
-    else if(type==='composition') s=r(subjectGenerators.composition);
-    else if(type==='speedShape') s=r(subjectGenerators.speedShapes);
-    else if(type==='constraint') s=r(subjectGenerators.constraints);
-    else if(type==='mashup') s=`${r(ideaData.subject)} + ${r(ideaData.style)} + ${r(ideaData.emotion)}`;
-    const el=document.getElementById('generated-'+blockId);
-    if(el){el.textContent='💡 '+s;el.classList.add('show');}
-}
-
 async function loadAllData(){
     if(!currentUser) return;
     try{
         const doc=await db.collection('users').doc(currentUser.uid).get();
         const data=doc.exists?doc.data():{};
-        const currentWeek=data.currentWeek||1;
-        document.getElementById('current-week').textContent=currentWeek+'/12';
-        const completedDays=data.completedDays||[];
-        document.getElementById('days-completed').textContent=completedDays.length+'/84';
-        const totalMins=data.totalMinutes||0;
-        document.getElementById('total-time').textContent=Math.floor(totalMins/60)+'h';
-        document.getElementById('streak').textContent=(data.streak||0)+' 🔥';
-        allSessions=data.sessions||[];
+
+        // ── FIX: on lit currentWeek depuis Firestore et on met à jour
+        // la variable centralisée EN PREMIER, avant tout appel à getCurrentWeek()
+        const currentWeek = data.currentWeek || 1;
+        _currentWeekNum = currentWeek; // ← variable centralisée mise à jour
+
+        document.getElementById('current-week').textContent = currentWeek + '/12';
+
+        const completedDays = data.completedDays || [];
+
+        // ── FIX: on compte les jours complétés de la semaine actuelle seulement
+        // pour l'affichage "Jours complétés cette semaine"
+        // (le total global reste completedDays.length pour le 0/84)
+        document.getElementById('days-completed').textContent = completedDays.length + '/84';
+
+        const totalMins = data.totalMinutes || 0;
+        document.getElementById('total-time').textContent = Math.floor(totalMins/60) + 'h';
+        document.getElementById('streak').textContent = (data.streak || 0) + ' 🔥';
+        allSessions = data.sessions || [];
         updateTodayDisplay();
         updateCategoryStats();
         renderHistory();
-        updateDayButtons(completedDays,currentWeek);
+
+        // ── FIX: on passe currentWeek directement — plus de lecture DOM ──
+        updateDayButtons(completedDays, currentWeek);
+
         if(data.progress){
             ['fluidity','originality','composition','confidence'].forEach(t=>{
                 const v=data.progress[t]||0;
@@ -865,14 +852,17 @@ async function deleteSession(id){
     allSessions=allSessions.filter(s=>s.id!==id);
     await saveSessions();await loadAllData();
 }
-function updateDayButtons(completedDays,currentWeek){
-    const w=currentWeek||getCurrentWeek();
-    document.querySelectorAll('.day-btn').forEach((btn,i)=>{
+
+// ── FIX: updateDayButtons utilise toujours le paramètre passé directement ──
+function updateDayButtons(completedDays, currentWeek){
+    const w = parseInt(currentWeek) || 1; // force integer, valeur passée directement
+    document.querySelectorAll('.day-btn').forEach((btn, i) => {
         btn.classList.remove('completed');
-        if(completedDays.includes('day'+i+'_week'+w)) btn.classList.add('completed');
+        if(completedDays.includes('day' + i + '_week' + w)){
+            btn.classList.add('completed');
+        }
     });
 }
-function getCurrentWeek(){return parseInt(document.getElementById('current-week').textContent)||1;}
 
 function startSession(){
     if(sessionRunning) return;
@@ -912,18 +902,23 @@ function updateSessionDisplay(){
     const h=Math.floor(sessionSeconds/3600),m=Math.floor((sessionSeconds%3600)/60),s=sessionSeconds%60;
     document.getElementById('session-timer').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
+
+// ── FIX: markDayCompleted utilise _currentWeekNum directement ────────────
 async function markDayCompleted(){
     if(!confirm('Marquer ce jour comme complété?')) return;
     const doc=await db.collection('users').doc(currentUser.uid).get();
     const data=doc.exists?doc.data():{};
     const completedDays=data.completedDays||[];
-    const key='day'+currentDay+'_week'+getCurrentWeek();
+    const w = _currentWeekNum; // ← utilise la variable centralisée, pas le DOM
+    const key='day'+currentDay+'_week'+w;
     if(!completedDays.includes(key)){
         completedDays.push(key);
         const streak=completedDays.length;
         await db.collection('users').doc(currentUser.uid).set({completedDays,streak,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
         alert('✅ Jour complété!\nStreak: '+streak+' 🔥');
         loadAllData();
+    } else {
+        alert('Ce jour est déjà marqué comme complété!');
     }
 }
 
@@ -988,7 +983,7 @@ function selectDay(day){
 }
 function loadExercises(day){
     const c=document.getElementById('exercises-container');
-    const week=getCurrentWeek();
+    const week=getCurrentWeek(); // utilise _currentWeekNum via la fonction
     const prog=getProgramForWeekDay(week, day);
     if(!prog){
         c.innerHTML='<div class="empty-state">Programme semaine '+week+' non disponible.</div>';
@@ -1010,7 +1005,6 @@ function loadExercises(day){
         <div style="font-size:.8rem;text-transform:uppercase;letter-spacing:2px;color:var(--accent-red);margin-bottom:6px;">${prog.theme}</div>
         <h2 style="font-family:Bebas Neue,sans-serif;font-size:2.5rem;letter-spacing:3px;color:var(--text-primary);">${prog.name}</h2>
     </div>`;
-    // Main block — 45 min
     html+=`<div class="exercise-block" style="border-color:var(--accent-yellow);">
         <div class="exercise-header">
             <div class="exercise-title">${prog.main.title}</div>
@@ -1018,7 +1012,6 @@ function loadExercises(day){
         </div>
         <ul class="exercise-list">${prog.main.exercises.map(e=>'<li class="exercise-item">'+e+'</li>').join('')}</ul>
     </div>`;
-    // Bonus block — 15 min
     html+=`<div class="exercise-block" style="border-color:var(--accent-green);opacity:.9;">
         <div class="exercise-header">
             <div class="exercise-title" style="color:var(--accent-green);">⭐ ${prog.bonus.title}</div>
@@ -1063,9 +1056,11 @@ function pauseTimer(){timerRunning=false;clearInterval(timerInterval);}
 function resetTimer(){pauseTimer();timerSeconds=parseInt(document.getElementById('timer-preset').value);updateTimerDisplay();}
 function updateTimerDisplay(){const m=Math.floor(timerSeconds/60),s=timerSeconds%60;document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 
+// ── FIX: advanceWeek met à jour _currentWeekNum immédiatement ────────────
 async function advanceWeek(){
-    const next=getCurrentWeek()+1;
-    if(!confirm('Passer à la semaine '+next+'?\n\nLes jours vont repasser en rouge (tes données restent intactes!)')) return;
+    const next = _currentWeekNum + 1;
+    if(!confirm('Passer à la semaine '+next+'?\n\nLes jours vont repasser en neutre (tes données restent intactes!)')) return;
+    _currentWeekNum = next; // mise à jour immédiate de la variable centralisée
     await db.collection('users').doc(currentUser.uid).set({currentWeek:next,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     await loadAllData();
     showQuickFeedback('🗓 Semaine '+next+'!');
@@ -1163,7 +1158,7 @@ async function quickCoach(msg){
         const sys=`Tu es le Coach Rocky, coach de dessin expert, enthousiaste. Tu tutoies toujours Florian. Tu accompagnes Florian dans son Programme Rocky de 12 semaines (84 jours) axé sur les fondamentaux du dessin d'imagination : géométries dans l'espace, perspectives, warping, construction par primitives, transitions de formes, texture wrapping, silhouette, analyse de structure, croquis dynamique et design de masse. Inspiré de Peter Han, Sorie Kim et Artwood.
 
 STATS REELLES DE FLORIAN (tirees de Firebase):
-- Semaine actuelle: ${week}/10
+- Semaine actuelle: ${week}/12
 - Temps total pratique: ${Math.floor(totalMins/60)}h${totalMins%60}m
 - Temps aujourd'hui: ${todayMins} min
 - Top categories: ${catStr||'aucune session enregistree pour linstant'}
@@ -1212,8 +1207,6 @@ function destroyChart(id) {
 
 function renderStats() {
     if (!allSessions.length) return;
-
-    // ── 1. Temps par catégorie (barres horizontales) ──────────────────────
     const catMap = {};
     allSessions.forEach(s => { catMap[s.category] = (catMap[s.category] || 0) + s.minutes; });
     const catSorted = Object.entries(catMap).sort((a,b) => b[1]-a[1]);
@@ -1237,8 +1230,6 @@ function renderStats() {
             </div>
         </div>`;
     });
-
-    // ── 2. Temps par semaine (barres verticales) ──────────────────────────
     const weekMap = {};
     allSessions.forEach(s => {
         const d = new Date(s.date);
@@ -1269,8 +1260,6 @@ function renderStats() {
             }
         }
     });
-
-    // ── 3. Donut Rocky vs Autres ──────────────────────────────────────────
     const rockyMins = allSessions.filter(s => s.category === 'Programme Rocky').reduce((t,s) => t+s.minutes, 0);
     const otherMins = allSessions.reduce((t,s) => t+s.minutes, 0) - rockyMins;
     destroyChart('donut');
@@ -1291,8 +1280,6 @@ function renderStats() {
     document.getElementById('chart-donut-legend').innerHTML =
         `<span style="color:#ff3333;">🟥 Rocky : ${rockyH}h${rockyM>0?rockyM+'m':''}</span>&nbsp;&nbsp;
          <span style="color:#3399ff;">🟦 Autres : ${otherH}h${otherM>0?otherM+'m':''}</span>`;
-
-    // ── 4. Courbe moyenne quotidienne 30 jours ────────────────────────────
     const today = new Date(); today.setHours(0,0,0,0);
     const days30 = [];
     const vals30 = [];
@@ -1328,6 +1315,7 @@ function renderStats() {
 
 async function resetWeekToOne(){
     if(!confirm('Remettre la semaine à 1?\n\nTes sessions, stats et historique ne seront pas touchés.')) return;
+    _currentWeekNum = 1;
     await db.collection('users').doc(currentUser.uid).set({currentWeek:1,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     await loadAllData();
     showQuickFeedback('✅ Semaine remise à 1!');
@@ -1346,6 +1334,7 @@ initDaySelector();
 loadExercises(0);
 updateTimerDisplay();
 </script>
+
     <!-- DANGER ZONE -->
     <div style="max-width:1400px;margin:60px auto 20px;padding:0 20px;">
         <details style="border:1px solid #2a2a2a;border-radius:8px;padding:0;">
