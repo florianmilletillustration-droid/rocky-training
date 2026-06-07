@@ -79,6 +79,8 @@
         .day-btn:hover{border-color:var(--accent-yellow);transform:scale(1.05);}
         .day-btn.active{border-color:var(--accent-red);background:rgba(255,51,51,.1);}
         .day-btn.completed{border-color:var(--accent-green);background:rgba(0,255,136,.1);}
+        .day-btn.missed{border-color:var(--accent-red);background:rgba(255,51,51,.15);opacity:.8;}
+        .day-btn.missed .day-name{color:var(--accent-red);}
         .day-btn.rest{opacity:.5;}
         .day-name{font-size:.7rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
         .day-label{font-weight:600;font-size:.9rem;}
@@ -144,7 +146,7 @@
     <header>
         <h1>Programme Rocky</h1>
         <p class="subtitle">Entraînement Intensif - Florian Millet</p>
-        <div style="display:inline-block;background:#ff3333;color:white;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:2px;padding:4px 14px;border-radius:20px;margin-top:8px;text-transform:uppercase;">🛠 VERSION FIX-3 — 2026</div>
+        <div style="display:inline-block;background:#ff3333;color:white;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:2px;padding:4px 14px;border-radius:20px;margin-top:8px;text-transform:uppercase;">🛠 VERSION FIX-4 — ROUGE/VERT</div>
         <div class="user-info">
             <span class="user-email" id="user-email"></span>
             <button class="logout-btn" onclick="changeApiKey()" style="border-color:var(--accent-purple);color:var(--accent-purple);">🔑 Clé API</button>
@@ -533,7 +535,7 @@ async function loadAllData(){
         // 3. Reconstruire les boutons avec la BONNE semaine déjà dans _currentWeekNum
         initDaySelector();
         loadExercises(currentDay);
-        updateDayButtons(completedDays, currentWeek);
+        updateDayButtons(completedDays, currentWeek, data.weekStartDate || null);
 
         if(data.progress){
             ['fluidity','originality','composition','confidence'].forEach(t=>{
@@ -604,15 +606,41 @@ async function deleteSession(id){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// FIX : updateDayButtons reçoit toujours currentWeek en paramètre
+// updateDayButtons : vert = fait, rouge = passé non fait, neutre = futur
 // ═══════════════════════════════════════════════════════════════
-function updateDayButtons(completedDays, currentWeek){
+function updateDayButtons(completedDays, currentWeek, weekStartDate){
     const w = parseInt(currentWeek) || 1;
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    // Calculer la date du lundi de la semaine courante
+    let monday;
+    if(weekStartDate){
+        monday = new Date(weekStartDate);
+    } else {
+        // Fallback : lundi de la semaine actuelle
+        monday = new Date(today);
+        const dow = today.getDay();
+        monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+    }
+    monday.setHours(0,0,0,0);
+
     document.querySelectorAll('.day-btn').forEach((btn, i) => {
-        btn.classList.remove('completed');
-        if(completedDays.includes('day' + i + '_week' + w)){
+        btn.classList.remove('completed','missed');
+
+        const dayDate = new Date(monday);
+        dayDate.setDate(monday.getDate() + i);
+        dayDate.setHours(0,0,0,0);
+
+        const isDone = completedDays.includes('day' + i + '_week' + w);
+        const isPast = dayDate < today;   // jour déjà passé (avant aujourd'hui)
+        const isRest = i === 5;           // samedi = repos
+
+        if(isDone){
             btn.classList.add('completed');
+        } else if(isPast && !isRest){
+            btn.classList.add('missed');  // passé et non fait → rouge
         }
+        // sinon : neutre (futur ou aujourd'hui non encore fait)
     });
 }
 
@@ -823,7 +851,18 @@ async function advanceWeek(){
     if(next > 12){alert('Tu as terminé les 12 semaines! Bravo! 🏆');return;}
     if(!confirm('Passer à la semaine '+next+'?\n\nLes jours vont repasser en neutre (tes données restent intactes!)')) return;
     _currentWeekNum = next;
-    await db.collection('users').doc(currentUser.uid).set({currentWeek:next,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    // Sauvegarder la date de début de la nouvelle semaine (lundi actuel)
+    const today = new Date();
+    const dow = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+    monday.setHours(0,0,0,0);
+    const weekStartDate = monday.toISOString().split('T')[0];
+    await db.collection('users').doc(currentUser.uid).set({
+        currentWeek: next,
+        weekStartDate: weekStartDate,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
     await loadAllData();
     showQuickFeedback('🗓 Semaine '+next+'!');
 }
@@ -1078,7 +1117,17 @@ function renderStats() {
 async function resetWeekToOne(){
     if(!confirm('Remettre la semaine à 1?\n\nTes sessions, stats et historique ne seront pas touchés.')) return;
     _currentWeekNum = 1;
-    await db.collection('users').doc(currentUser.uid).set({currentWeek:1,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    const today = new Date();
+    const dow = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+    monday.setHours(0,0,0,0);
+    const weekStartDate = monday.toISOString().split('T')[0];
+    await db.collection('users').doc(currentUser.uid).set({
+        currentWeek: 1,
+        weekStartDate: weekStartDate,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
     await loadAllData();
     showQuickFeedback('✅ Semaine remise à 1!');
 }
