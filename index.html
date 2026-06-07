@@ -154,7 +154,7 @@
     <div class="stats-bar">
         <div class="stat-card" style="cursor:default;">
             <div class="stat-label">Semaine actuelle</div>
-            <div class="stat-value" id="current-week">1</div>
+            <div class="stat-value" id="current-week">1/12</div>
             <button onclick="advanceWeek()" style="margin-top:10px;font-family:'Space Mono',monospace;background:transparent;border:1px solid var(--accent-yellow);color:var(--accent-yellow);padding:5px 12px;border-radius:4px;cursor:pointer;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;transition:all .3s;width:100%;">➡ Semaine suivante</button>
         </div>
         <div class="stat-card"><div class="stat-label">Jours complétés</div><div class="stat-value" id="days-completed">0/84</div></div>
@@ -415,7 +415,6 @@
     </div>
 
 </div>
-
 <script>
 const firebaseConfig = {
     apiKey:"AIzaSyA1y7_GRSPmSCsgMu-8aGhCtcMxMzIdtiQ",
@@ -468,276 +467,26 @@ let sessionInterval=null, sessionSeconds=0, sessionRunning=false, sessionPaused=
 let timerInterval=null, timerSeconds=900, timerRunning=false;
 let coachHistory=[];
 
-// ── FIX: variable centralisée pour la semaine courante ──────────────────
-// On ne lit PLUS le DOM pour obtenir la semaine — on utilise cette variable.
+// ═══════════════════════════════════════════════════════════════
+// FIX CENTRAL : variable unique pour la semaine courante.
+// On ne lit JAMAIS le DOM pour obtenir la semaine.
+// ═══════════════════════════════════════════════════════════════
 let _currentWeekNum = 1;
-
-// ── FIX: getCurrentWeek() utilise la variable, pas le DOM ───────────────
 function getCurrentWeek(){ return _currentWeekNum; }
 
 const weekProgram = {
-    1: {
-        theme: "Mois 1 — Le langage des formes",
-        name: "Semaine 1 — Cubes et lignes droites",
-        main: {
-            title: "Cubes à main levée",
-            time: "45 min",
-            exercises: [
-                "Dessine 20 cubes à main levée, sans règle. Commence par un cube de face, puis tourne-le progressivement à chaque dessin.",
-                "Chaque cube doit avoir des arêtes droites et des angles visuellement cohérents. Si une arête est courbe, recommence ce cube.",
-                "Varie la taille : petits (1 cm), moyens (3 cm), grands (6 cm). Répartis-les sur toute la page."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Commence toujours par tracer la ligne d'action (courbe en C ou S) avant d'ajouter quoi que ce soit d'autre.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    },
-    2: {
-        theme: "Mois 1 — Le langage des formes",
-        name: "Semaine 2 — Cylindres et ellipses",
-        main: {
-            title: "Cylindres dans l'espace",
-            time: "45 min",
-            exercises: [
-                "Dessine 20 cylindres dans des orientations différentes : vertical, horizontal, en diagonale à 45°.",
-                "Pour chaque cylindre, trace d'abord les deux ellipses (dessus et dessous), PUIS relie-les avec deux lignes droites parallèles.",
-                "L'ellipse du dessus et celle du dessous doivent être identiques en largeur. Plus le cylindre est incliné vers toi, plus les ellipses sont rondes."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Ligne d'action en C ou S en premier, toujours.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    },
-    3: {
-        theme: "Mois 1 — Le langage des formes",
-        name: "Semaine 3 — Perspective 1 et 2 points",
-        main: {
-            title: "Grilles et boîtes en perspective",
-            time: "45 min",
-            exercises: [
-                "Partie 1 — 20 min : Trace une ligne d'horizon. Place un point de fuite au centre. Dessine une grille en perspective 1 point, puis place 5 boîtes dessus en respectant les lignes de fuite.",
-                "Partie 2 — 25 min : Trace une nouvelle ligne d'horizon avec deux points de fuite aux extrémités. Dessine 5 boîtes en perspective 2 points. Toutes les arêtes doivent converger vers l'un des deux points de fuite.",
-                "Critère de réussite : si tu prolonges les arêtes au crayon, elles doivent rejoindre exactement le point de fuite."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Ligne d'action en C ou S en premier, toujours.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    },
-    4: {
-        theme: "Mois 1 — Le langage des formes",
-        name: "Semaine 4 — Rotation mentale",
-        main: {
-            title: "Un objet, 6 angles",
-            time: "45 min",
-            exercises: [
-                "Choisis 5 objets simples du quotidien (ex: bouteille, boîte, tasse, téléphone, chaussure).",
-                "Pour chaque objet : observe-le 30 secondes, puis dessine-le sous 6 angles différents SANS le regarder après ce premier examen. Les 6 angles : face, profil gauche, profil droit, dessus, dessous, trois-quarts.",
-                "L'objectif n'est pas d'être parfait — c'est de forcer ton cerveau à construire le volume de l'objet en 3D dans ta tête."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Ligne d'action en C ou S en premier, toujours.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    },
-    5: {
-        theme: "Mois 2 — La forme dans l'espace",
-        name: "Semaine 5 — Warping",
-        main: {
-            title: "Lignes qui épousent les volumes",
-            time: "45 min",
-            exercises: [
-                "Partie 1 — 20 min : Dessine une sphère, un cube et un cylindre. Sur chacun, trace un réseau de lignes qui collent à la surface comme des lignes de latitude/longitude sur un globe. Sur la sphère tout est courbé. Sur le cube les lignes sont droites sur les faces mais font un angle net aux arêtes. Sur le cylindre les horizontales sont des ellipses, les verticales restent droites. 3 répétitions de chaque forme.",
-                "Partie 2 — 25 min : Reprends les mêmes 3 formes. Pose un drap imaginaire sur chacune. Dessine les plis du tissu en suivant la même logique — les plis épousent la forme en dessous. 3 répétitions de chaque."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Ligne d'action en C ou S en premier, toujours.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    },
-    6: {
-        theme: "Mois 2 — La forme dans l'espace",
-        name: "Semaine 6 — Construction par primitives",
-        main: {
-            title: "Voir la structure cachée",
-            time: "45 min",
-            exercises: [
-                "Choisis 5 objets du quotidien de complexité moyenne (chaise, lampe, voiture, téléphone, bouteille thermos).",
-                "Pour chaque objet, dessine en 2 étapes : Étape 1 — décompose l'objet en cubes, cylindres et sphères UNIQUEMENT. Pas de détails, juste les volumes de base. Étape 2 — par-dessus cette construction, ajoute les détails.",
-                "L'objectif est d'automatiser le réflexe de voir la structure 3D avant de dessiner quoi que ce soit."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Ligne d'action en C ou S en premier, toujours.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    },
-    7: {
-        theme: "Mois 2 — La forme dans l'espace",
-        name: "Semaine 7 — Transitions de formes",
-        main: {
-            title: "Morphing de volumes",
-            time: "45 min",
-            exercises: [
-                "Exercice 1 — 22 min : Dessine une séquence de 8 cases côte à côte. Case 1 = un cube. Case 8 = une sphère. Cases 2 à 7 = les étapes intermédiaires où le cube se transforme progressivement en sphère. Les arêtes s'arrondissent, les coins disparaissent.",
-                "Exercice 2 — 23 min : Même principe du cylindre vers une forme organique de ton choix (rein, goutte, haricot). 8 cases, transformation progressive et régulière."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Ligne d'action en C ou S en premier, toujours.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    },
-    8: {
-        theme: "Mois 2 — La forme dans l'espace",
-        name: "Semaine 8 — Texture wrapping",
-        main: {
-            title: "Lignes de contour et volume",
-            time: "45 min",
-            exercises: [
-                "Dessine 10 formes 3D variées (mélange géométrique et organique : cube, sphère, torse simplifié, crâne, rocher, pomme, etc.).",
-                "Sur chaque forme, trace uniquement des lignes de contour — comme des lignes topographiques sur une carte. Ces lignes doivent suivre la courbure de la surface et donner l'impression de volume sans aucun ombrage.",
-                "Critère de réussite : si tu enlèves le contour extérieur, les lignes intérieures seules doivent encore donner l'impression de 3D."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Ligne d'action en C ou S en premier, toujours.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    },
-    9: {
-        theme: "Mois 3 — Expression et dynamisme",
-        name: "Semaine 9 — Silhouette",
-        main: {
-            title: "Lisibilité instantanée",
-            time: "45 min",
-            exercises: [
-                "Dessine 15 silhouettes remplies entièrement en noir. Varie les sujets : personnages (5), animaux (5), objets ou créatures (5).",
-                "Règle absolue : aucun détail intérieur. Juste la forme extérieure pleine. Si tu traces une ligne à l'intérieur, recommence.",
-                "Test de réussite : montre ta silhouette 3 secondes. Si on ne peut pas identifier ce que c'est, simplifie et recommence."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Ligne d'action en C ou S en premier, toujours.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    },
-    10: {
-        theme: "Mois 3 — Expression et dynamisme",
-        name: "Semaine 10 — Analyse de structure",
-        main: {
-            title: "Le squelette avant la chair",
-            time: "45 min",
-            exercises: [
-                "Choisis 5 références visuelles variées (personnage, animal, véhicule, créature fantastique, objet complexe).",
-                "Pour chaque référence, dessine en 2 passes : Passe 1 — uniquement les axes principaux, les masses et les directions de force. Aucun détail, c'est un schéma. Passe 2 — par-dessus ce schéma, construis la forme finale.",
-                "L'objectif est de ne plus jamais attaquer un dessin par les détails. Le schéma de structure doit devenir un réflexe automatique."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Ligne d'action en C ou S en premier, toujours.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    },
-    11: {
-        theme: "Mois 3 — Expression et dynamisme",
-        name: "Semaine 11 — Croquis dynamique",
-        main: {
-            title: "Le mouvement avant tout",
-            time: "45 min",
-            exercises: [
-                "Dessine 20 personnages ou créatures en mouvement (course, saut, combat, chute, danse, lancer).",
-                "Méthode obligatoire : trace d'abord la ligne d'action (courbe en C ou S de la tête aux pieds). Ensuite seulement, construis le corps autour de cette ligne.",
-                "Exagère chaque pose de 30% par rapport à ce qui te semble naturel. Le mouvement doit être lisible en 1 seconde."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Ligne d'action en C ou S en premier, toujours.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    },
-    12: {
-        theme: "Mois 3 — Expression et dynamisme",
-        name: "Semaine 12 — Design de masse",
-        main: {
-            title: "Des silhouettes uniques par les proportions",
-            time: "45 min",
-            exercises: [
-                "Dessine 10 personnages ou créatures en jouant UNIQUEMENT sur la répartition des masses. Exemples : torse énorme/jambes minuscules, tête gigantesque/corps minuscule, bas du corps très lourd/haut léger, bras démesurément longs.",
-                "Aucun détail autorisé — seulement les masses en silhouette. Chaque personnage doit être immédiatement distinct des autres juste par ses proportions.",
-                "Critère de réussite : si tu alignes tes 10 silhouettes, aucune ne doit ressembler à une autre. Si deux sont trop similaires, pousse l'une vers des proportions plus extrêmes."
-            ]
-        },
-        bonus: {
-            title: "Boni — Gesture",
-            time: "15 min",
-            exercises: [
-                "15 gestures de 1 minute chacun. Corps humain entier.",
-                "Ligne d'action en C ou S en premier, toujours.",
-                "Objectif : capturer le mouvement, pas les détails."
-            ]
-        }
-    }
+    1:{theme:"Mois 1 — Le langage des formes",name:"Semaine 1 — Cubes et lignes droites",main:{title:"Cubes à main levée",time:"45 min",exercises:["Dessine 20 cubes à main levée, sans règle. Commence par un cube de face, puis tourne-le progressivement à chaque dessin.","Chaque cube doit avoir des arêtes droites et des angles visuellement cohérents. Si une arête est courbe, recommence ce cube.","Varie la taille : petits (1 cm), moyens (3 cm), grands (6 cm). Répartis-les sur toute la page."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Commence toujours par tracer la ligne d'action (courbe en C ou S) avant d'ajouter quoi que ce soit d'autre.","Objectif : capturer le mouvement, pas les détails."]}},
+    2:{theme:"Mois 1 — Le langage des formes",name:"Semaine 2 — Cylindres et ellipses",main:{title:"Cylindres dans l'espace",time:"45 min",exercises:["Dessine 20 cylindres dans des orientations différentes : vertical, horizontal, en diagonale à 45°.","Pour chaque cylindre, trace d'abord les deux ellipses (dessus et dessous), PUIS relie-les avec deux lignes droites parallèles.","L'ellipse du dessus et celle du dessous doivent être identiques en largeur. Plus le cylindre est incliné vers toi, plus les ellipses sont rondes."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Ligne d'action en C ou S en premier, toujours.","Objectif : capturer le mouvement, pas les détails."]}},
+    3:{theme:"Mois 1 — Le langage des formes",name:"Semaine 3 — Perspective 1 et 2 points",main:{title:"Grilles et boîtes en perspective",time:"45 min",exercises:["Partie 1 — 20 min : Trace une ligne d'horizon. Place un point de fuite au centre. Dessine une grille en perspective 1 point, puis place 5 boîtes dessus en respectant les lignes de fuite.","Partie 2 — 25 min : Trace une nouvelle ligne d'horizon avec deux points de fuite aux extrémités. Dessine 5 boîtes en perspective 2 points. Toutes les arêtes doivent converger vers l'un des deux points de fuite.","Critère de réussite : si tu prolonges les arêtes au crayon, elles doivent rejoindre exactement le point de fuite."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Ligne d'action en C ou S en premier, toujours.","Objectif : capturer le mouvement, pas les détails."]}},
+    4:{theme:"Mois 1 — Le langage des formes",name:"Semaine 4 — Rotation mentale",main:{title:"Un objet, 6 angles",time:"45 min",exercises:["Choisis 5 objets simples du quotidien (ex: bouteille, boîte, tasse, téléphone, chaussure).","Pour chaque objet : observe-le 30 secondes, puis dessine-le sous 6 angles différents SANS le regarder après ce premier examen. Les 6 angles : face, profil gauche, profil droit, dessus, dessous, trois-quarts.","L'objectif n'est pas d'être parfait — c'est de forcer ton cerveau à construire le volume de l'objet en 3D dans ta tête."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Ligne d'action en C ou S en premier, toujours.","Objectif : capturer le mouvement, pas les détails."]}},
+    5:{theme:"Mois 2 — La forme dans l'espace",name:"Semaine 5 — Warping",main:{title:"Lignes qui épousent les volumes",time:"45 min",exercises:["Partie 1 — 20 min : Dessine une sphère, un cube et un cylindre. Sur chacun, trace un réseau de lignes qui collent à la surface comme des lignes de latitude/longitude sur un globe. Sur la sphère tout est courbé. Sur le cube les lignes sont droites sur les faces mais font un angle net aux arêtes. Sur le cylindre les horizontales sont des ellipses, les verticales restent droites. 3 répétitions de chaque forme.","Partie 2 — 25 min : Reprends les mêmes 3 formes. Pose un drap imaginaire sur chacune. Dessine les plis du tissu en suivant la même logique — les plis épousent la forme en dessous. 3 répétitions de chaque."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Ligne d'action en C ou S en premier, toujours.","Objectif : capturer le mouvement, pas les détails."]}},
+    6:{theme:"Mois 2 — La forme dans l'espace",name:"Semaine 6 — Construction par primitives",main:{title:"Voir la structure cachée",time:"45 min",exercises:["Choisis 5 objets du quotidien de complexité moyenne (chaise, lampe, voiture, téléphone, bouteille thermos).","Pour chaque objet, dessine en 2 étapes : Étape 1 — décompose l'objet en cubes, cylindres et sphères UNIQUEMENT. Pas de détails, juste les volumes de base. Étape 2 — par-dessus cette construction, ajoute les détails.","L'objectif est d'automatiser le réflexe de voir la structure 3D avant de dessiner quoi que ce soit."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Ligne d'action en C ou S en premier, toujours.","Objectif : capturer le mouvement, pas les détails."]}},
+    7:{theme:"Mois 2 — La forme dans l'espace",name:"Semaine 7 — Transitions de formes",main:{title:"Morphing de volumes",time:"45 min",exercises:["Exercice 1 — 22 min : Dessine une séquence de 8 cases côte à côte. Case 1 = un cube. Case 8 = une sphère. Cases 2 à 7 = les étapes intermédiaires où le cube se transforme progressivement en sphère. Les arêtes s'arrondissent, les coins disparaissent.","Exercice 2 — 23 min : Même principe du cylindre vers une forme organique de ton choix (rein, goutte, haricot). 8 cases, transformation progressive et régulière."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Ligne d'action en C ou S en premier, toujours.","Objectif : capturer le mouvement, pas les détails."]}},
+    8:{theme:"Mois 2 — La forme dans l'espace",name:"Semaine 8 — Texture wrapping",main:{title:"Lignes de contour et volume",time:"45 min",exercises:["Dessine 10 formes 3D variées (mélange géométrique et organique : cube, sphère, torse simplifié, crâne, rocher, pomme, etc.).","Sur chaque forme, trace uniquement des lignes de contour — comme des lignes topographiques sur une carte. Ces lignes doivent suivre la courbure de la surface et donner l'impression de volume sans aucun ombrage.","Critère de réussite : si tu enlèves le contour extérieur, les lignes intérieures seules doivent encore donner l'impression de 3D."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Ligne d'action en C ou S en premier, toujours.","Objectif : capturer le mouvement, pas les détails."]}},
+    9:{theme:"Mois 3 — Expression et dynamisme",name:"Semaine 9 — Silhouette",main:{title:"Lisibilité instantanée",time:"45 min",exercises:["Dessine 15 silhouettes remplies entièrement en noir. Varie les sujets : personnages (5), animaux (5), objets ou créatures (5).","Règle absolue : aucun détail intérieur. Juste la forme extérieure pleine. Si tu traces une ligne à l'intérieur, recommence.","Test de réussite : montre ta silhouette 3 secondes. Si on ne peut pas identifier ce que c'est, simplifie et recommence."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Ligne d'action en C ou S en premier, toujours.","Objectif : capturer le mouvement, pas les détails."]}},
+    10:{theme:"Mois 3 — Expression et dynamisme",name:"Semaine 10 — Analyse de structure",main:{title:"Le squelette avant la chair",time:"45 min",exercises:["Choisis 5 références visuelles variées (personnage, animal, véhicule, créature fantastique, objet complexe).","Pour chaque référence, dessine en 2 passes : Passe 1 — uniquement les axes principaux, les masses et les directions de force. Aucun détail, c'est un schéma. Passe 2 — par-dessus ce schéma, construis la forme finale.","L'objectif est de ne plus jamais attaquer un dessin par les détails. Le schéma de structure doit devenir un réflexe automatique."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Ligne d'action en C ou S en premier, toujours.","Objectif : capturer le mouvement, pas les détails."]}},
+    11:{theme:"Mois 3 — Expression et dynamisme",name:"Semaine 11 — Croquis dynamique",main:{title:"Le mouvement avant tout",time:"45 min",exercises:["Dessine 20 personnages ou créatures en mouvement (course, saut, combat, chute, danse, lancer).","Méthode obligatoire : trace d'abord la ligne d'action (courbe en C ou S de la tête aux pieds). Ensuite seulement, construis le corps autour de cette ligne.","Exagère chaque pose de 30% par rapport à ce qui te semble naturel. Le mouvement doit être lisible en 1 seconde."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Ligne d'action en C ou S en premier, toujours.","Objectif : capturer le mouvement, pas les détails."]}},
+    12:{theme:"Mois 3 — Expression et dynamisme",name:"Semaine 12 — Design de masse",main:{title:"Des silhouettes uniques par les proportions",time:"45 min",exercises:["Dessine 10 personnages ou créatures en jouant UNIQUEMENT sur la répartition des masses. Exemples : torse énorme/jambes minuscules, tête gigantesque/corps minuscule, bas du corps très lourd/haut léger, bras démesurément longs.","Aucun détail autorisé — seulement les masses en silhouette. Chaque personnage doit être immédiatement distinct des autres juste par ses proportions.","Critère de réussite : si tu alignes tes 10 silhouettes, aucune ne doit ressembler à une autre. Si deux sont trop similaires, pousse l'une vers des proportions plus extrêmes."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Ligne d'action en C ou S en premier, toujours.","Objectif : capturer le mouvement, pas les détails."]}}
 };
 
 function getProgramForWeekDay(week, day) {
@@ -754,26 +503,24 @@ const ideaData = {
     constraint:["Vue de dessous","Silhouette pure","Palette 3 couleurs","Formes triangulaires","Symétrie parfaite","Asymétrie extrême","Contre-jour","Gros plan","Vue aérienne","Reflet dans l'eau","Fumée/brouillard","Composition circulaire","Diagonales fortes","Espace négatif dominant","Perspective forcée","Point de fuite multiple"]
 };
 
+// ═══════════════════════════════════════════════════════════════
+// FIX PRINCIPAL : loadAllData établit _currentWeekNum EN PREMIER
+// puis reconstruit les boutons avec initDaySelector + loadExercises
+// ═══════════════════════════════════════════════════════════════
 async function loadAllData(){
     if(!currentUser) return;
     try{
         const doc=await db.collection('users').doc(currentUser.uid).get();
         const data=doc.exists?doc.data():{};
 
-        // ── FIX: on lit currentWeek depuis Firestore et on met à jour
-        // la variable centralisée EN PREMIER, avant tout appel à getCurrentWeek()
+        // 1. Établir la semaine AVANT tout render
         const currentWeek = data.currentWeek || 1;
-        _currentWeekNum = currentWeek; // ← variable centralisée mise à jour
+        _currentWeekNum = currentWeek;
 
+        // 2. Mettre à jour l'affichage des stats
         document.getElementById('current-week').textContent = currentWeek + '/12';
-
         const completedDays = data.completedDays || [];
-
-        // ── FIX: on compte les jours complétés de la semaine actuelle seulement
-        // pour l'affichage "Jours complétés cette semaine"
-        // (le total global reste completedDays.length pour le 0/84)
         document.getElementById('days-completed').textContent = completedDays.length + '/84';
-
         const totalMins = data.totalMinutes || 0;
         document.getElementById('total-time').textContent = Math.floor(totalMins/60) + 'h';
         document.getElementById('streak').textContent = (data.streak || 0) + ' 🔥';
@@ -782,7 +529,9 @@ async function loadAllData(){
         updateCategoryStats();
         renderHistory();
 
-        // ── FIX: on passe currentWeek directement — plus de lecture DOM ──
+        // 3. Reconstruire les boutons avec la BONNE semaine déjà dans _currentWeekNum
+        initDaySelector();
+        loadExercises(currentDay);
         updateDayButtons(completedDays, currentWeek);
 
         if(data.progress){
@@ -853,9 +602,11 @@ async function deleteSession(id){
     await saveSessions();await loadAllData();
 }
 
-// ── FIX: updateDayButtons utilise toujours le paramètre passé directement ──
+// ═══════════════════════════════════════════════════════════════
+// FIX : updateDayButtons reçoit toujours currentWeek en paramètre
+// ═══════════════════════════════════════════════════════════════
 function updateDayButtons(completedDays, currentWeek){
-    const w = parseInt(currentWeek) || 1; // force integer, valeur passée directement
+    const w = parseInt(currentWeek) || 1;
     document.querySelectorAll('.day-btn').forEach((btn, i) => {
         btn.classList.remove('completed');
         if(completedDays.includes('day' + i + '_week' + w)){
@@ -903,13 +654,15 @@ function updateSessionDisplay(){
     document.getElementById('session-timer').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-// ── FIX: markDayCompleted utilise _currentWeekNum directement ────────────
+// ═══════════════════════════════════════════════════════════════
+// FIX : markDayCompleted utilise _currentWeekNum, jamais le DOM
+// ═══════════════════════════════════════════════════════════════
 async function markDayCompleted(){
     if(!confirm('Marquer ce jour comme complété?')) return;
     const doc=await db.collection('users').doc(currentUser.uid).get();
     const data=doc.exists?doc.data():{};
     const completedDays=data.completedDays||[];
-    const w = _currentWeekNum; // ← utilise la variable centralisée, pas le DOM
+    const w = _currentWeekNum;
     const key='day'+currentDay+'_week'+w;
     if(!completedDays.includes(key)){
         completedDays.push(key);
@@ -965,9 +718,14 @@ async function saveProgressToCloud(){
 }
 function updateProgress(type,value){const f=document.getElementById('progress-'+type);f.style.width=(value/10*100)+'%';f.textContent=value;}
 
+// ═══════════════════════════════════════════════════════════════
+// FIX : initDaySelector vide le container avant de reconstruire
+// (évite les doublons quand loadAllData est rappelé)
+// ═══════════════════════════════════════════════════════════════
 function initDaySelector(){
     const days=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
     const c=document.getElementById('day-selector');
+    c.innerHTML=''; // ← reset avant reconstruction
     days.forEach((d,i)=>{
         const btn=document.createElement('div');
         btn.className='day-btn'+(i===5?' rest':'')+(i===currentDay?' active':'');
@@ -983,7 +741,7 @@ function selectDay(day){
 }
 function loadExercises(day){
     const c=document.getElementById('exercises-container');
-    const week=getCurrentWeek(); // utilise _currentWeekNum via la fonction
+    const week=getCurrentWeek();
     const prog=getProgramForWeekDay(week, day);
     if(!prog){
         c.innerHTML='<div class="empty-state">Programme semaine '+week+' non disponible.</div>';
@@ -1056,11 +814,14 @@ function pauseTimer(){timerRunning=false;clearInterval(timerInterval);}
 function resetTimer(){pauseTimer();timerSeconds=parseInt(document.getElementById('timer-preset').value);updateTimerDisplay();}
 function updateTimerDisplay(){const m=Math.floor(timerSeconds/60),s=timerSeconds%60;document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 
-// ── FIX: advanceWeek met à jour _currentWeekNum immédiatement ────────────
+// ═══════════════════════════════════════════════════════════════
+// FIX : advanceWeek met _currentWeekNum à jour IMMÉDIATEMENT
+// ═══════════════════════════════════════════════════════════════
 async function advanceWeek(){
     const next = _currentWeekNum + 1;
+    if(next > 12){alert('Tu as terminé les 12 semaines! Bravo! 🏆');return;}
     if(!confirm('Passer à la semaine '+next+'?\n\nLes jours vont repasser en neutre (tes données restent intactes!)')) return;
-    _currentWeekNum = next; // mise à jour immédiate de la variable centralisée
+    _currentWeekNum = next;
     await db.collection('users').doc(currentUser.uid).set({currentWeek:next,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     await loadAllData();
     showQuickFeedback('🗓 Semaine '+next+'!');
@@ -1330,8 +1091,11 @@ function switchTab(name,e){
     if(name==='stats') setTimeout(renderStats,50);
 }
 
-initDaySelector();
-loadExercises(0);
+// ═══════════════════════════════════════════════════════════════
+// FIX : on NE PLUS appelle initDaySelector() ni loadExercises() ici.
+// Ils seront appelés dans loadAllData() une fois _currentWeekNum établi.
+// On appelle seulement updateTimerDisplay() pour initialiser le timer.
+// ═══════════════════════════════════════════════════════════════
 updateTimerDisplay();
 </script>
 
