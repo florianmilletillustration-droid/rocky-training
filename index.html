@@ -123,6 +123,22 @@
         .checkin-mood-btn.selected[data-mood="dead"]{border-color:#888;background:rgba(136,136,136,.2);}
         .checkin-mood-btn.selected[data-mood="meh"]{border-color:var(--accent-yellow);background:rgba(255,215,0,.15);}
         .checkin-mood-btn.selected[data-mood="fire"]{border-color:var(--accent-red);background:rgba(255,51,51,.2);}
+        .journal-month{font-size:.7rem;text-transform:uppercase;letter-spacing:3px;color:var(--text-secondary);margin:30px 0 15px;font-family:'Space Mono',monospace;}
+        .journal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px;margin-bottom:10px;}
+        .jcard{border-radius:10px;overflow:hidden;border:1.5px solid var(--border);background:var(--bg-card);transition:transform .2s,border-color .2s;cursor:default;}
+        .jcard:hover{transform:translateY(-3px);border-color:#444;}
+        .jcard-img-wrap{position:relative;width:100%;height:105px;overflow:hidden;}
+        .jcard-img{width:100%;height:100%;object-fit:cover;filter:brightness(.45) saturate(.65);}
+        .jcard-img-label{position:absolute;top:7px;left:9px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.5);font-family:'Space Mono',monospace;}
+        .jcard-body{padding:10px 12px 12px;}
+        .jcard-date{font-size:10px;color:var(--text-secondary);margin-bottom:6px;font-family:'Space Mono',monospace;}
+        .jcard-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+        .jcard-time{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;color:var(--accent-green);}
+        .jcard-mood{font-size:1.2rem;line-height:1;}
+        .jcard-note{font-size:10px;color:var(--text-secondary);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:28px;}
+        .jcard-tag{display:inline-block;font-size:9px;padding:2px 8px;border-radius:99px;margin-top:6px;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:1px;}
+        .jcard-empty{border-radius:10px;border:1.5px dashed #2a2a2a;height:195px;display:flex;align-items:center;justify-content:center;}
+        .jcard-empty span{font-size:10px;color:#333;font-family:'Space Mono',monospace;}
         @media(max-width:768px){h1{font-size:2.5rem}.day-selector{grid-template-columns:repeat(4,1fr)}.dice{width:80px;height:80px;font-size:1rem}.form-row{grid-template-columns:1fr}}
     </style>
 </head>
@@ -270,21 +286,20 @@
 
     <!-- HISTORIQUE TAB -->
     <div id="tab-historique" class="tab-content">
-        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:20px;">Historique Complet</h2>
-        <div class="history-filters">
-            <select class="form-select" id="filter-category" style="max-width:250px;" onchange="filterHistory()">
-                <option value="all">Toutes les catégories</option>
-                <option>Programme Rocky</option><option>Peinture</option><option>Gouache</option><option>Aquarelle</option>
-                <option>Acrylique</option><option>Huile</option><option>Inking</option><option>Illustration</option>
-                <option>Digital</option><option>Croquis</option><option>Anatomie</option><option>Perspective</option>
-                <option>Couleur</option><option>Composition</option><option>Vidéos/Cours</option><option>Autre</option>
-            </select>
-            <input type="date" class="form-input" id="filter-date-from" style="max-width:200px;" onchange="filterHistory()">
-            <span style="padding:10px;color:var(--text-secondary);">à</span>
-            <input type="date" class="form-input" id="filter-date-to" style="max-width:200px;" onchange="filterHistory()">
-            <button class="btn btn-secondary btn-small" onclick="clearFilters()">Effacer filtres</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px;margin-bottom:25px;">
+            <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin:0;">Journal de bord</h2>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <select class="form-select" id="filter-category" style="max-width:200px;font-size:.8rem;" onchange="renderJournal()">
+                    <option value="all">Toutes catégories</option>
+                    <option>Programme Rocky</option><option>Peinture</option><option>Gouache</option><option>Aquarelle</option>
+                    <option>Acrylique</option><option>Huile</option><option>Inking</option><option>Illustration</option>
+                    <option>Digital</option><option>Croquis</option><option>Anatomie</option><option>Perspective</option>
+                    <option>Couleur</option><option>Composition</option><option>Vidéos/Cours</option><option>Autre</option>
+                </select>
+                <button class="btn btn-secondary btn-small" onclick="clearFilters()">Effacer</button>
+            </div>
         </div>
-        <div class="history-list" id="history-list"></div>
+        <div id="journal-container"></div>
     </div>
 
     <!-- GENERATOR TAB -->
@@ -551,6 +566,7 @@ async function loadAllData(){
         document.getElementById('total-time').textContent = Math.floor(totalMins/60) + 'h';
         document.getElementById('streak').textContent = (data.streak || 0) + ' 🔥';
         allSessions = data.sessions || [];
+        window._checkins = data.checkins || [];
         updateTodayDisplay();
         updateCategoryStats();
         renderHistory();
@@ -584,28 +600,98 @@ function updateCategoryStats(){
         :sorted.map(([cat,m])=>`<div class="category-stat-card"><div class="category-name">${cat}</div><div class="category-time">${Math.floor(m/60)}h${m%60>0?' '+(m%60)+'m':''}</div></div>`).join('');
 }
 
-function renderHistory(){
-    const filtered=getFilteredSessions();
-    const c=document.getElementById('history-list');
-    if(!filtered.length){c.innerHTML='<div class="empty-state">Aucune session trouvée.</div>';return;}
-    c.innerHTML=filtered.map(s=>{
-        const d=new Date(s.date).toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-        return `<div class="history-item"><div><div class="history-date">${d}</div><div class="history-details"><strong>${s.category}</strong> - ${s.minutes} min${s.note?'<br><em>'+s.note+'</em>':''}</div></div><button class="session-delete" onclick="deleteSession('${s.id}')">🗑️</button></div>`;
-    }).join('');
+function renderHistory(){renderJournal();}
+
+function renderJournal(){
+    const container = document.getElementById('journal-container');
+    if(!container) return;
+    const catFilter = document.getElementById('filter-category')?.value || 'all';
+
+    // Grouper les sessions par date
+    const sessionsByDate = {};
+    allSessions.forEach(s => {
+        if(catFilter !== 'all' && s.category !== catFilter) return;
+        if(!sessionsByDate[s.date]) sessionsByDate[s.date] = {sessions:[], totalMins:0};
+        sessionsByDate[s.date].sessions.push(s);
+        sessionsByDate[s.date].totalMins += s.minutes;
+    });
+
+    // Récupérer les checkins depuis Firebase (déjà chargés)
+    const checkinMap = {};
+    if(window._checkins) window._checkins.forEach(c => { checkinMap[c.date] = c; });
+
+    // Obtenir toutes les dates avec sessions, triées du plus récent
+    const dates = Object.keys(sessionsByDate).sort((a,b) => b.localeCompare(a));
+
+    if(!dates.length){
+        container.innerHTML = '<div class="empty-state">Aucune session trouvée. Lance-toi! 🎨</div>';
+        return;
+    }
+
+    // Grouper par mois
+    const byMonth = {};
+    dates.forEach(d => {
+        const dt = new Date(d + 'T12:00:00');
+        const key = dt.toLocaleDateString('fr-FR', {year:'numeric', month:'long'});
+        if(!byMonth[key]) byMonth[key] = [];
+        byMonth[key].push(d);
+    });
+
+    // Couleurs par catégorie
+    const tagColor = cat => {
+        if(cat === 'Programme Rocky') return 'border-color:var(--accent-red);color:var(--accent-red);background:rgba(255,51,51,.1)';
+        if(['Inking','Illustration','Croquis'].includes(cat)) return 'border-color:var(--accent-purple);color:var(--accent-purple);background:rgba(153,102,255,.1)';
+        if(['Peinture','Gouache','Aquarelle','Acrylique','Huile'].includes(cat)) return 'border-color:var(--accent-blue);color:var(--accent-blue);background:rgba(51,153,255,.1)';
+        return 'border-color:var(--border);color:var(--text-secondary);background:var(--bg-elevated)';
+    };
+
+    let html = '';
+    Object.entries(byMonth).forEach(([month, ds]) => {
+        html += `<div class="journal-month">${month}</div><div class="journal-grid">`;
+        ds.forEach(date => {
+            const data = sessionsByDate[date];
+            const checkin = checkinMap[date];
+            const dt = new Date(date + 'T12:00:00');
+            const dateLabel = dt.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short'});
+            const h = Math.floor(data.totalMins/60), m = data.totalMins%60;
+            const timeLabel = h > 0 ? h+'h'+(m>0?m+'m':'') : m+'min';
+            const mood = checkin?.mood || null;
+            const moodEmoji = mood === 'fire' ? '🔥' : mood === 'dead' ? '💀' : mood === 'meh' ? '😐' : '';
+            const note = checkin?.note || data.sessions.map(s=>s.note).filter(Boolean).join(' · ') || '';
+            const mainCat = data.sessions.sort((a,b)=>b.minutes-a.minutes)[0].category;
+
+            // Image du jour basée sur la date (même logique que la galerie)
+            const dayOfYear = Math.floor((dt - new Date(dt.getFullYear(), 0, 0)) / 86400000);
+            const imgIdx = dayOfYear % HUE_TEO_GALLERY.length;
+            const artwork = HUE_TEO_GALLERY[imgIdx];
+
+            html += `<div class="jcard">
+                <div class="jcard-img-wrap">
+                    <img class="jcard-img" src="${artwork.url}" alt="" loading="lazy">
+                    <span class="jcard-img-label">Hue Teo</span>
+                </div>
+                <div class="jcard-body">
+                    <div class="jcard-date">${dateLabel}</div>
+                    <div class="jcard-row">
+                        <span class="jcard-time">${timeLabel}</span>
+                        <span class="jcard-mood">${moodEmoji}</span>
+                    </div>
+                    <div class="jcard-note">${note || '—'}</div>
+                    <span class="jcard-tag" style="border:1px solid;${tagColor(mainCat)}">${mainCat}</span>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+    });
+
+    container.innerHTML = html;
 }
 
-function getFilteredSessions(){
-    let f=[...allSessions];
-    const cat=document.getElementById('filter-category')?.value;
-    if(cat&&cat!=='all') f=f.filter(s=>s.category===cat);
-    const from=document.getElementById('filter-date-from')?.value;
-    if(from) f=f.filter(s=>s.date>=from);
-    const to=document.getElementById('filter-date-to')?.value;
-    if(to) f=f.filter(s=>s.date<=to);
-    return f.sort((a,b)=>new Date(b.date)-new Date(a.date));
+function clearFilters(){
+    const el = document.getElementById('filter-category');
+    if(el) el.value='all';
+    renderJournal();
 }
-function filterHistory(){renderHistory();}
-function clearFilters(){document.getElementById('filter-category').value='all';document.getElementById('filter-date-from').value='';document.getElementById('filter-date-to').value='';renderHistory();}
 
 async function saveSessions(){
     if(!currentUser) return;
@@ -1152,6 +1238,7 @@ function switchTab(name,e){
     if(name==='heatmap') setTimeout(renderHeatmap,50);
     if(name==='stats') setTimeout(renderStats,50);
     if(name==='checkin') setTimeout(initCheckin,50);
+    if(name==='historique') setTimeout(renderJournal,50);
 }
 
 // ═══════════════════════════════════════════════════════════════
