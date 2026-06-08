@@ -49,11 +49,6 @@
         @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
         @keyframes popIn{0%{transform:translate(-50%,-50%) scale(0);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
         @keyframes popOut{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-50%) scale(0);opacity:0}}
-        .session-controls{background:var(--bg-elevated);border:2px solid var(--accent-yellow);border-radius:12px;padding:30px;margin:30px 0;text-align:center;}
-        .session-timer{font-family:'Bebas Neue',sans-serif;font-size:4rem;color:var(--accent-green);letter-spacing:4px;margin:20px 0;}
-        .session-timer.running{animation:pulse 2s ease-in-out infinite;}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
-        .session-buttons{display:flex;gap:15px;justify-content:center;flex-wrap:wrap;margin-top:20px;}
         .category-select{background:var(--bg-dark);color:var(--text-primary);border:2px solid var(--border);padding:10px 20px;border-radius:6px;font-size:1rem;margin:15px 0;width:100%;max-width:400px;}
         .today-sessions{background:var(--bg-card);border:2px solid var(--border);border-radius:8px;padding:25px;margin:20px 0;}
         .session-item{background:var(--bg-elevated);padding:15px;margin-bottom:10px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;border-left:4px solid var(--accent-blue);}
@@ -115,11 +110,8 @@
         .dice-label{position:absolute;bottom:-25px;font-size:.7rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;}
         .result-box{background:var(--bg-elevated);padding:30px;border-radius:8px;margin-top:30px;border-left:4px solid var(--accent-red);}
         .result-text{font-size:1.3rem;line-height:1.8;color:var(--text-primary);font-weight:500;}
-        .progress-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin:30px 0;}
         .progress-card{background:var(--bg-card);border:2px solid var(--border);border-radius:8px;padding:25px;}
         .progress-label{font-size:.9rem;color:var(--text-secondary);margin-bottom:15px;text-transform:uppercase;letter-spacing:1px;}
-        .progress-bar{width:100%;height:30px;background:var(--bg-elevated);border-radius:15px;overflow:hidden;}
-        .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent-red),var(--accent-yellow));transition:width .5s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:15px;font-weight:700;font-size:.85rem;}
         .coach-msg-user{background:rgba(255,215,0,.08);border-left:4px solid var(--accent-yellow);padding:15px;border-radius:6px;}
         .coach-msg-ai{background:rgba(153,102,255,.1);border-left:4px solid var(--accent-purple);padding:15px;border-radius:6px;}
         .coach-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
@@ -131,16 +123,22 @@
         .checkin-mood-btn.selected[data-mood="dead"]{border-color:#888;background:rgba(136,136,136,.2);}
         .checkin-mood-btn.selected[data-mood="meh"]{border-color:var(--accent-yellow);background:rgba(255,215,0,.15);}
         .checkin-mood-btn.selected[data-mood="fire"]{border-color:var(--accent-red);background:rgba(255,51,51,.2);}
-        @media(max-width:768px){h1{font-size:2.5rem}.day-selector{grid-template-columns:repeat(4,1fr)}.dice{width:80px;height:80px;font-size:1rem}.session-timer{font-size:3rem}.form-row{grid-template-columns:1fr}}
+        @media(max-width:768px){h1{font-size:2.5rem}.day-selector{grid-template-columns:repeat(4,1fr)}.dice{width:80px;height:80px;font-size:1rem}.form-row{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
 
-<div id="login-screen" class="login-screen">
-    <h1>Programme Rocky</h1>
-    <p class="subtitle">Entraînement Intensif Cloud</p>
-    <p style="color:var(--text-secondary);margin-top:20px;max-width:500px;">Connecte-toi avec Google pour sauvegarder tes données! 🚀</p>
-    <button class="login-btn" onclick="loginWithGoogle()">🔐 Connexion avec Google</button>
+<div id="login-screen" class="login-screen" style="position:relative;overflow:hidden;min-height:100vh;">
+    <!-- Image du jour Hue Teo -->
+    <div id="login-bg" style="position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;filter:brightness(.35) saturate(.8);z-index:0;transition:opacity 1s ease;"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom, transparent 30%, rgba(10,10,10,.95) 100%);z-index:1;"></div>
+    <!-- Contenu -->
+    <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:40px 20px;">
+        <h1 style="font-family:'Bebas Neue',sans-serif;font-size:5rem;letter-spacing:6px;background:linear-gradient(135deg,var(--accent-red),var(--accent-yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-transform:uppercase;margin-bottom:10px;animation:glow 3s ease-in-out infinite;">Programme Rocky</h1>
+        <p style="font-family:'Space Mono',monospace;color:var(--text-secondary);font-size:.85rem;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px;">Entraînement Intensif — Florian Millet</p>
+        <div id="login-artwork-label" style="font-family:'Space Mono',monospace;font-size:.7rem;color:rgba(255,255,255,.35);letter-spacing:2px;margin-bottom:40px;text-transform:uppercase;"></div>
+        <button class="login-btn" onclick="loginWithGoogle()">🔐 Connexion avec Google</button>
+    </div>
 </div>
 
 <div id="app-content" class="app-content container">
@@ -173,7 +171,6 @@
         <button class="tab-btn" onclick="switchTab('historique',event)">Historique</button>
         <button class="tab-btn" onclick="switchTab('generator',event)">Générateur</button>
         <button class="tab-btn" onclick="switchTab('checkin',event)" style="color:var(--accent-green);">⚡ Check-in</button>
-        <button class="tab-btn" onclick="switchTab('progress',event)">Progrès</button>
         <button class="tab-btn" onclick="switchTab('stats',event)" style="color:var(--accent-blue);">📊 Stats</button>
         <button class="tab-btn" onclick="switchTab('heatmap',event)" style="color:var(--accent-green);">🔥 Heatmap</button>
         <button class="tab-btn" onclick="switchTab('coach',event)" style="color:var(--accent-purple);">🤖 Coach IA</button>
@@ -182,24 +179,6 @@
     <!-- PROGRAMME TAB -->
     <div id="tab-programme" class="tab-content active">
         <div class="day-selector" id="day-selector"></div>
-        <div class="session-controls">
-            <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;margin-bottom:10px;">Session Training</h2>
-            <div style="background:rgba(0,255,136,.08);border:2px solid var(--accent-green);border-radius:8px;padding:15px;margin:15px 0;font-size:.85rem;">💡 <strong>Tip:</strong> Tu bosses avec de la musique? Utilise l'<strong>Ajout Rapide</strong> dans Tracking, ou fais ton <strong>Check-in</strong> après la session!</div>
-            <div class="session-timer" id="session-timer">00:00:00</div>
-            <select class="category-select" id="session-category">
-                <option>Programme Rocky</option><option>Peinture</option><option>Gouache</option><option>Aquarelle</option>
-                <option>Acrylique</option><option>Huile</option><option>Inking</option><option>Illustration</option>
-                <option>Digital</option><option>Croquis</option><option>Anatomie</option><option>Perspective</option>
-                <option>Couleur</option><option>Composition</option><option>Vidéos/Cours</option><option>Autre</option>
-            </select>
-            <div class="session-buttons">
-                <button class="btn btn-green" id="btn-start" onclick="startSession()">🟢 START</button>
-                <button class="btn btn-secondary" id="btn-pause" onclick="pauseSession()" style="display:none;">⏸️ PAUSE</button>
-                <button class="btn btn-secondary" id="btn-reset" onclick="resetSession()" style="display:none;">🔄 RESET</button>
-                <button class="btn btn-stop" id="btn-save" onclick="saveSession()" style="display:none;">💾 SAUVEGARDER</button>
-            </div>
-            <button class="btn" onclick="markDayCompleted()" style="margin-top:20px;display:none;" id="btn-complete-day">✅ TERMINER LA JOURNÉE</button>
-        </div>
         <div id="exercises-container"></div>
     </div>
 
@@ -378,34 +357,6 @@
         </div>
     </div>
 
-    <!-- PROGRESS TAB -->
-    <div id="tab-progress" class="tab-content">
-        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:30px;">Ton Progrès</h2>
-        <div class="progress-grid">
-            <div class="progress-card">
-                <div class="progress-label">Fluidité des poses</div>
-                <div class="progress-bar"><div class="progress-fill" id="progress-fluidity" style="width:0%">0</div></div>
-                <div style="margin-top:15px;"><input type="range" min="0" max="10" value="0" id="fluidity-slider" oninput="updateProgress('fluidity',this.value)" style="width:100%;"></div>
-            </div>
-            <div class="progress-card">
-                <div class="progress-label">Originalité</div>
-                <div class="progress-bar"><div class="progress-fill" id="progress-originality" style="width:0%">0</div></div>
-                <div style="margin-top:15px;"><input type="range" min="0" max="10" value="0" id="originality-slider" oninput="updateProgress('originality',this.value)" style="width:100%;"></div>
-            </div>
-            <div class="progress-card">
-                <div class="progress-label">Composition</div>
-                <div class="progress-bar"><div class="progress-fill" id="progress-composition" style="width:0%">0</div></div>
-                <div style="margin-top:15px;"><input type="range" min="0" max="10" value="0" id="composition-slider" oninput="updateProgress('composition',this.value)" style="width:100%;"></div>
-            </div>
-            <div class="progress-card">
-                <div class="progress-label">Confiance</div>
-                <div class="progress-bar"><div class="progress-fill" id="progress-confidence" style="width:0%">0</div></div>
-                <div style="margin-top:15px;"><input type="range" min="0" max="10" value="0" id="confidence-slider" oninput="updateProgress('confidence',this.value)" style="width:100%;"></div>
-            </div>
-        </div>
-        <button class="btn" onclick="saveProgressToCloud()">💾 Sauvegarder le progrès</button>
-    </div>
-
     <!-- STATS TAB -->
     <div id="tab-stats" class="tab-content">
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:30px;">Statistiques</h2>
@@ -527,7 +478,6 @@ function loginWithGoogle(){const p=new firebase.auth.GoogleAuthProvider();auth.s
 function logout(){auth.signOut();}
 
 let allSessions=[], currentDay=0;
-let sessionInterval=null, sessionSeconds=0, sessionRunning=false, sessionPaused=false;
 let coachHistory=[];
 let _currentWeekNum = 1;
 function getCurrentWeek(){ return _currentWeekNum; }
@@ -581,13 +531,6 @@ async function loadAllData(){
         initDaySelector();
         loadExercises(currentDay);
         updateDayButtons(completedDays, currentWeek, data.weekStartDate || null);
-        if(data.progress){
-            ['fluidity','originality','composition','confidence'].forEach(t=>{
-                const v=data.progress[t]||0;
-                updateProgress(t,v);
-                document.getElementById(t+'-slider').value=v;
-            });
-        }
     }catch(e){console.error(e);}
 }
 
@@ -603,7 +546,6 @@ function updateTodayDisplay(){
         ?'<div class="empty-state">Aucune session aujourd\'hui. Lance-toi! 💪</div>'
         :ts.map(s=>`<div class="session-item"><div class="session-info"><div class="session-category">${s.category}</div><div class="session-time">${s.minutes} min${s.note?' - '+s.note:''}</div></div><button class="session-delete" onclick="deleteSession('${s.id}')">🗑️</button></div>`).join('');
     document.getElementById('today-sessions-total').textContent=total+' min';
-    document.getElementById('btn-complete-day').style.display=ts.length>0?'block':'none';
 }
 
 function updateCategoryStats(){
@@ -674,45 +616,6 @@ function updateDayButtons(completedDays, currentWeek, weekStartDate){
     });
 }
 
-function startSession(){
-    if(sessionRunning) return;
-    sessionRunning=true;sessionPaused=false;
-    sessionInterval=setInterval(()=>{sessionSeconds++;updateSessionDisplay();},1000);
-    document.getElementById('btn-start').style.display='none';
-    document.getElementById('btn-pause').style.display='inline-block';
-    document.getElementById('btn-reset').style.display='inline-block';
-    document.getElementById('btn-save').style.display='inline-block';
-    document.getElementById('session-timer').classList.add('running');
-}
-function pauseSession(){
-    if(sessionRunning&&!sessionPaused){clearInterval(sessionInterval);sessionPaused=true;document.getElementById('btn-pause').textContent='▶️ REPRENDRE';document.getElementById('session-timer').classList.remove('running');}
-    else if(sessionPaused){sessionInterval=setInterval(()=>{sessionSeconds++;updateSessionDisplay();},1000);sessionPaused=false;document.getElementById('btn-pause').textContent='⏸️ PAUSE';document.getElementById('session-timer').classList.add('running');}
-}
-function resetSession(){
-    if(!confirm('Reset le chrono?')) return;
-    clearInterval(sessionInterval);sessionSeconds=0;sessionRunning=false;sessionPaused=false;updateSessionDisplay();
-    document.getElementById('btn-start').style.display='inline-block';
-    document.getElementById('btn-pause').style.display='none';
-    document.getElementById('btn-reset').style.display='none';
-    document.getElementById('btn-save').style.display='none';
-    document.getElementById('btn-pause').textContent='⏸️ PAUSE';
-    document.getElementById('session-timer').classList.remove('running');
-}
-async function saveSession(){
-    if(sessionSeconds===0){alert('Aucun temps à sauvegarder!');return;}
-    const mins=Math.floor(sessionSeconds/60);
-    const cat=document.getElementById('session-category').value;
-    if(!confirm('Sauvegarder?\n\n'+cat+'\n'+mins+' min')) return;
-    allSessions.push({id:'session_'+Date.now(),date:getTodayString(),category:cat,minutes:mins,note:'',timestamp:Date.now()});
-    await saveSessions();await loadAllData();
-    alert('✅ +'+mins+' min sauvegardées!');
-    sessionSeconds=0;updateSessionDisplay();
-}
-function updateSessionDisplay(){
-    const h=Math.floor(sessionSeconds/3600),m=Math.floor((sessionSeconds%3600)/60),s=sessionSeconds%60;
-    document.getElementById('session-timer').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-}
-
 async function markDayCompleted(){
     if(!confirm('Marquer ce jour comme complété?')) return;
     const doc=await db.collection('users').doc(currentUser.uid).get();
@@ -765,14 +668,6 @@ async function addManualSession(){
     document.getElementById('manual-note').value='';
     alert('✅ '+cat+' - '+dur+' min ajoutés!');
 }
-
-async function saveProgressToCloud(){
-    if(!currentUser) return;
-    const p={fluidity:+document.getElementById('fluidity-slider').value,originality:+document.getElementById('originality-slider').value,composition:+document.getElementById('composition-slider').value,confidence:+document.getElementById('confidence-slider').value};
-    await db.collection('users').doc(currentUser.uid).set({progress:p,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-    alert('Progrès sauvegardé! 💪');
-}
-function updateProgress(type,value){const f=document.getElementById('progress-'+type);f.style.width=(value/10*100)+'%';f.textContent=value;}
 
 function initDaySelector(){
     const days=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
@@ -1223,7 +1118,44 @@ function switchTab(name,e){
     if(name==='checkin') setTimeout(initCheckin,50);
 }
 
-updateSessionDisplay();
+// ═══════════════════════════════════════════════════════════════
+// IMAGE DU JOUR — Hue Teo ArtStation
+// ═══════════════════════════════════════════════════════════════
+const HUE_TEO_GALLERY = [
+    { url: 'https://cdna.artstation.com/p/assets/images/images/031/093/058/large/hue-teo-inking3.jpg?1602589391', title: 'Inking Techniques' },
+    { url: 'https://cdnb.artstation.com/p/assets/images/images/031/093/031/large/hue-teo-inking32.jpg?1602589247', title: 'Inking Techniques II' },
+    { url: 'https://cdna.artstation.com/p/assets/images/images/031/093/040/large/hue-teo-inking1.jpg?1602589257', title: 'Inking Techniques III' },
+    { url: 'https://cdna.artstation.com/p/assets/images/images/022/888/806/large/hue-teo-compositions1.jpg?1577111525', title: 'Storytelling 3' },
+    { url: 'https://cdnb.artstation.com/p/assets/images/images/022/888/809/large/hue-teo-compositions3.jpg?1577111462', title: 'Storytelling 3 — II' },
+    { url: 'https://cdnb.artstation.com/p/assets/images/images/022/888/807/large/hue-teo-compositions2summer.jpg?1577111451', title: 'Storytelling 3 — Summer' },
+    { url: 'https://cdna.artstation.com/p/assets/images/images/022/888/808/large/hue-teo-compositions2winter.jpg?1577111456', title: 'Storytelling 3 — Winter' },
+    { url: 'https://cdnb.artstation.com/p/assets/images/images/010/996/301/large/hue-teo-watertrees.jpg?1527321741', title: 'World of Toth — Water Trees' },
+    { url: 'https://cdnb.artstation.com/p/assets/images/images/010/996/377/large/hue-teo-cave-of-the-scared.jpg?1527322309', title: 'World of Toth — Cave' },
+    { url: 'https://cdna.artstation.com/p/assets/images/images/010/996/298/large/hue-teo-practice-creatures1.jpg?1527321740', title: 'World of Toth — Creatures I' },
+    { url: 'https://cdnb.artstation.com/p/assets/images/images/010/996/303/large/hue-teo-practice-creatures2.jpg?1527321750', title: 'World of Toth — Creatures II' },
+    { url: 'https://cdna.artstation.com/p/assets/images/images/010/996/308/large/hue-teo-practice-creatures3.jpg?1527321762', title: 'World of Toth — Creatures III' },
+    { url: 'https://cdna.artstation.com/p/assets/images/images/010/996/286/large/hue-teo-practice-creatures4.jpg?1527321699', title: 'World of Toth — Creatures IV' },
+    { url: 'https://cdnb.artstation.com/p/assets/images/images/010/996/289/large/hue-teo-practice-creatures5.jpg?1527321710', title: 'World of Toth — Creatures V' },
+    { url: 'https://cdna.artstation.com/p/assets/images/images/010/996/288/large/hue-teo-toothw1.jpg?1527321702', title: 'World of Toth — Toothw I' },
+    { url: 'https://cdnb.artstation.com/p/assets/images/images/010/996/291/large/hue-teo-toothw2.jpg?1527321713', title: 'World of Toth — Toothw II' },
+    { url: 'https://cdnb.artstation.com/p/assets/images/images/010/996/293/large/hue-teo-toothw3.jpg?1527321724', title: 'World of Toth — Toothw III' },
+];
+
+function initDailyImage() {
+    const bg = document.getElementById('login-bg');
+    const label = document.getElementById('login-artwork-label');
+    if (!bg) return;
+    // Index basé sur le jour de l'année pour changer chaque jour
+    const now = new Date();
+    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+    const idx = dayOfYear % HUE_TEO_GALLERY.length;
+    const artwork = HUE_TEO_GALLERY[idx];
+    bg.style.backgroundImage = `url('${artwork.url}')`;
+    if (label) label.textContent = `Hue Teo — ${artwork.title}`;
+}
+
+initDailyImage();
+// init
 </script>
 
     <!-- DANGER ZONE -->
