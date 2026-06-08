@@ -145,10 +145,8 @@
 <body>
 
 <div id="login-screen" class="login-screen" style="position:relative;overflow:hidden;min-height:100vh;">
-    <!-- Image du jour Hue Teo — affichée via img tag -->
     <img id="login-bg-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.32) saturate(.7);z-index:0;">
     <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,.2) 0%, rgba(10,10,10,.97) 100%);z-index:1;"></div>
-    <!-- Contenu -->
     <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:40px 20px;">
         <h1 style="font-family:'Bebas Neue',sans-serif;font-size:5rem;letter-spacing:6px;background:linear-gradient(135deg,var(--accent-red),var(--accent-yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-transform:uppercase;margin-bottom:10px;animation:glow 3s ease-in-out infinite;">Programme Rocky</h1>
         <p style="font-family:'Space Mono',monospace;color:var(--text-secondary);font-size:.85rem;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px;">Entraînement Intensif — Florian Millet</p>
@@ -194,8 +192,6 @@
 
     <!-- PROGRAMME TAB -->
     <div id="tab-programme" class="tab-content active">
-
-        <!-- Hue Teo — Image du jour -->
         <div style="position:relative;width:100%;height:220px;border-radius:12px;overflow:hidden;margin-bottom:25px;border:2px solid #222;">
             <img id="prog-daily-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.45) saturate(.75);">
             <div style="position:absolute;inset:0;background:linear-gradient(to right, rgba(10,10,10,.85) 0%, transparent 60%);"></div>
@@ -208,7 +204,6 @@
                 <button onclick="switchTab('checkin',{target:document.querySelector('[onclick*=checkin]')})" style="font-family:'Space Mono',monospace;background:var(--accent-green);color:var(--bg-dark);border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;flex-shrink:0;">⚡ Check-in</button>
             </div>
         </div>
-
         <div class="day-selector" id="day-selector"></div>
         <div id="exercises-container"></div>
     </div>
@@ -323,8 +318,6 @@
         <div style="max-width:800px;margin:0 auto;">
             <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:5px;color:var(--accent-green);">⚡ Check-in rapide</h2>
             <p style="color:var(--text-secondary);margin-bottom:25px;font-size:.9rem;">T'as fini de bosser? 30 secondes pour logger ta session.</p>
-
-            <!-- Humeur -->
             <div style="background:var(--bg-card);border:2px solid var(--border);border-radius:12px;padding:25px;margin-bottom:20px;">
                 <div class="form-label" style="margin-bottom:15px;">Comment tu te sens après cette session?</div>
                 <div style="display:flex;gap:15px;justify-content:center;">
@@ -334,22 +327,15 @@
                 </div>
                 <div id="checkin-mood-label" style="text-align:center;margin-top:12px;font-size:.85rem;color:var(--text-secondary);min-height:20px;"></div>
             </div>
-
-            <!-- Exercices faits -->
             <div style="background:var(--bg-card);border:2px solid var(--border);border-radius:12px;padding:25px;margin-bottom:20px;">
                 <div class="form-label" style="margin-bottom:15px;">Exercices complétés aujourd'hui</div>
                 <div id="checkin-exercises" style="display:flex;flex-direction:column;gap:10px;"></div>
             </div>
-
-            <!-- Note rapide -->
             <div style="background:var(--bg-card);border:2px solid var(--border);border-radius:12px;padding:25px;margin-bottom:20px;">
                 <div class="form-label" style="margin-bottom:10px;">Note rapide (optionnel)</div>
                 <textarea id="checkin-note" class="form-textarea" placeholder="Ce qui a bien marché, ce qui bloque, une observation..." style="min-height:60px;"></textarea>
             </div>
-
-            <!-- Inspiration du jour -->
             <div style="background:var(--bg-card);border:2px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;">
-                <!-- Image Hue Teo du jour — auto -->
                 <div id="checkin-daily-img-wrap" style="position:relative;width:100%;height:280px;background:var(--bg-elevated);overflow:hidden;">
                     <img id="checkin-daily-img" style="width:100%;height:100%;object-fit:cover;opacity:.85;" />
                     <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(10,10,10,.9) 0%, transparent 50%);"></div>
@@ -358,8 +344,6 @@
                         <div id="checkin-daily-title" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:white;"></div>
                     </div>
                 </div>
-
-                <!-- Boutons -->
                 <div style="padding:20px;">
                     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:15px;">
                         <label style="font-family:'Space Mono',monospace;background:transparent;border:2px solid var(--accent-blue);color:var(--accent-blue);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;transition:all .3s;display:inline-flex;align-items:center;gap:8px;"
@@ -374,22 +358,16 @@
                             🤖 Conseil IA ciblé
                         </button>
                     </div>
-
-                    <!-- Image uploadée par l'user -->
                     <div id="checkin-image-preview" style="display:none;margin-bottom:15px;">
                         <img id="checkin-image-img" style="max-width:100%;max-height:250px;border-radius:8px;border:2px solid var(--accent-blue);object-fit:contain;" />
                         <button onclick="clearInspirationImage()" style="margin-top:8px;font-family:'Space Mono',monospace;background:transparent;border:1px solid var(--accent-red);color:var(--accent-red);padding:5px 15px;border-radius:4px;cursor:pointer;font-size:.75rem;">🗑 Retirer</button>
                     </div>
-
-                    <!-- Conseil IA texte -->
                     <div id="checkin-ai-inspo" style="display:none;background:rgba(153,102,255,.1);border-left:4px solid var(--accent-purple);border-radius:6px;padding:15px;">
                         <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent-purple);font-weight:700;margin-bottom:8px;">🤖 Conseil IA</div>
                         <div id="checkin-ai-inspo-text" style="line-height:1.8;white-space:pre-wrap;font-size:.9rem;"></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Save button -->
             <button onclick="saveCheckin()" class="btn btn-green" style="width:100%;padding:20px;font-size:1.1rem;letter-spacing:3px;">
                 ✅ SAUVEGARDER MON CHECK-IN
             </button>
@@ -470,6 +448,7 @@
     </div>
 
 </div>
+
 <script>
 const firebaseConfig = {
     apiKey:"AIzaSyA1y7_GRSPmSCsgMu-8aGhCtcMxMzIdtiQ",
@@ -507,7 +486,8 @@ auth.onAuthStateChanged(user=>{
         document.getElementById('login-screen').style.display='none';
         document.getElementById('app-content').classList.add('active');
         document.getElementById('user-email').textContent=user.email;
-        document.getElementById('manual-date').valueAsDate=new Date();
+        // FIX: utilise getTodayString() au lieu de valueAsDate=new Date() pour éviter le décalage UTC
+        document.getElementById('manual-date').value=getTodayString();
         initDailyImage();
         loadAllData();
     }else{
@@ -522,6 +502,19 @@ let allSessions=[], currentDay=0;
 let coachHistory=[];
 let _currentWeekNum = 1;
 function getCurrentWeek(){ return _currentWeekNum; }
+
+// ═══════════════════════════════════════════════════════════════
+// FIX TIMEZONE: utilise l'heure locale au lieu de UTC
+// Avant: new Date().toISOString().split('T')[0] → date UTC (décalée la nuit)
+// Après: reconstruction manuelle avec getFullYear/getMonth/getDate → date locale
+// ═══════════════════════════════════════════════════════════════
+function getTodayString(){
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + d;
+}
 
 const weekProgram = {
     1:{theme:"Mois 1 — Le langage des formes",name:"Semaine 1 — Cubes et lignes droites",main:{title:"Cubes à main levée",time:"45 min",exercises:["Dessine 20 cubes à main levée, sans règle. Commence par un cube de face, puis tourne-le progressivement à chaque dessin.","Chaque cube doit avoir des arêtes droites et des angles visuellement cohérents. Si une arête est courbe, recommence ce cube.","Varie la taille : petits (1 cm), moyens (3 cm), grands (6 cm). Répartis-les sur toute la page."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Commence toujours par tracer la ligne d'action (courbe en C ou S) avant d'ajouter quoi que ce soit d'autre.","Objectif : capturer le mouvement, pas les détails."]}},
@@ -576,8 +569,10 @@ async function loadAllData(){
     }catch(e){console.error(e);}
 }
 
-function getTodayString(){return new Date().toISOString().split('T')[0];}
-function getTodaySessions(){const t=getTodayString();return allSessions.filter(s=>s.date===t);}
+function getTodaySessions(){
+    const t=getTodayString();
+    return allSessions.filter(s=>s.date===t);
+}
 
 function updateTodayDisplay(){
     const ts=getTodaySessions();
@@ -606,8 +601,6 @@ function renderJournal(){
     const container = document.getElementById('journal-container');
     if(!container) return;
     const catFilter = document.getElementById('filter-category')?.value || 'all';
-
-    // Grouper les sessions par date
     const sessionsByDate = {};
     allSessions.forEach(s => {
         if(catFilter !== 'all' && s.category !== catFilter) return;
@@ -615,20 +608,13 @@ function renderJournal(){
         sessionsByDate[s.date].sessions.push(s);
         sessionsByDate[s.date].totalMins += s.minutes;
     });
-
-    // Récupérer les checkins depuis Firebase (déjà chargés)
     const checkinMap = {};
     if(window._checkins) window._checkins.forEach(c => { checkinMap[c.date] = c; });
-
-    // Obtenir toutes les dates avec sessions, triées du plus récent
     const dates = Object.keys(sessionsByDate).sort((a,b) => b.localeCompare(a));
-
     if(!dates.length){
         container.innerHTML = '<div class="empty-state">Aucune session trouvée. Lance-toi! 🎨</div>';
         return;
     }
-
-    // Grouper par mois
     const byMonth = {};
     dates.forEach(d => {
         const dt = new Date(d + 'T12:00:00');
@@ -636,15 +622,12 @@ function renderJournal(){
         if(!byMonth[key]) byMonth[key] = [];
         byMonth[key].push(d);
     });
-
-    // Couleurs par catégorie
     const tagColor = cat => {
         if(cat === 'Programme Rocky') return 'border-color:var(--accent-red);color:var(--accent-red);background:rgba(255,51,51,.1)';
         if(['Inking','Illustration','Croquis'].includes(cat)) return 'border-color:var(--accent-purple);color:var(--accent-purple);background:rgba(153,102,255,.1)';
         if(['Peinture','Gouache','Aquarelle','Acrylique','Huile'].includes(cat)) return 'border-color:var(--accent-blue);color:var(--accent-blue);background:rgba(51,153,255,.1)';
         return 'border-color:var(--border);color:var(--text-secondary);background:var(--bg-elevated)';
     };
-
     let html = '';
     Object.entries(byMonth).forEach(([month, ds]) => {
         html += `<div class="journal-month">${month}</div><div class="journal-grid">`;
@@ -659,12 +642,9 @@ function renderJournal(){
             const moodEmoji = mood === 'fire' ? '🔥' : mood === 'dead' ? '💀' : mood === 'meh' ? '😐' : '';
             const note = checkin?.note || data.sessions.map(s=>s.note).filter(Boolean).join(' · ') || '';
             const mainCat = data.sessions.sort((a,b)=>b.minutes-a.minutes)[0].category;
-
-            // Image du jour basée sur la date (même logique que la galerie)
             const dayOfYear = Math.floor((dt - new Date(dt.getFullYear(), 0, 0)) / 86400000);
             const imgIdx = dayOfYear % HUE_TEO_GALLERY.length;
             const artwork = HUE_TEO_GALLERY[imgIdx];
-
             html += `<div class="jcard">
                 <div class="jcard-img-wrap">
                     <img class="jcard-img" src="${artwork.url}" alt="" loading="lazy">
@@ -683,7 +663,6 @@ function renderJournal(){
         });
         html += '</div>';
     });
-
     container.innerHTML = html;
 }
 
@@ -890,7 +869,7 @@ function renderHeatmap(){
             const mins=dayMap[ds]||0;
             wTot.total+=mins;
             const future=cell>today;
-            const isToday=ds===today.toISOString().split('T')[0];
+            const isToday=ds===getTodayString();
             const color=future?'transparent':getColor(mins);
             const border=isToday?'2px solid var(--accent-yellow)':'1px solid rgba(255,255,255,.06)';
             const lbl=cell.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
@@ -1030,7 +1009,10 @@ function renderStats() {
     const days30 = [], vals30 = [];
     for (let i = 29; i >= 0; i--) {
         const d = new Date(today); d.setDate(d.getDate() - i);
-        const ds = d.toISOString().split('T')[0];
+        const y = d.getFullYear();
+        const mo = String(d.getMonth()+1).padStart(2,'0');
+        const dy = String(d.getDate()).padStart(2,'0');
+        const ds = y+'-'+mo+'-'+dy;
         const mins = allSessions.filter(s => s.date === ds).reduce((t,s) => t+s.minutes, 0);
         days30.push(d.toLocaleDateString('fr-FR', {day:'numeric', month:'short'}));
         vals30.push(+(mins/60).toFixed(1));
@@ -1074,7 +1056,6 @@ function initCheckin() {
     document.getElementById('checkin-ai-inspo').style.display = 'none';
     document.getElementById('checkin-feedback').style.display = 'none';
 
-    // Image du jour Hue Teo — auto
     const now = new Date();
     const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
     const idx = dayOfYear % HUE_TEO_GALLERY.length;
@@ -1178,7 +1159,7 @@ Réponds en français, sois concis et inspirant. Pas de markdown avec #.`
         document.getElementById('checkin-ai-inspo-text').textContent = 'Erreur de connexion. Réessaie!';
         document.getElementById('checkin-ai-inspo').style.display = 'block';
     }
-    btn.textContent = '🎨 Inspiration IA (style Hue Teo)';
+    btn.textContent = '🤖 Conseil IA ciblé';
     btn.disabled = false;
 }
 
@@ -1269,25 +1250,21 @@ function initDailyImage() {
     const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
     const idx = dayOfYear % HUE_TEO_GALLERY.length;
     const artwork = HUE_TEO_GALLERY[idx];
-    // Page de login
     const img = document.getElementById('login-bg-img');
     if (img) img.src = artwork.url;
     const label = document.getElementById('login-artwork-label');
     if (label) label.textContent = 'Hue Teo — ' + artwork.title;
-    // Page principale — onglet Programme
     const progImg = document.getElementById('prog-daily-img');
     if (progImg) progImg.src = artwork.url;
     const progTitle = document.getElementById('prog-daily-title');
     if (progTitle) progTitle.textContent = artwork.title;
 }
 
-// Lance immédiatement dès que le DOM est prêt
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initDailyImage);
 } else {
     initDailyImage();
 }
-// init
 </script>
 
     <!-- DANGER ZONE -->
