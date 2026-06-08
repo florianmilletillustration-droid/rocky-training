@@ -178,6 +178,21 @@
 
     <!-- PROGRAMME TAB -->
     <div id="tab-programme" class="tab-content active">
+
+        <!-- Hue Teo — Image du jour -->
+        <div style="position:relative;width:100%;height:220px;border-radius:12px;overflow:hidden;margin-bottom:25px;border:2px solid #222;">
+            <img id="prog-daily-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.45) saturate(.75);">
+            <div style="position:absolute;inset:0;background:linear-gradient(to right, rgba(10,10,10,.85) 0%, transparent 60%);"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;padding:20px 25px;display:flex;justify-content:space-between;align-items:flex-end;">
+                <div>
+                    <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--accent-yellow);font-family:'Space Mono',monospace;margin-bottom:5px;">🎨 Inspiration du jour</div>
+                    <div id="prog-daily-title" style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;color:white;line-height:1.1;"></div>
+                    <div style="font-size:.7rem;color:rgba(255,255,255,.45);font-family:'Space Mono',monospace;margin-top:4px;">Hue Teo — ArtStation</div>
+                </div>
+                <button onclick="switchTab('checkin',{target:document.querySelector('[onclick*=checkin]')})" style="font-family:'Space Mono',monospace;background:var(--accent-green);color:var(--bg-dark);border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;flex-shrink:0;">⚡ Check-in</button>
+            </div>
+        </div>
+
         <div class="day-selector" id="day-selector"></div>
         <div id="exercises-container"></div>
     </div>
@@ -478,6 +493,7 @@ auth.onAuthStateChanged(user=>{
         document.getElementById('app-content').classList.add('active');
         document.getElementById('user-email').textContent=user.email;
         document.getElementById('manual-date').valueAsDate=new Date();
+        initDailyImage();
         loadAllData();
     }else{
         document.getElementById('login-screen').style.display='flex';
@@ -1171,6 +1187,11 @@ function initDailyImage() {
     if (img) img.src = artwork.url;
     const label = document.getElementById('login-artwork-label');
     if (label) label.textContent = 'Hue Teo — ' + artwork.title;
+    // Page principale — onglet Programme
+    const progImg = document.getElementById('prog-daily-img');
+    if (progImg) progImg.src = artwork.url;
+    const progTitle = document.getElementById('prog-daily-title');
+    if (progTitle) progTitle.textContent = artwork.title;
 }
 
 // Lance immédiatement dès que le DOM est prêt
