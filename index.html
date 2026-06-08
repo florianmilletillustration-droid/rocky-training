@@ -317,35 +317,45 @@
                 <textarea id="checkin-note" class="form-textarea" placeholder="Ce qui a bien marché, ce qui bloque, une observation..." style="min-height:60px;"></textarea>
             </div>
 
-            <!-- Inspiration -->
-            <div style="background:var(--bg-card);border:2px solid var(--border);border-radius:12px;padding:25px;margin-bottom:20px;">
-                <div class="form-label" style="margin-bottom:5px;">💡 Inspiration du jour</div>
-                <p style="color:var(--text-secondary);font-size:.8rem;margin-bottom:15px;">Upload une ref qui t'a inspiré, ou laisse l'IA t'en suggérer une basée sur ta semaine.</p>
-
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
-                    <label style="font-family:'Space Mono',monospace;background:transparent;border:2px solid var(--accent-blue);color:var(--accent-blue);padding:10px 20px;border-radius:6px;cursor:pointer;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;transition:all .3s;display:inline-flex;align-items:center;gap:8px;"
-                        onmouseover="this.style.background='var(--accent-blue)';this.style.color='white';"
-                        onmouseout="this.style.background='transparent';this.style.color='var(--accent-blue)';">
-                        📎 Upload une image
-                        <input type="file" id="checkin-image-input" accept="image/*" onchange="handleInspirationUpload(this)" style="display:none;">
-                    </label>
-                    <button onclick="getAIInspiration()" id="btn-ai-inspo" style="font-family:'Space Mono',monospace;background:transparent;border:2px solid var(--accent-purple);color:var(--accent-purple);padding:10px 20px;border-radius:6px;cursor:pointer;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;transition:all .3s;"
-                        onmouseover="this.style.background='var(--accent-purple)';this.style.color='white';"
-                        onmouseout="this.style.background='transparent';this.style.color='var(--accent-purple)';">
-                        🎨 Inspiration IA (style Hue Teo)
-                    </button>
+            <!-- Inspiration du jour -->
+            <div style="background:var(--bg-card);border:2px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;">
+                <!-- Image Hue Teo du jour — auto -->
+                <div id="checkin-daily-img-wrap" style="position:relative;width:100%;height:280px;background:var(--bg-elevated);overflow:hidden;">
+                    <img id="checkin-daily-img" style="width:100%;height:100%;object-fit:cover;opacity:.85;" />
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(10,10,10,.9) 0%, transparent 50%);"></div>
+                    <div style="position:absolute;bottom:15px;left:20px;right:20px;">
+                        <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--accent-yellow);font-family:'Space Mono',monospace;margin-bottom:4px;">🎨 Hue Teo — Inspiration du jour</div>
+                        <div id="checkin-daily-title" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:white;"></div>
+                    </div>
                 </div>
 
-                <!-- Image uploadée -->
-                <div id="checkin-image-preview" style="display:none;margin-bottom:15px;">
-                    <img id="checkin-image-img" style="max-width:100%;max-height:300px;border-radius:8px;border:2px solid var(--accent-blue);object-fit:contain;" />
-                    <button onclick="clearInspirationImage()" style="margin-top:8px;font-family:'Space Mono',monospace;background:transparent;border:1px solid var(--accent-red);color:var(--accent-red);padding:5px 15px;border-radius:4px;cursor:pointer;font-size:.75rem;">🗑 Retirer</button>
-                </div>
+                <!-- Boutons -->
+                <div style="padding:20px;">
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:15px;">
+                        <label style="font-family:'Space Mono',monospace;background:transparent;border:2px solid var(--accent-blue);color:var(--accent-blue);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;transition:all .3s;display:inline-flex;align-items:center;gap:8px;"
+                            onmouseover="this.style.background='var(--accent-blue)';this.style.color='white';"
+                            onmouseout="this.style.background='transparent';this.style.color='var(--accent-blue)';">
+                            📎 Ajouter ma ref
+                            <input type="file" id="checkin-image-input" accept="image/*" onchange="handleInspirationUpload(this)" style="display:none;">
+                        </label>
+                        <button onclick="getAIInspiration()" id="btn-ai-inspo" style="font-family:'Space Mono',monospace;background:transparent;border:2px solid var(--accent-purple);color:var(--accent-purple);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;transition:all .3s;"
+                            onmouseover="this.style.background='var(--accent-purple)';this.style.color='white';"
+                            onmouseout="this.style.background='transparent';this.style.color='var(--accent-purple)';">
+                            🤖 Conseil IA ciblé
+                        </button>
+                    </div>
 
-                <!-- Suggestion IA -->
-                <div id="checkin-ai-inspo" style="display:none;background:rgba(153,102,255,.1);border-left:4px solid var(--accent-purple);border-radius:6px;padding:20px;">
-                    <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent-purple);font-weight:700;margin-bottom:10px;">🤖 Suggestion IA</div>
-                    <div id="checkin-ai-inspo-text" style="line-height:1.8;white-space:pre-wrap;"></div>
+                    <!-- Image uploadée par l'user -->
+                    <div id="checkin-image-preview" style="display:none;margin-bottom:15px;">
+                        <img id="checkin-image-img" style="max-width:100%;max-height:250px;border-radius:8px;border:2px solid var(--accent-blue);object-fit:contain;" />
+                        <button onclick="clearInspirationImage()" style="margin-top:8px;font-family:'Space Mono',monospace;background:transparent;border:1px solid var(--accent-red);color:var(--accent-red);padding:5px 15px;border-radius:4px;cursor:pointer;font-size:.75rem;">🗑 Retirer</button>
+                    </div>
+
+                    <!-- Conseil IA texte -->
+                    <div id="checkin-ai-inspo" style="display:none;background:rgba(153,102,255,.1);border-left:4px solid var(--accent-purple);border-radius:6px;padding:15px;">
+                        <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent-purple);font-weight:700;margin-bottom:8px;">🤖 Conseil IA</div>
+                        <div id="checkin-ai-inspo-text" style="line-height:1.8;white-space:pre-wrap;font-size:.9rem;"></div>
+                    </div>
                 </div>
             </div>
 
@@ -961,6 +971,16 @@ function initCheckin() {
     document.getElementById('checkin-image-preview').style.display = 'none';
     document.getElementById('checkin-ai-inspo').style.display = 'none';
     document.getElementById('checkin-feedback').style.display = 'none';
+
+    // Image du jour Hue Teo — auto
+    const now = new Date();
+    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+    const idx = dayOfYear % HUE_TEO_GALLERY.length;
+    const artwork = HUE_TEO_GALLERY[idx];
+    const dailyImg = document.getElementById('checkin-daily-img');
+    const dailyTitle = document.getElementById('checkin-daily-title');
+    if (dailyImg) dailyImg.src = artwork.url;
+    if (dailyTitle) dailyTitle.textContent = artwork.title;
 
     const week = getCurrentWeek();
     const prog = weekProgram[week];
