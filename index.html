@@ -129,14 +129,14 @@
 <body>
 
 <div id="login-screen" class="login-screen" style="position:relative;overflow:hidden;min-height:100vh;">
-    <!-- Image du jour Hue Teo -->
-    <div id="login-bg" style="position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;filter:brightness(.35) saturate(.8);z-index:0;transition:opacity 1s ease;"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom, transparent 30%, rgba(10,10,10,.95) 100%);z-index:1;"></div>
+    <!-- Image du jour Hue Teo — affichée via img tag -->
+    <img id="login-bg-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.32) saturate(.7);z-index:0;">
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,.2) 0%, rgba(10,10,10,.97) 100%);z-index:1;"></div>
     <!-- Contenu -->
     <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:40px 20px;">
         <h1 style="font-family:'Bebas Neue',sans-serif;font-size:5rem;letter-spacing:6px;background:linear-gradient(135deg,var(--accent-red),var(--accent-yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-transform:uppercase;margin-bottom:10px;animation:glow 3s ease-in-out infinite;">Programme Rocky</h1>
         <p style="font-family:'Space Mono',monospace;color:var(--text-secondary);font-size:.85rem;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px;">Entraînement Intensif — Florian Millet</p>
-        <div id="login-artwork-label" style="font-family:'Space Mono',monospace;font-size:.7rem;color:rgba(255,255,255,.35);letter-spacing:2px;margin-bottom:40px;text-transform:uppercase;"></div>
+        <div id="login-artwork-label" style="font-family:'Space Mono',monospace;font-size:.7rem;color:rgba(255,255,255,.4);letter-spacing:2px;margin-bottom:40px;text-transform:uppercase;"></div>
         <button class="login-btn" onclick="loginWithGoogle()">🔐 Connexion avec Google</button>
     </div>
 </div>
@@ -1162,19 +1162,23 @@ const HUE_TEO_GALLERY = [
 ];
 
 function initDailyImage() {
-    const bg = document.getElementById('login-bg');
-    const label = document.getElementById('login-artwork-label');
-    if (!bg) return;
-    // Index basé sur le jour de l'année pour changer chaque jour
     const now = new Date();
     const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
     const idx = dayOfYear % HUE_TEO_GALLERY.length;
     const artwork = HUE_TEO_GALLERY[idx];
-    bg.style.backgroundImage = `url('${artwork.url}')`;
-    if (label) label.textContent = `Hue Teo — ${artwork.title}`;
+    // Page de login
+    const img = document.getElementById('login-bg-img');
+    if (img) img.src = artwork.url;
+    const label = document.getElementById('login-artwork-label');
+    if (label) label.textContent = 'Hue Teo — ' + artwork.title;
 }
 
-initDailyImage();
+// Lance immédiatement dès que le DOM est prêt
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDailyImage);
+} else {
+    initDailyImage();
+}
 // init
 </script>
 
