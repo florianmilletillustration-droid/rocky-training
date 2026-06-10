@@ -884,7 +884,7 @@ function renderHeatmap(){
         html+='<div style="height:18px;font-size:.6rem;color:var(--text-secondary);white-space:nowrap;">'+(showMonth?monthLbl:'')+'</div>';
         for(let d=0;d<7;d++){
             const cell=new Date(wStart); cell.setDate(cell.getDate()+d);
-            const ds=cell.toISOString().split('T')[0];
+            const ds=cell.getFullYear()+'-'+String(cell.getMonth()+1).padStart(2,'0')+'-'+String(cell.getDate()).padStart(2,'0');
             const mins=dayMap[ds]||0;
             wTot.total+=mins;
             const future=cell>today;
