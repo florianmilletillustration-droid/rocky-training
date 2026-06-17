@@ -159,7 +159,7 @@
     <header>
         <h1>Programme Rocky</h1>
         <p class="subtitle">Entraînement Intensif - Florian Millet</p>
-        <div style="display:inline-block;background:#00ff88;color:#0a0a0a;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:2px;padding:4px 14px;border-radius:20px;margin-top:8px;text-transform:uppercase;">✅ VERSION CHECK-IN + INSPIRATION</div>
+        <div style="display:inline-block;background:#00ff88;color:#0a0a0a;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:2px;padding:4px 14px;border-radius:20px;margin-top:8px;text-transform:uppercase;">✅ VERSION V3 — SESSIONS AUTO-VERT</div>
         <div class="user-info">
             <span class="user-email" id="user-email"></span>
             <button class="logout-btn" onclick="changeApiKey()" style="border-color:var(--accent-purple);color:var(--accent-purple);">🔑 Clé API</button>
@@ -318,8 +318,6 @@
         <div style="max-width:800px;margin:0 auto;">
             <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:5px;color:var(--accent-green);">⚡ Check-in rapide</h2>
             <p style="color:var(--text-secondary);margin-bottom:25px;font-size:.9rem;">T'as fini de bosser? 30 secondes pour logger ta session.</p>
-
-            <!-- FIN DE JOURNÉE — révision des sessions -->
             <div style="background:var(--bg-card);border:2px solid var(--accent-yellow);border-radius:12px;padding:25px;margin-bottom:20px;">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px;">
                     <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--accent-yellow);">🌙 Sessions d'aujourd'hui</div>
@@ -505,7 +503,6 @@ auth.onAuthStateChanged(user=>{
         document.getElementById('login-screen').style.display='none';
         document.getElementById('app-content').classList.add('active');
         document.getElementById('user-email').textContent=user.email;
-        // FIX: utilise getTodayString() au lieu de valueAsDate=new Date() pour éviter le décalage UTC
         document.getElementById('manual-date').value=getTodayString();
         initDailyImage();
         loadAllData();
@@ -522,11 +519,6 @@ let coachHistory=[];
 let _currentWeekNum = 1;
 function getCurrentWeek(){ return _currentWeekNum; }
 
-// ═══════════════════════════════════════════════════════════════
-// FIX TIMEZONE: utilise l'heure locale au lieu de UTC
-// Avant: new Date().toISOString().split('T')[0] → date UTC (décalée la nuit)
-// Après: reconstruction manuelle avec getFullYear/getMonth/getDate → date locale
-// ═══════════════════════════════════════════════════════════════
 function getTodayString(){
     const now = new Date();
     const y = now.getFullYear();
@@ -584,6 +576,9 @@ async function loadAllData(){
         renderHistory();
         initDaySelector();
         loadExercises(currentDay);
+        // ═══════════════════════════════════════════════════════
+        // FIX V3: passe allSessions pour détecter les jours avec pratique
+        // ═══════════════════════════════════════════════════════
         updateDayButtons(completedDays, currentWeek, data.weekStartDate || null);
     }catch(e){console.error(e);}
 }
@@ -701,6 +696,13 @@ async function deleteSession(id){
     await saveSessions();await loadAllData();
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// FIX V3 — updateDayButtons
+// Un jour devient VERT si :
+//   1. Il est dans completedDays (marquage manuel / check-in), OU
+//   2. Il y a au moins une session enregistrée ce jour-là dans allSessions
+// Un jour devient ROUGE seulement s'il est passé, sans session, et pas un repos
+// ═══════════════════════════════════════════════════════════════════════
 function updateDayButtons(completedDays, currentWeek, weekStartDate){
     const w = parseInt(currentWeek) || 1;
     const today = new Date(); today.setHours(0,0,0,0);
@@ -713,16 +715,32 @@ function updateDayButtons(completedDays, currentWeek, weekStartDate){
         monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
     }
     monday.setHours(0,0,0,0);
+
+    // Construire un Set des dates qui ont au moins une session
+    const sessionDates = new Set((allSessions || []).map(s => s.date));
+
     document.querySelectorAll('.day-btn').forEach((btn, i) => {
-        btn.classList.remove('completed','missed');
+        btn.classList.remove('completed', 'missed');
         const dayDate = new Date(monday);
         dayDate.setDate(monday.getDate() + i);
         dayDate.setHours(0,0,0,0);
+
+        // Reconstruire la date string en heure locale (évite décalage UTC)
+        const y = dayDate.getFullYear();
+        const mo = String(dayDate.getMonth() + 1).padStart(2, '0');
+        const d = String(dayDate.getDate()).padStart(2, '0');
+        const dateStr = y + '-' + mo + '-' + d;
+
         const isDone = completedDays.includes('day' + i + '_week' + w);
+        const hasSessions = sessionDates.has(dateStr);
         const isPast = dayDate < today;
-        const isRest = i === 5;
-        if(isDone){btn.classList.add('completed');}
-        else if(isPast && !isRest){btn.classList.add('missed');}
+        const isRest = i === 5; // Samedi = repos
+
+        if(isDone || hasSessions){
+            btn.classList.add('completed');
+        } else if(isPast && !isRest){
+            btn.classList.add('missed');
+        }
     });
 }
 
