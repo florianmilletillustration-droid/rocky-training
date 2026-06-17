@@ -224,7 +224,7 @@
                         <option>Couleur</option><option>Composition</option><option>Vidéos/Cours</option><option>Autre</option>
                     </select>
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin:20px 0;">
+                <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:20px 0;">
                     <button class="btn btn-green" onclick="quickAddTime(15)">+15 min</button>
                     <button class="btn btn-green" onclick="quickAddTime(30)">+30 min</button>
                     <button class="btn btn-green" onclick="quickAddTime(45)">+45 min</button>
@@ -232,9 +232,18 @@
                     <button class="btn btn-green" onclick="quickAddTime(90)">+90 min</button>
                     <button class="btn btn-green" onclick="quickAddTime(120)">+2h</button>
                 </div>
-                <div style="display:flex;gap:10px;align-items:center;justify-content:center;margin-top:20px;">
-                    <input type="number" class="form-input" id="quick-minutes" placeholder="Minutes" min="1" style="max-width:150px;text-align:center;font-weight:600;font-size:1.1rem;">
-                    <button class="btn" onclick="quickAddCustomTime()">➕ AJOUTER</button>
+                <!-- Bouton custom inline -->
+                <div id="quick-custom-zone" style="margin-top:10px;display:flex;gap:10px;align-items:center;justify-content:center;">
+                    <button id="btn-show-custom" onclick="showCustomInput()" class="btn btn-secondary" style="font-size:.85rem;padding:12px 30px;">✏️ Autre durée</button>
+                </div>
+                <div id="quick-custom-input" style="display:none;margin-top:10px;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+                    <input type="number" id="quick-minutes" placeholder="Entres le nombre de minutes" min="1"
+                        style="background:var(--bg-elevated);border:2px solid var(--accent-yellow);color:var(--text-primary);padding:12px 20px;border-radius:6px;font-size:1rem;font-family:'Space Mono',monospace;font-weight:700;width:260px;text-align:center;outline:none;"
+                        onkeydown="if(event.key==='Enter') quickAddCustomTime();"
+                        onfocus="this.style.borderColor='var(--accent-green)'"
+                        onblur="this.style.borderColor='var(--accent-yellow)'">
+                    <button class="btn btn-green" onclick="quickAddCustomTime()" style="padding:12px 30px;">✅ Ajouter</button>
+                    <button onclick="hideCustomInput()" style="background:transparent;border:1px solid #444;color:#888;padding:12px 20px;border-radius:6px;cursor:pointer;font-family:'Space Mono',monospace;font-size:.8rem;">Annuler</button>
                 </div>
             </div>
         </div>
@@ -768,13 +777,24 @@ async function quickAddTime(mins){
     await saveSessions();await loadAllData();
     showQuickFeedback('✅ +'+mins+' min ajoutées!');
 }
+function showCustomInput(){
+    document.getElementById('quick-custom-zone').style.display='none';
+    const zone=document.getElementById('quick-custom-input');
+    zone.style.display='flex';
+    setTimeout(()=>document.getElementById('quick-minutes').focus(),50);
+}
+function hideCustomInput(){
+    document.getElementById('quick-custom-input').style.display='none';
+    document.getElementById('quick-custom-zone').style.display='flex';
+    document.getElementById('quick-minutes').value='';
+}
 async function quickAddCustomTime(){
     const mins=parseInt(document.getElementById('quick-minutes').value);
     if(!mins||mins<=0){alert('Entre un nombre de minutes valide!');return;}
     const cat=document.getElementById('quick-category').value;
     allSessions.push({id:'session_'+Date.now(),date:getTodayString(),category:cat,minutes:mins,note:'',timestamp:Date.now()});
     await saveSessions();await loadAllData();
-    document.getElementById('quick-minutes').value='';
+    hideCustomInput();
     showQuickFeedback('✅ +'+mins+' min ajoutées!');
 }
 function showQuickFeedback(msg){
