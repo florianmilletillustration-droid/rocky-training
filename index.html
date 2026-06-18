@@ -232,7 +232,6 @@
                     <button class="btn btn-green" onclick="quickAddTime(90)">+90 min</button>
                     <button class="btn btn-green" onclick="quickAddTime(120)">+2h</button>
                 </div>
-                <!-- Bouton custom inline -->
                 <div id="quick-custom-zone" style="margin-top:10px;display:flex;gap:10px;align-items:center;justify-content:center;">
                     <button id="btn-show-custom" onclick="showCustomInput()" class="btn btn-secondary" style="font-size:.85rem;padding:12px 30px;">✏️ Autre durée</button>
                 </div>
@@ -585,9 +584,6 @@ async function loadAllData(){
         renderHistory();
         initDaySelector();
         loadExercises(currentDay);
-        // ═══════════════════════════════════════════════════════
-        // FIX V3: passe allSessions pour détecter les jours avec pratique
-        // ═══════════════════════════════════════════════════════
         updateDayButtons(completedDays, currentWeek, data.weekStartDate || null);
     }catch(e){console.error(e);}
 }
@@ -706,10 +702,11 @@ async function deleteSession(id){
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// FIX V3 — updateDayButtons
+// FIX V3.1 — updateDayButtons
 // Un jour devient VERT si :
 //   1. Il est dans completedDays (marquage manuel / check-in), OU
 //   2. Il y a au moins une session enregistrée ce jour-là dans allSessions
+//   ET dans les deux cas : le jour ne doit PAS être dans le futur
 // Un jour devient ROUGE seulement s'il est passé, sans session, et pas un repos
 // ═══════════════════════════════════════════════════════════════════════
 function updateDayButtons(completedDays, currentWeek, weekStartDate){
@@ -743,9 +740,11 @@ function updateDayButtons(completedDays, currentWeek, weekStartDate){
         const isDone = completedDays.includes('day' + i + '_week' + w);
         const hasSessions = sessionDates.has(dateStr);
         const isPast = dayDate < today;
+        const isFuture = dayDate > today;
         const isRest = i === 5; // Samedi = repos
 
-        if(isDone || hasSessions){
+        // ✅ FIX: un jour futur ne peut jamais être vert
+        if((isDone || hasSessions) && !isFuture){
             btn.classList.add('completed');
         } else if(isPast && !isRest){
             btn.classList.add('missed');
