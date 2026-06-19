@@ -576,9 +576,15 @@ async function loadAllData(){
         document.getElementById('days-completed').textContent = completedDays.length + '/84';
         const totalMins = data.totalMinutes || 0;
         document.getElementById('total-time').textContent = Math.floor(totalMins/60) + 'h';
-        document.getElementById('streak').textContent = (data.streak || 0) + ' 🔥';
         allSessions = data.sessions || [];
         window._checkins = data.checkins || [];
+        // Recalcule le streak réel (jours consécutifs) depuis les sessions
+        const realStreak = calculateStreak();
+        document.getElementById('streak').textContent = realStreak + ' 🔥';
+        // Sync Firebase si le streak stocké est différent
+        if(realStreak !== (data.streak || 0)){
+            db.collection('users').doc(currentUser.uid).set({streak: realStreak},{merge:true});
+        }
         updateTodayDisplay();
         updateCategoryStats();
         renderHistory();
@@ -691,9 +697,38 @@ function clearFilters(){
     renderJournal();
 }
 
+function calculateStreak(){
+    // Construit un Set de toutes les dates avec au moins une session
+    const sessionDates = new Set(allSessions.map(s => s.date));
+    const today = new Date(); today.setHours(0,0,0,0);
+    let streak = 0;
+    let cursor = new Date(today);
+    // Si pas de session aujourd'hui, on commence à vérifier hier
+    // (on ne pénalise pas si la journée est pas encore finie)
+    const todayStr = getTodayString();
+    if(!sessionDates.has(todayStr)){
+        cursor.setDate(cursor.getDate() - 1);
+    }
+    // Remonte jour par jour tant qu'il y a une session
+    while(true){
+        const y = cursor.getFullYear();
+        const m = String(cursor.getMonth()+1).padStart(2,'0');
+        const d = String(cursor.getDate()).padStart(2,'0');
+        const dateStr = y+'-'+m+'-'+d;
+        if(sessionDates.has(dateStr)){
+            streak++;
+            cursor.setDate(cursor.getDate()-1);
+        } else {
+            break;
+        }
+    }
+    return streak;
+}
+
 async function saveSessions(){
     if(!currentUser) return;
-    await db.collection('users').doc(currentUser.uid).set({sessions:allSessions,totalMinutes:allSessions.reduce((s,x)=>s+x.minutes,0),lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    const streak = calculateStreak();
+    await db.collection('users').doc(currentUser.uid).set({sessions:allSessions,totalMinutes:allSessions.reduce((s,x)=>s+x.minutes,0),streak,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
 }
 async function deleteSession(id){
     if(!confirm('Supprimer cette session?')) return;
