@@ -175,7 +175,8 @@
         </div>
         <div class="stat-card"><div class="stat-label">Jours complétés</div><div class="stat-value" id="days-completed">0/84</div></div>
         <div class="stat-card"><div class="stat-label">Temps total</div><div class="stat-value" id="total-time">0h</div></div>
-        <div class="stat-card"><div class="stat-label">Streak actuel</div><div class="stat-value" id="streak">0 🔥</div></div>
+        <div class="stat-card"><div class="stat-label">Streak consécutif</div><div class="stat-value" id="streak">0 🔥</div></div>
+        <div class="stat-card"><div class="stat-label">Jours actifs total</div><div class="stat-value" id="days-active">0</div></div>
         <div class="stat-card"><div class="stat-label">Aujourd'hui</div><div class="stat-value" id="today-total">0min</div></div>
     </div>
 
@@ -581,6 +582,10 @@ async function loadAllData(){
         // Recalcule le streak réel (jours consécutifs) depuis les sessions
         const realStreak = calculateStreak();
         document.getElementById('streak').textContent = realStreak + ' 🔥';
+        // Jours actifs = nombre de dates uniques avec au moins une session
+        const activeDays = new Set(allSessions.map(s => s.date)).size;
+        const daysActiveEl = document.getElementById('days-active');
+        if(daysActiveEl) daysActiveEl.textContent = activeDays;
         // Sync Firebase si le streak stocké est différent
         if(realStreak !== (data.streak || 0)){
             db.collection('users').doc(currentUser.uid).set({streak: realStreak},{merge:true});
