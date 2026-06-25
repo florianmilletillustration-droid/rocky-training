@@ -137,7 +137,7 @@
     <header>
         <h1>Programme Rocky</h1>
         <p class="subtitle">Entraînement Intensif - Florian Millet</p>
-        <div style="display:inline-block;background:#00ff88;color:#0a0a0a;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:2px;padding:4px 14px;border-radius:20px;margin-top:8px;text-transform:uppercase;">✅ VERSION V3.2 — FIX JOURS FUTURS</div>
+        <div style="display:inline-block;background:#00ff88;color:#0a0a0a;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:2px;padding:4px 14px;border-radius:20px;margin-top:8px;text-transform:uppercase;">✅ VERSION V3.3 — FIX JOURS FUTURS</div>
         <div class="user-info">
             <span class="user-email" id="user-email"></span>
             <button class="logout-btn" onclick="changeApiKey()" style="border-color:var(--accent-purple);color:var(--accent-purple);">🔑 Clé API</button>
@@ -531,35 +531,57 @@ async function saveSessions(){if(!currentUser)return;const streak=calculateStrea
 async function deleteSession(id){if(!confirm('Supprimer cette session?'))return;allSessions=allSessions.filter(s=>s.id!==id);await saveSessions();await loadAllData();}
 
 // ═══════════════════════════════════════════════════
-// FIX V3.2 — updateDayButtons
-// weekStartDate parsé en LOCAL (pas UTC)
-// Comparaison via .getTime() — 100% fiable
-// Futur = toujours neutre. Aujourd'hui sans session = neutre.
+// FIX V3.3 — updateDayButtons
+// Le lundi est TOUJOURS calculé depuis aujourd'hui (heure locale)
+// On n'utilise PLUS weekStartDate pour éviter tout bug UTC
+// Futur = gris. Aujourd'hui sans session = neutre.
 // ═══════════════════════════════════════════════════
 function updateDayButtons(completedDays,currentWeek,weekStartDate){
     const w=parseInt(currentWeek)||1;
+
+    // Today à minuit heure locale — référence absolue
     const today=new Date();today.setHours(0,0,0,0);
-    let monday;
-    if(weekStartDate){
-        const p=weekStartDate.split('-');
-        monday=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
-    }else{
-        monday=new Date(today);const dow=today.getDay();
-        monday.setDate(today.getDate()-(dow===0?6:dow-1));
-    }
+
+    // Lundi de LA SEMAINE EN COURS — calculé depuis today, jamais depuis Firebase
+    const monday=new Date(today);
+    const dow=today.getDay(); // 0=dim,1=lun,2=mar,3=mer,4=jeu,5=ven,6=sam
+    monday.setDate(today.getDate()-(dow===0?6:dow-1));
     monday.setHours(0,0,0,0);
+
     const sessionDates=new Set((allSessions||[]).map(s=>s.date));
+
     document.querySelectorAll('.day-btn').forEach((btn,i)=>{
         btn.classList.remove('completed','missed');
-        const dayDate=new Date(monday);dayDate.setDate(monday.getDate()+i);dayDate.setHours(0,0,0,0);
+
+        // Date du bouton i = monday + i jours
+        const dayDate=new Date(monday);
+        dayDate.setDate(monday.getDate()+i);
+        dayDate.setHours(0,0,0,0);
+
+        // String YYYY-MM-DD heure locale
         const dateStr=dayDate.getFullYear()+'-'+String(dayDate.getMonth()+1).padStart(2,'0')+'-'+String(dayDate.getDate()).padStart(2,'0');
+
         const isDone=completedDays.includes('day'+i+'_week'+w);
         const hasSessions=sessionDates.has(dateStr);
-        const isRest=(i===5);
-        const dayTime=dayDate.getTime(),todayTime=today.getTime();
-        const isPast=dayTime<todayTime,isToday=dayTime===todayTime,isFuture=dayTime>todayTime;
-        if(!isFuture&&(isDone||hasSessions)){btn.classList.add('completed');}
-        else if(isPast&&!isToday&&!isRest){btn.classList.add('missed');}
+        const isRest=(i===5); // Samedi = repos
+        const isOffDay=(i===6); // Dimanche = hors programme
+
+        const dayTime=dayDate.getTime();
+        const todayTime=today.getTime();
+        const isPast=dayTime<todayTime;
+        const isToday=dayTime===todayTime;
+        const isFuture=dayTime>todayTime;
+
+        // Dimanche : toujours gris/désactivé
+        if(isOffDay){btn.style.opacity='0.3';btn.style.pointerEvents='none';return;}
+
+        if(!isFuture&&(isDone||hasSessions)){
+            btn.classList.add('completed');   // Vert
+        }else if(isFuture||isToday){
+            // Futur ou aujourd'hui sans session = neutre (gris par défaut)
+        }else if(isPast&&!isRest){
+            btn.classList.add('missed');      // Rouge : passé sans session
+        }
     });
 }
 
