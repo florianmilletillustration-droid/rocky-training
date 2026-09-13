@@ -8,6 +8,19 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-13 — Le marqueur « jour validé » est indexé sur la date calendaire réelle
+Le bug de réinitialisation hebdomadaire venait d'une clé `day{position}_week{numéro}` :
+`numéro` était le compteur de semaine manuel (`_currentWeekNum`, avancé seulement au clic
+sur « Semaine suivante »), tandis que l'affichage des boutons de jour calculait toujours le
+lundi depuis la date du jour réel. Quand la semaine calendaire changeait avant que le
+compteur manuel soit avancé, les anciennes coches de la semaine précédente réapparaissaient
+en vert sur la nouvelle semaine. Correctif : le marqueur utilise désormais directement la
+date du jour (`YYYY-MM-DD`, comme pour les sessions de pratique) au lieu de la position dans
+le programme. Aucune entrée existante n'est supprimée de `completedDays` — les anciennes
+clés au format `day{i}_week{w}` restent en base (comptent toujours dans le total `N/84`)
+mais ne sont plus utilisées pour l'affichage. Pas de migration nécessaire : changement de
+format d'écriture à partir de maintenant, sans effet sur les données déjà enregistrées.
+
 ## 2026-09-12 — Le temps et le niveau sont deux mesures séparées
 La constellation affiche un niveau auto-évalué, pas un cumul d'heures. Remplir des branches à
 l'heure aurait produit une carte des habitudes et non des compétences : on peut accumuler des

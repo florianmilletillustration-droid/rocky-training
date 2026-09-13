@@ -137,7 +137,7 @@
     <header>
         <h1>Programme Rocky</h1>
         <p class="subtitle">Entraînement Intensif - Florian Millet</p>
-        <div style="display:inline-block;background:#00ff88;color:#0a0a0a;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:2px;padding:4px 14px;border-radius:20px;margin-top:8px;text-transform:uppercase;">✅ VERSION V3.3 — FIX JOURS FUTURS</div>
+        <div style="display:inline-block;background:#00ff88;color:#0a0a0a;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:2px;padding:4px 14px;border-radius:20px;margin-top:8px;text-transform:uppercase;">✅ VERSION V3.4 — FIX RESET HEBDO</div>
         <div class="user-info">
             <span class="user-email" id="user-email"></span>
             <button class="logout-btn" onclick="changeApiKey()" style="border-color:var(--accent-purple);color:var(--accent-purple);">🔑 Clé API</button>
@@ -531,14 +531,16 @@ async function saveSessions(){if(!currentUser)return;const streak=calculateStrea
 async function deleteSession(id){if(!confirm('Supprimer cette session?'))return;allSessions=allSessions.filter(s=>s.id!==id);await saveSessions();await loadAllData();}
 
 // ═══════════════════════════════════════════════════
-// FIX V3.3 — updateDayButtons
+// FIX V3.4 — updateDayButtons
 // Le lundi est TOUJOURS calculé depuis aujourd'hui (heure locale)
 // On n'utilise PLUS weekStartDate pour éviter tout bug UTC
+// "Validé" se juge sur la date calendaire réelle du bouton, jamais
+// sur (position dans la semaine + numéro de semaine manuel) : ce
+// dernier ne change qu'au clic sur "Semaine suivante" et faisait
+// réapparaître les coches de la semaine passée sur la nouvelle semaine.
 // Futur = gris. Aujourd'hui sans session = neutre.
 // ═══════════════════════════════════════════════════
 function updateDayButtons(completedDays,currentWeek,weekStartDate){
-    const w=parseInt(currentWeek)||1;
-
     // Today à minuit heure locale — référence absolue
     const today=new Date();today.setHours(0,0,0,0);
 
@@ -561,7 +563,7 @@ function updateDayButtons(completedDays,currentWeek,weekStartDate){
         // String YYYY-MM-DD heure locale
         const dateStr=dayDate.getFullYear()+'-'+String(dayDate.getMonth()+1).padStart(2,'0')+'-'+String(dayDate.getDate()).padStart(2,'0');
 
-        const isDone=completedDays.includes('day'+i+'_week'+w);
+        const isDone=completedDays.includes(dateStr);
         const hasSessions=sessionDates.has(dateStr);
         const isRest=(i===5); // Samedi = repos
         const isOffDay=(i===6); // Dimanche = hors programme
@@ -588,7 +590,7 @@ function updateDayButtons(completedDays,currentWeek,weekStartDate){
 async function markDayCompleted(){
     if(!confirm('Marquer ce jour comme complété?'))return;
     const doc=await db.collection('users').doc(currentUser.uid).get();const data=doc.exists?doc.data():{};
-    const completedDays=data.completedDays||[];const key='day'+currentDay+'_week'+_currentWeekNum;
+    const completedDays=data.completedDays||[];const key=getTodayString();
     if(!completedDays.includes(key)){completedDays.push(key);await db.collection('users').doc(currentUser.uid).set({completedDays,streak:completedDays.length,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});alert('✅ Jour complété!');loadAllData();}
     else alert('Ce jour est déjà marqué!');
 }
@@ -744,7 +746,7 @@ async function saveCheckin(){
         const doc=await db.collection('users').doc(currentUser.uid).get();const data=doc.exists?doc.data():{};
         const checkins=data.checkins||[];const filtered=checkins.filter(c=>c.date!==getTodayString());filtered.push(entry);
         await db.collection('users').doc(currentUser.uid).set({checkins:filtered},{merge:true});
-        if(mainDone){const completedDays=data.completedDays||[];const key='day'+currentDay+'_week'+week;if(!completedDays.includes(key)){completedDays.push(key);await db.collection('users').doc(currentUser.uid).set({completedDays,streak:completedDays.length},{merge:true});}}
+        if(mainDone){const completedDays=data.completedDays||[];const key=getTodayString();if(!completedDays.includes(key)){completedDays.push(key);await db.collection('users').doc(currentUser.uid).set({completedDays,streak:completedDays.length},{merge:true});}}
         const fb=document.getElementById('checkin-feedback');fb.textContent=mainDone?'✅ Check-in sauvegardé! Jour marqué complété!':'✅ Check-in sauvegardé!';fb.style.display='block';await loadAllData();setTimeout(()=>{fb.style.display='none';},3000);
     }catch(e){alert('Erreur: '+e.message);}
 }

@@ -10,11 +10,6 @@ données veuillent dire quelque chose reviendrait à décorer des chiffres faux.
 
 ## Phase 0 — Correctif et filet de sécurité
 
-- [ ] **Bug : les jours validés ne se réinitialisent pas chaque semaine.**
-  Les jours cochés restent verts d'une semaine à l'autre.
-  *Attendu :* les jours de la semaine courante restent verts ; au passage à une nouvelle
-  semaine l'affichage repart à blanc, **sans jamais effacer l'historique Firestore**.
-
 - [ ] **Export JSON complet des données de pratique.**
   Un bouton qui télécharge tout. À faire **avant** toute migration. C'est le filet.
 
@@ -74,4 +69,7 @@ données veuillent dire quelque chose reviendrait à décorer des chiffres faux.
 
 ## Fait
 
-*(déplacer ici les items terminés, avec la date)*
+- [x] **Bug : les jours validés ne se réinitialisent pas chaque semaine.** *(2026-09-13)*
+  Les jours cochés restaient verts d'une semaine à l'autre. Corrigé en indexant le marqueur
+  de jour validé sur la date calendaire réelle plutôt que sur (position dans la semaine +
+  numéro de semaine manuel). Voir DECISIONS.md.
