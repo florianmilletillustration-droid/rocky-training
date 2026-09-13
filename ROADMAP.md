@@ -60,6 +60,21 @@ données veuillent dire quelque chose reviendrait à décorer des chiffres faux.
 
 - [ ] **Temps investi affiché sous la constellation**, jamais à la place du niveau.
 
+## Phase 5 — Le cycle
+
+- [ ] Le programme devient cyclique : après la semaine 12, un nouveau cycle de
+      12 semaines démarre. Le compteur devient « Cycle N · Semaine X/12 ».
+
+- [ ] Rituel de fin de cycle : auto-évaluation de toutes les branches, révision
+      du registre des faiblesses, archivage de l'instantané de la constellation.
+
+- [ ] Le contenu des semaines sort du code et devient une donnée modifiable,
+      pour que chaque cycle puisse avoir son propre contenu.
+
+- [ ] Le contenu d'un nouveau cycle se compose à partir du registre des
+      faiblesses issu du rituel de fin de cycle. Ne jamais générer un cycle
+      automatiquement : Florian le compose, l'app l'assiste.
+
 ## Idées non validées
 
 À ne pas implémenter sans approbation explicite de Florian.
