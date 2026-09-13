@@ -8,6 +8,18 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-13 — Le programme boucle en cycles de 12 semaines plutôt que de s'allonger
+Un programme plus long ne se commence pas et n'offre aucune fin à célébrer. Douze
+semaines restent la bonne unité : assez court pour s'y engager, assez long pour
+produire un changement. La pratique ne s'arrête jamais, donc le programme se
+relance au lieu de s'étirer.
+
+## 2026-09-13 — Le contenu du cycle suivant naît du registre des faiblesses
+La pratique délibérée vise une faiblesse précise. Écrire le cycle 2 d'avance
+reviendrait à concevoir le programme d'un dessinateur qui n'existe pas encore.
+Le contenu se compose au rituel de fin de cycle, à partir de ce qui bloque
+réellement à ce moment-là.
+
 ## 2026-09-13 — Le marqueur « jour validé » est indexé sur la date calendaire réelle
 Le bug de réinitialisation hebdomadaire venait d'une clé `day{position}_week{numéro}` :
 `numéro` était le compteur de semaine manuel (`_currentWeekNum`, avancé seulement au clic
