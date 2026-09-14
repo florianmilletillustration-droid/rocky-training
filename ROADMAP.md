@@ -10,6 +10,10 @@ données veuillent dire quelque chose reviendrait à décorer des chiffres faux.
 
 ## Phase 0 — Correctif et filet de sécurité
 
+- [ ] Vérifier le compteur « jours complétés N/84 ». Il affiche 13/84 alors
+      que l'app enregistre 91 jours actifs et 248 h. Diagnostiquer l'écart
+      sans modifier aucune donnée existante, et corriger l'affichage.
+
 - [ ] **Export JSON complet des données de pratique.**
   Un bouton qui télécharge tout. À faire **avant** toute migration. C'est le filet.
 
@@ -48,17 +52,22 @@ données veuillent dire quelque chose reviendrait à décorer des chiffres faux.
 - [ ] **Jalons par preuve** : liste de jalons concrets cochables par branche.
   Les premiers jalons sont à rédiger **par Florian**, pas à inventer.
 
-## Phase 4 — La constellation
+## Phase 4 — Le sphérier
 
-- [ ] **Vue d'ensemble** par discipline, affichant le niveau auto-évalué.
-
-- [ ] **Zoom** sur une discipline pour ouvrir ses médiums en sous-constellation.
-
-- [ ] **Dormance** : estompement progressif d'une branche non travaillée. Ton neutre.
-
-- [ ] **Instantané mensuel** archivé et consultable dans le temps.
-
-- [ ] **Temps investi affiché sous la constellation**, jamais à la place du niveau.
+- [ ] Remplacer la constellation par un sphérier : un plateau de nœuds reliés,
+      inspiré du sphérier de Final Fantasy X.
+- [ ] Un nœud se débloque UNIQUEMENT en cochant un jalon par preuve. Jamais par
+      un seuil d'heures. Le temps investi s'affiche en contexte, il n'achète rien.
+- [ ] L'adjacence encode les prérequis : un nœud n'est accessible que depuis un
+      nœud voisin déjà débloqué.
+- [ ] Régions distinctes par discipline (Dessin, Peinture, Encrage, Anatomie),
+      reliées entre elles à quelques points seulement.
+- [ ] Les régions sont fixes, les nœuds poussent : chaque rituel de fin de cycle
+      greffe les nouveaux jalons à la frontière atteinte. Le plateau n'est
+      jamais complet.
+- [ ] Dormance : un nœud non retravaillé depuis longtemps se ternit, mais reste
+      débloqué.
+- [ ] Instantané mensuel du plateau, archivé et consultable.
 
 ## Phase 5 — Le cycle
 

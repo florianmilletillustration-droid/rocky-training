@@ -120,25 +120,35 @@ marqueur **Délibéré / Kilométrage**. Le marqueur doit se choisir en un seul 
 
 ---
 
-## 6. La constellation
+## 6. Le sphérier
 
-Carte visuelle inspirée des arbres de compétences de jeux vidéo, à branches.
+Plateau de nœuds reliés entre eux, inspiré du sphérier de Final Fantasy X. Il montre non
+seulement où on en est, mais aussi où on pourrait aller, et encode les prérequis réels du
+dessin par l'adjacence — ce qu'une carte à branches ne fait pas.
 
-- **Elle affiche le niveau, pas le temps.**
-- **Deux niveaux de zoom** : vue d'ensemble par discipline ; on clique sur une discipline et
-  ses médiums s'ouvrent en sous-constellation.
-- **Auto-évaluation mensuelle.** Florian note lui-même chaque branche. C'est ce qui fait
-  monter le niveau affiché.
-- **Jalons par preuve, pas par heures.** Une branche progresse quand un jalon concret est
-  coché — « nature morte au fusain complète en une séance », « mélange de peau à l'huile sans
-  le boueux ». Jamais à un seuil d'heures atteint.
+- **Il affiche le niveau, pas le temps.** Le temps investi apparaît en dessous, comme
+  contexte. Il n'achète jamais l'accès à un nœud.
+- **Un nœud se débloque uniquement par un jalon par preuve, jamais par un seuil d'heures.**
+  « Nature morte au fusain complète en une séance », « mélange de peau à l'huile sans le
+  boueux ». Jamais à un total d'heures atteint — sans quoi ce ne serait qu'une barre
+  d'expérience déguisée.
+- **L'adjacence encode les prérequis.** Un nœud n'est accessible que depuis un nœud voisin
+  déjà débloqué.
+- **Régions distinctes par discipline** — Dessin, Peinture, Encrage, Anatomie — reliées entre
+  elles à quelques points seulement. Les deux traditions du §2 restent des régions séparées,
+  jamais fusionnées.
+- **Les régions sont fixes, les nœuds poussent.** Chaque rituel de fin de cycle greffe les
+  nouveaux jalons à la frontière atteinte. Le plateau n'est jamais complet.
+- **Auto-évaluation mensuelle.** Florian note lui-même chaque branche. C'est ce qui alimente
+  le registre des faiblesses et les jalons à venir.
 - **Registre des faiblesses.** Chaque branche porte une courte liste de ce qui bloque
   actuellement. C'est la cible des sessions délibérées et la matière du Coach. Elle se révise
   à l'auto-évaluation mensuelle.
-- **Dormance.** Une branche non travaillée depuis plusieurs semaines s'estompe visuellement.
-  C'est une information sur l'oubli, jamais une réprimande. Ton neutre, pas culpabilisant.
-- **Instantané mensuel.** L'état de la constellation est archivé chaque mois et consultable.
-  C'est la vraie mesure de progrès sur un an.
+- **Dormance.** Un nœud non retravaillé depuis plusieurs semaines se ternit visuellement,
+  mais reste débloqué. C'est une information sur l'oubli, jamais une réprimande ni un retrait
+  d'accès. Ton neutre, pas culpabilisant.
+- **Instantané mensuel.** L'état du plateau est archivé chaque mois et consultable. C'est la
+  vraie mesure de progrès sur un an.
 
 ---
 
