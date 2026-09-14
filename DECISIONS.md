@@ -8,6 +8,27 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-14 — Le cycle 2 porte sur l'anatomie, en trois blocs
+Cinq semaines en parallèle d'un cours externe qui livre le savoir, trois semaines
+de reprise sans le cours pour transformer le savoir en compétence, quatre semaines
+d'application de mémoire. Un cours s'arrête quand son contenu s'arrête ; la
+rétention se joue après, d'où le bloc de reprise.
+
+## 2026-09-14 — Ordre du bloc 2 : torse, bras, bassin
+Ordre choisi par Florian selon ce qui gâche le plus un dessin quand ça rate. Le
+bassin remonte avant les jambes parce qu'il porte la jambe et reçoit le torse :
+un socle incertain fait chercher le problème au mauvais endroit.
+
+## 2026-09-14 — Les jambes sortent du bloc 2 plutôt que d'ajouter une semaine
+Douze semaines est une décision, pas une contrainte. Ajouter une semaine « juste
+cette fois » dilue le format. Couvrir moins en profondeur bat effleurer tout.
+
+## 2026-09-14 — Le boni porte les zones écartées du programme principal
+Le bloc vert reçoit un thème persistant plutôt qu'un contenu aléatoire : mains,
+puis jambes. Rien de ce qui tombe du programme principal n'est complètement
+abandonné. Le boni reste optionnel et ne porte aucun jalon — quinze minutes par
+jour entretiennent, elles ne prouvent pas.
+
 ## 2026-09-13 — Le streak est retiré au profit des jours actifs sur 30 jours
 L'app contredisait son propre fichier de règles. Un compteur de jours consécutifs
 tombe à zéro pour une maladie et pousse à venir pour le compteur. Les jours actifs
