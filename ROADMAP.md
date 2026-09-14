@@ -80,6 +80,9 @@ données veuillent dire quelque chose reviendrait à décorer des chiffres faux.
       faiblesses issu du rituel de fin de cycle. Ne jamais générer un cycle
       automatiquement : Florian le compose, l'app l'assiste.
 
+- [ ] Le contenu du cycle 2 est défini dans CYCLE-2.md. L'intégrer à l'app
+      lorsque le contenu des semaines sera sorti du code.
+
 ## Idées non validées
 
 À ne pas implémenter sans approbation explicite de Florian.
