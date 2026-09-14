@@ -8,6 +8,18 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-13 — Le streak est retiré au profit des jours actifs sur 30 jours
+L'app contredisait son propre fichier de règles. Un compteur de jours consécutifs
+tombe à zéro pour une maladie et pousse à venir pour le compteur. Les jours actifs
+sur une fenêtre glissante mesurent la même régularité sans punir un imprévu.
+
+## 2026-09-13 — Le sphérier remplace la constellation
+Une constellation montre où on est ; un sphérier montre aussi où on pourrait aller,
+ce qui soutient mieux une pratique sur plusieurs années. Il encode en plus les
+prérequis par l'adjacence, ce qui est réel en dessin. Monnaie de déblocage : le
+jalon par preuve, jamais l'heure — sans quoi ce ne serait qu'une barre
+d'expérience déguisée.
+
 ## 2026-09-13 — Le programme boucle en cycles de 12 semaines plutôt que de s'allonger
 Un programme plus long ne se commence pas et n'offre aucune fin à célébrer. Douze
 semaines restent la bonne unité : assez court pour s'y engager, assez long pour
