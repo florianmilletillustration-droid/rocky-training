@@ -29,6 +29,16 @@ puis jambes. Rien de ce qui tombe du programme principal n'est complètement
 abandonné. Le boni reste optionnel et ne porte aucun jalon — quinze minutes par
 jour entretiennent, elles ne prouvent pas.
 
+## 2026-09-14 — « Jours complétés » compte aussi les sessions, pas seulement le Check-in
+Le compteur `completedDays.length` n'était incrémenté que par la confirmation explicite du
+Check-in (case « exercice principal fait »). Les deux autres méthodes de tracking — ajout
+rapide et chrono — n'y touchaient jamais, alors qu'elles sont d'usage courant (§5,
+CLAUDE.md : l'ajout rapide est la méthode principale). Résultat concret chez Florian :
+13/84 affiché contre 91 jours actifs et 248 h réellement enregistrés. Le compteur affiché
+est désormais l'union des jours confirmés par Check-in et des jours où au moins une session
+existe, plafonnée à 84. Rien n'est écrit dans Firestore : correction d'affichage seule,
+`completedDays` reste tel quel en base.
+
 ## 2026-09-13 — Le streak est retiré au profit des jours actifs sur 30 jours
 L'app contredisait son propre fichier de règles. Un compteur de jours consécutifs
 tombe à zéro pour une maladie et pousse à venir pour le compteur. Les jours actifs

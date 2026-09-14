@@ -471,9 +471,15 @@ async function loadAllData(){
         _currentWeekNum=data.currentWeek||1;
         document.getElementById('current-week').textContent=_currentWeekNum+'/12';
         const completedDays=data.completedDays||[];
-        document.getElementById('days-completed').textContent=completedDays.length+'/84';
         document.getElementById('total-time').textContent=Math.floor((data.totalMinutes||0)/60)+'h';
         allSessions=data.sessions||[];window._checkins=data.checkins||[];
+        // "Jours complétés" = jours où le programme a été confirmé via le Check-in
+        // (completedDays) UNION jours où au moins une session a été enregistrée
+        // (allSessions), sinon le compteur ne reflète que les confirmations
+        // explicites du Check-in et ignore les 3/4 des méthodes de tracking
+        // (ajout rapide, chrono, manuel), très en retard sur l'activité réelle.
+        const daysCompletedCount=new Set([...completedDays,...allSessions.map(s=>s.date)]).size;
+        document.getElementById('days-completed').textContent=Math.min(daysCompletedCount,84)+'/84';
         const realStreak=calculateStreak();
         const el=document.getElementById('days-active');if(el)el.textContent=new Set(allSessions.map(s=>s.date)).size;
         const cutoff30=new Date();cutoff30.setHours(0,0,0,0);cutoff30.setDate(cutoff30.getDate()-29);
