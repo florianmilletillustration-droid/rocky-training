@@ -10,10 +10,6 @@ données veuillent dire quelque chose reviendrait à décorer des chiffres faux.
 
 ## Phase 0 — Correctif et filet de sécurité
 
-- [ ] Vérifier le compteur « jours complétés N/84 ». Il affiche 13/84 alors
-      que l'app enregistre 91 jours actifs et 248 h. Diagnostiquer l'écart
-      sans modifier aucune donnée existante, et corriger l'affichage.
-
 - [ ] **Export JSON complet des données de pratique.**
   Un bouton qui télécharge tout. À faire **avant** toute migration. C'est le filet.
 
@@ -92,6 +88,13 @@ données veuillent dire quelque chose reviendrait à décorer des chiffres faux.
 - [ ] Import de références ou de photos de travaux dans les jalons.
 
 ## Fait
+
+- [x] **Bug : compteur « jours complétés N/84 » très en dessous de l'activité réelle.**
+  *(2026-09-14)*
+  Affichait 13/84 alors que l'app enregistrait 91 jours actifs et 248 h. Le compteur ne
+  comptait que les confirmations explicites du Check-in, en ignorant les sessions ajoutées
+  par les deux autres méthodes de tracking. Corrigé côté affichage uniquement, aucune donnée
+  modifiée. Voir DECISIONS.md.
 
 - [x] **Bug : les jours validés ne se réinitialisent pas chaque semaine.** *(2026-09-13)*
   Les jours cochés restaient verts d'une semaine à l'autre. Corrigé en indexant le marqueur
