@@ -607,6 +607,14 @@ function milestoneState(mid,milestones){
     if(!dep)return'available';
     return dep.done?'available':'locked';
 }
+// État du hub d'une région. Un hub n'est pas un jalon (DECISIONS.md,
+// 2026-09-15) : il n'a pas de dépendance et ne peut donc jamais être
+// « verrouillé » — c'est le point d'entrée de la région, toujours accessible.
+// Mais son apparence doit quand même respecter la règle affichée dans
+// l'interface (« seul un jalon coché débloque un nœud ») : il ne prend
+// l'aspect « débloqué » que si au moins un jalon de sa branche est coché,
+// jamais par défaut ni par la couleur d'accent de la branche.
+function domainHubState(milestones){return(milestones||[]).some(m=>m.done)?'unlocked':'available';}
 function refreshBranchViews(){renderEvaluation();if(document.getElementById('spherier-svg'))renderSpherier();}
 async function addBranch(){
     const nameInput=document.getElementById('new-branch-name');const colorInput=document.getElementById('new-branch-color');
@@ -843,9 +851,18 @@ function renderSpherier(){
             chainHtml+=`<circle class="${cls}" cx="${pos.x}" cy="${pos.y}" r="16" style="${style}cursor:pointer;" data-branch="${branch}" data-mid="${m.id}" onmouseenter="showSphTooltip(event,'${branch}','${m.id}')" onmouseleave="hideSphTooltip()" onclick="onSphNodeClick('${branch}','${m.id}')"></circle>`;
         });
         const doneCount=milestones.filter(m=>m.done).length;const labelBelow=hubLabelBelow(branch);
+        const hubState=domainHubState(milestones);
+        // La dormance (CLAUDE.md §6) ne décrit que l'oubli d'un nœud déjà
+        // débloqué — elle ne s'applique donc qu'à l'état "unlocked" du hub,
+        // jamais à un hub encore "available" (rien coché = rien à oublier).
+        const hubDormant=dormant&&hubState==='unlocked';
+        const hubStyle=hubState==='unlocked'
+            ?(hubDormant?`fill:#666;opacity:.6;`:`fill:${color};filter:drop-shadow(0 0 10px ${color});`)
+            :`fill:var(--bg-elevated);stroke:${color};stroke-width:3;filter:drop-shadow(0 0 6px ${color});`;
+        const hubLevelTextColor=(hubState==='unlocked'&&!hubDormant)?'var(--bg-dark)':color;
         hubsHtml+=`<g onmouseenter="showSphHubTooltip(event,'${branch}')" onmouseleave="hideSphTooltip()" style="cursor:default;">
-            <circle cx="${hub.x}" cy="${hub.y}" r="24" fill="var(--bg-elevated)" stroke="${color}" stroke-width="3"${dormant&&milestones.length?' opacity="0.7"':''}/>
-            <text x="${hub.x}" y="${hub.y+5}" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="15" fill="${color}">${b.level||'—'}</text>
+            <circle cx="${hub.x}" cy="${hub.y}" r="24" style="${hubStyle}"/>
+            <text x="${hub.x}" y="${hub.y+5}" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="15" fill="${hubLevelTextColor}">${b.level||'—'}</text>
             <text x="${hub.x}" y="${hub.y+(labelBelow?44:-28)}" text-anchor="middle" font-family="'Space Mono',monospace" font-size="12" fill="${color}" letter-spacing="1">${branch.toUpperCase()}</text>
             <text x="${hub.x}" y="${hub.y+(labelBelow?59:-43)}" text-anchor="middle" font-family="'Space Mono',monospace" font-size="9" fill="var(--text-secondary)">${milestones.length?doneCount+'/'+milestones.length:'aucun jalon'}</text>
         </g>`;
