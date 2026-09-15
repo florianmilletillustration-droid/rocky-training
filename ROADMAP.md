@@ -3,8 +3,9 @@
 Les phases se font **dans l'ordre**. Un seul item par pull request.
 Cocher l'item dans la même PR que l'implémentation.
 
-**Pourquoi cet ordre :** le visuel vient en dernier. Construire la constellation avant que les
-données veuillent dire quelque chose reviendrait à décorer des chiffres faux.
+**Pourquoi cet ordre :** évaluation et sphérier passent devant taxonomie et qualité de
+pratique — changement de priorité demandé par Florian le 15 septembre 2026. Raison
+détaillée dans DECISIONS.md.
 
 ---
 
@@ -15,40 +16,17 @@ données veuillent dire quelque chose reviendrait à décorer des chiffres faux.
 
 - [ ] **Ajouter `schemaVersion` aux documents Firestore**, avec lecture rétrocompatible.
 
-## Phase 1 — Taxonomie et migration
+## Phase 1 — Évaluation
 
-- [ ] **Implémenter le modèle Domaine → Discipline → Médium** (voir CLAUDE.md §4).
+- [x] **Auto-évaluation mensuelle** du niveau de chaque branche.
 
-- [ ] **Migrer les catégories plates existantes** vers la nouvelle structure.
-  Mapping explicite, écrit dans la PR, validé par Florian avant merge.
-  *Aucune minute de pratique ne doit disparaître.* Tester sur une copie d'abord.
-
-- [ ] **Adapter les trois méthodes d'entrée** (ajout rapide, chrono, manuel) à la nouvelle
-  taxonomie, sans ajouter d'étape à l'ajout rapide.
-
-- [ ] **Ajouter le domaine Corps** : Course, Gym, Randonnée, Autre. Temps uniquement.
-
-## Phase 2 — Qualité de pratique
-
-- [ ] **Marqueur Délibéré / Kilométrage** sur chaque session de Pratique visuelle.
-  Un seul geste. Deux boutons, pas un écran.
-
-- [ ] **Séparer les totaux** dans les stats : temps total, dont temps délibéré.
-
-- [ ] **Boucle de feedback du Coach** après une session marquée Délibéré : deux questions
-  courtes, deux phrases de réponse.
-
-## Phase 3 — Évaluation
-
-- [ ] **Auto-évaluation mensuelle** du niveau de chaque branche.
-
-- [ ] **Registre des faiblesses** par branche : liste courte, éditable, révisée à
+- [x] **Registre des faiblesses** par branche : liste courte, éditable, révisée à
   l'auto-évaluation.
 
-- [ ] **Jalons par preuve** : liste de jalons concrets cochables par branche.
+- [x] **Jalons par preuve** : liste de jalons concrets cochables par branche.
   Les premiers jalons sont à rédiger **par Florian**, pas à inventer.
 
-## Phase 4 — Le sphérier
+## Phase 2 — Le sphérier
 
 - [ ] Remplacer la constellation par un sphérier : un plateau de nœuds reliés,
       inspiré du sphérier de Final Fantasy X.
@@ -64,6 +42,44 @@ données veuillent dire quelque chose reviendrait à décorer des chiffres faux.
 - [ ] Dormance : un nœud non retravaillé depuis longtemps se ternit, mais reste
       débloqué.
 - [ ] Instantané mensuel du plateau, archivé et consultable.
+- [ ] Le plateau est un réseau organique, jamais une liste ni un arbre linéaire.
+      Les nœuds sont répartis dans un espace 2D avec des positions irrégulières,
+      des courbes, des boucles qui se referment et des embranchements.
+- [ ] Chaque discipline forme une grappe distincte, reliée aux autres par
+      quelques ponts seulement.
+- [ ] Rendu en SVG, avec des chemins courbes entre les nœuds, pas des segments
+      droits.
+- [ ] Trois états visuels distincts : verrouillé (sombre, contour seulement),
+      disponible (contour lumineux, pulsation légère), débloqué (rempli, halo).
+- [ ] Zoom et déplacement à la souris et au doigt.
+- [ ] Respecter la palette existante de l'app : fond sombre, accents jaune,
+      vert et violet. Police Bebas Neue pour les titres, Space Mono pour les
+      libellés.
+- [ ] Référence d'intention : le sphérier de Final Fantasy X. Ne pas copier son
+      graphisme, s'en inspirer pour la structure en réseau.
+
+## Phase 3 — Taxonomie et migration
+
+- [ ] **Implémenter le modèle Domaine → Discipline → Médium** (voir CLAUDE.md §4).
+
+- [ ] **Migrer les catégories plates existantes** vers la nouvelle structure.
+  Mapping explicite, écrit dans la PR, validé par Florian avant merge.
+  *Aucune minute de pratique ne doit disparaître.* Tester sur une copie d'abord.
+
+- [ ] **Adapter les trois méthodes d'entrée** (ajout rapide, chrono, manuel) à la nouvelle
+  taxonomie, sans ajouter d'étape à l'ajout rapide.
+
+- [ ] **Ajouter le domaine Corps** : Course, Gym, Randonnée, Autre. Temps uniquement.
+
+## Phase 4 — Qualité de pratique
+
+- [ ] **Marqueur Délibéré / Kilométrage** sur chaque session de Pratique visuelle.
+  Un seul geste. Deux boutons, pas un écran.
+
+- [ ] **Séparer les totaux** dans les stats : temps total, dont temps délibéré.
+
+- [ ] **Boucle de feedback du Coach** après une session marquée Délibéré : deux questions
+  courtes, deux phrases de réponse.
 
 ## Phase 5 — Le cycle
 

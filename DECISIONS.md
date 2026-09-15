@@ -8,6 +8,37 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-15 — Évaluation et sphérier passent avant taxonomie et qualité de pratique
+Changement de priorité demandé explicitement par Florian, qui inverse la règle « le
+visuel vient en dernier » posée le 12 septembre. Phase 0 (filet de sécurité) reste en
+tête et Phase 5 (le cycle) reste en fin de roadmap ; seul l'ordre entre les quatre
+phases intermédiaires change. Les items ne sont pas supprimés, seulement renumérotés.
+
+## 2026-09-15 — Les branches de l'évaluation reprennent les régions déjà nommées du sphérier
+La Phase Évaluation arrive avant la taxonomie Domaine → Discipline → Médium (Phase 3),
+qui n'existe donc pas encore. Plutôt qu'inventer une structure provisoire vouée à être
+jetée, les quatre branches évaluées (Dessin, Peinture, Encrage, Anatomie) reprennent
+telles quelles les régions déjà décrites en CLAUDE.md §6 et dans la Phase 2 (sphérier).
+Quand la taxonomie arrivera, ces branches seront le point de départ des régions du
+plateau plutôt qu'un système parallèle à réconcilier.
+
+## 2026-09-15 — Le niveau par branche est une auto-évaluation 1-10, jamais calculé
+Un curseur 1-10 rempli à la main par Florian, horodaté à chaque mise à jour. Aucun
+calcul à partir du temps ou du nombre de sessions n'entre dans cette valeur — CLAUDE.md
+l'interdit explicitement (§6, §9). Les jalons cochés ne modifient pas encore ce chiffre :
+tant que le sphérier (Phase 2) n'existe pas, un jalon coché reste une preuve enregistrée
+sur sa branche, sans mécanisme de déblocage à réconcilier avec le niveau affiché. Cette
+réconciliation (jalon → nœud débloqué) est le travail de la Phase 2, pas de celle-ci.
+
+## 2026-09-15 — Les jalons d'Anatomie sont importés tels quels depuis CYCLE-2.md, les autres branches partent vides
+Les 7 jalons du cycle 2 (S6 à S12) sont rédigés par Florian dans CYCLE-2.md ; ils sont
+recopiés mot pour mot comme jalons cochables de la branche Anatomie, importés une seule
+fois à la première ouverture de l'app après ce changement (pas réimportés si Florian les
+modifie ou en supprime ensuite). Dessin, Peinture et Encrage n'ont pas de jalons prédéfinis :
+inventer un contenu pour ces branches violerait la règle « les premiers jalons sont à
+rédiger par Florian, pas à inventer ». Chaque branche reçoit un champ de saisie pour qu'il
+les écrive lui-même quand il sera prêt.
+
 ## 2026-09-14 — Le cycle 2 porte sur l'anatomie, en trois blocs
 Cinq semaines en parallèle d'un cours externe qui livre le savoir, trois semaines
 de reprise sans le cours pour transformer le savoir en compétence, quatre semaines
