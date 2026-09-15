@@ -8,6 +8,42 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-15 — Un nœud du sphérier, c'est un jalon ; les hubs de région ne sont pas des jalons
+Chaque jalon par preuve d'une branche (Phase Évaluation) devient un nœud du sphérier. Les
+quatre régions (Dessin, Peinture, Encrage, Anatomie) reçoivent en plus une ancre fixe — le
+« hub » — qui porte le niveau auto-évalué et le nom de la branche, mais qui ne se
+verrouille/débloque jamais lui-même : ce n'est pas un jalon, juste le point d'où la chaîne
+de jalons de la région part et d'où partent les ponts vers les régions voisines.
+
+## 2026-09-15 — La chaîne de jalons de chaque région suit l'ordre réel du cycle, pas une forme inventée
+Les jalons d'Anatomie (S6 à S12) ont un ordre de prérequis réel posé dans CYCLE-2.md : le
+torse avant le bassin, la perspective 2 points avant la 3 points, etc. Le sphérier respecte
+cet ordre tel quel plutôt que d'inventer des embranchements artificiels pour faire joli —
+inventer de faux prérequis aurait menti sur la vraie dépendance entre les exercices.
+L'exigence « réseau organique, jamais une liste » est satisfaite autrement : les positions
+des nœuds suivent une courbe irrégulière (jamais alignées en droite), le rendu est en
+chemins SVG courbes, et le plateau complet boucle et branche à l'échelle des quatre
+régions (chaque hub relie sa propre chaîne à deux ponts vers ses voisins, et les quatre
+ponts referment une boucle Dessin—Peinture—Encrage—Anatomie—Dessin).
+
+## 2026-09-15 — La dormance visuelle utilise le même mapping provisoire branche → catégories que l'heuristique de temps
+Sans la taxonomie Domaine → Discipline → Médium (Phase 3, pas encore faite), il n'existe
+aucun lien formel entre une branche du sphérier et les catégories de session existantes
+(« Peinture », « Gouache », « Inking », etc.). Un mapping approximatif sert uniquement à
+deux affichages cosmétiques sans conséquence sur le déblocage : ternir un nœud débloqué
+non retravaillé depuis 28 jours, et afficher le temps investi en contexte au survol d'un
+hub. Ce mapping sera remplacé par la vraie taxonomie à la Phase 3 ; en attendant, une
+branche jamais pratiquée au sens de ce mapping est traitée comme dormante par défaut,
+sans jugement (CLAUDE.md §6 : « ton neutre, pas culpabilisant »).
+
+## 2026-09-15 — Le sphérier garde les couleurs déjà utilisées ailleurs dans l'app, dont le bleu
+La consigne visuelle nomme jaune/vert/violet comme accents à respecter. L'app en a un
+cinquième déjà en place partout ailleurs (bleu, utilisé par exemple pour les bordures de
+session) : Peinture le reprend, en plus de jaune (Dessin), violet (Encrage) et vert
+(Anatomie), pour que les quatre régions restent visuellement distinctes plutôt que de
+recycler une couleur entre deux régions adjacentes. Lecture à confirmer avec Florian s'il
+voulait strictement s'en tenir aux trois couleurs citées.
+
 ## 2026-09-15 — Évaluation et sphérier passent avant taxonomie et qualité de pratique
 Changement de priorité demandé explicitement par Florian, qui inverse la règle « le
 visuel vient en dernier » posée le 12 septembre. Phase 0 (filet de sécurité) reste en
