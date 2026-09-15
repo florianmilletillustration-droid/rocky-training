@@ -28,34 +28,34 @@ détaillée dans DECISIONS.md.
 
 ## Phase 2 — Le sphérier
 
-- [ ] Remplacer la constellation par un sphérier : un plateau de nœuds reliés,
+- [x] Remplacer la constellation par un sphérier : un plateau de nœuds reliés,
       inspiré du sphérier de Final Fantasy X.
-- [ ] Un nœud se débloque UNIQUEMENT en cochant un jalon par preuve. Jamais par
+- [x] Un nœud se débloque UNIQUEMENT en cochant un jalon par preuve. Jamais par
       un seuil d'heures. Le temps investi s'affiche en contexte, il n'achète rien.
-- [ ] L'adjacence encode les prérequis : un nœud n'est accessible que depuis un
+- [x] L'adjacence encode les prérequis : un nœud n'est accessible que depuis un
       nœud voisin déjà débloqué.
-- [ ] Régions distinctes par discipline (Dessin, Peinture, Encrage, Anatomie),
+- [x] Régions distinctes par discipline (Dessin, Peinture, Encrage, Anatomie),
       reliées entre elles à quelques points seulement.
-- [ ] Les régions sont fixes, les nœuds poussent : chaque rituel de fin de cycle
+- [x] Les régions sont fixes, les nœuds poussent : chaque rituel de fin de cycle
       greffe les nouveaux jalons à la frontière atteinte. Le plateau n'est
       jamais complet.
-- [ ] Dormance : un nœud non retravaillé depuis longtemps se ternit, mais reste
+- [x] Dormance : un nœud non retravaillé depuis longtemps se ternit, mais reste
       débloqué.
-- [ ] Instantané mensuel du plateau, archivé et consultable.
-- [ ] Le plateau est un réseau organique, jamais une liste ni un arbre linéaire.
+- [x] Instantané mensuel du plateau, archivé et consultable.
+- [x] Le plateau est un réseau organique, jamais une liste ni un arbre linéaire.
       Les nœuds sont répartis dans un espace 2D avec des positions irrégulières,
       des courbes, des boucles qui se referment et des embranchements.
-- [ ] Chaque discipline forme une grappe distincte, reliée aux autres par
+- [x] Chaque discipline forme une grappe distincte, reliée aux autres par
       quelques ponts seulement.
-- [ ] Rendu en SVG, avec des chemins courbes entre les nœuds, pas des segments
+- [x] Rendu en SVG, avec des chemins courbes entre les nœuds, pas des segments
       droits.
-- [ ] Trois états visuels distincts : verrouillé (sombre, contour seulement),
+- [x] Trois états visuels distincts : verrouillé (sombre, contour seulement),
       disponible (contour lumineux, pulsation légère), débloqué (rempli, halo).
-- [ ] Zoom et déplacement à la souris et au doigt.
-- [ ] Respecter la palette existante de l'app : fond sombre, accents jaune,
+- [x] Zoom et déplacement à la souris et au doigt.
+- [x] Respecter la palette existante de l'app : fond sombre, accents jaune,
       vert et violet. Police Bebas Neue pour les titres, Space Mono pour les
       libellés.
-- [ ] Référence d'intention : le sphérier de Final Fantasy X. Ne pas copier son
+- [x] Référence d'intention : le sphérier de Final Fantasy X. Ne pas copier son
       graphisme, s'en inspirer pour la structure en réseau.
 
 ## Phase 3 — Taxonomie et migration
