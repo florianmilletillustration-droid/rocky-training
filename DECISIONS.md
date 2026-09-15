@@ -8,6 +8,32 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-15 — Le hub d'une région ne prend l'aspect « débloqué » que si un de ses jalons est coché
+Bug signalé par Florian : le hub ANATOMIE s'affichait rempli et lumineux (l'aspect « Débloqué »
+de la légende) alors qu'aucun de ses 7 jalons n'était coché — en contradiction directe avec la
+règle affichée dans l'interface et CLAUDE.md §6 (« seul un jalon coché débloque un nœud »).
+Cause : le hub n'avait aucune logique d'état ; son cercle utilisait toujours la couleur
+d'accent de la branche comme contour vif (`stroke`), sans jamais distinguer « rien n'a encore
+été prouvé » de « au moins un jalon prouvé ». Pour Anatomie, dont la couleur d'accent est
+justement le vert utilisé par la légende pour « Débloqué », ce contour permanent se lisait à
+tort comme un nœud débloqué.
+
+État retenu pour un hub sans aucun jalon coché : **Disponible** (le même aspect que la
+légende « Disponible » — fond sombre, contour et halo dans la couleur de la branche), jamais
+Verrouillé ni Débloqué. Deux raisons :
+- **Jamais Verrouillé** : le hub n'est pas un jalon (DECISIONS.md du 2026-09-15 ci-dessous) et
+  n'a pas de prérequis — c'est le point d'entrée de la région, toujours accessible pour
+  consulter la branche et cocher son premier jalon. Le griser comme un jalon verrouillé
+  suggérerait à tort qu'il faut « débloquer » la région elle-même.
+- **Jamais Débloqué par défaut** : lui donner cet aspect sans preuve romprait la même règle
+  que le bug signalé, quelle que soit la couleur de la branche.
+
+Un hub ne prend donc l'aspect Débloqué (rempli, halo, ou terni s'il est en dormance) qu'à
+partir du moment où au moins un jalon de sa branche est coché — la dormance elle-même ne
+s'applique plus qu'à cet état (rien coché = rien à oublier, CLAUDE.md §6). Le chiffre de
+niveau affiché au centre passe en texte sombre sur fond rempli une fois débloqué, pour rester
+lisible sur un cercle plein plutôt que sur un contour.
+
 ## 2026-09-15 — Le jalon « dépend de » remplace le verrouillage séquentiel implicite, avec migration rétrocompatible
 Chaque jalon porte désormais un champ optionnel `dependsOn` (l'id d'un autre jalon de la même
 branche) choisi dans une liste déroulante, plutôt que de dépendre toujours et uniquement du

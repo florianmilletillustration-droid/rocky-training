@@ -108,6 +108,14 @@ détaillée dans DECISIONS.md.
 
 ## Fait
 
+- [x] **Bug : le hub d'une région s'affichait « Débloqué » sans aucun jalon coché.**
+  *(2026-09-15)*
+  Le hub ANATOMIE apparaissait rempli et lumineux (aspect « Débloqué ») alors qu'aucun de ses
+  7 jalons n'était coché, contredisant la règle affichée dans l'interface. Le hub n'avait
+  aucune logique d'état ; il utilise désormais l'aspect « Disponible » tant qu'aucun jalon de
+  sa branche n'est coché, et ne passe à « Débloqué » qu'une fois une preuve réelle enregistrée.
+  Voir DECISIONS.md.
+
 - [x] **Domaine personnalisé + dépendance de jalon.** *(2026-09-15)*
   Demande directe de Florian, hors ordre des phases. Un domaine peut être ajouté depuis
   l'Évaluation (nom + couleur d'accent), avec suppression confirmée qui prévient de la perte
