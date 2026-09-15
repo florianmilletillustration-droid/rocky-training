@@ -282,7 +282,7 @@
             <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;border-radius:50%;background:#666;display:inline-block;opacity:.6;"></span> Débloqué, en dormance</span>
         </div>
         <div id="spherier-wrap" style="background:var(--bg-card);border:2px solid var(--border);border-radius:12px;overflow:hidden;position:relative;">
-            <svg id="spherier-svg" viewBox="0 0 1000 800" style="width:100%;height:auto;display:block;cursor:grab;user-select:none;touch-action:none;"></svg>
+            <svg id="spherier-svg" viewBox="0 0 640 540" style="width:100%;height:auto;display:block;cursor:grab;user-select:none;touch-action:none;"></svg>
             <div id="spherier-tooltip" style="display:none;position:absolute;max-width:280px;background:#151515;border:2px solid var(--accent-yellow);border-radius:8px;padding:14px 16px;font-size:.8rem;line-height:1.6;pointer-events:none;z-index:20;box-shadow:0 10px 30px rgba(0,0,0,.5);"></div>
         </div>
         <div style="margin-top:35px;">
@@ -591,14 +591,15 @@ function renderEvaluation(){
 // jamais par un total d'heures. Réseau organique en SVG, régions fixes
 // par discipline reliées par quelques ponts, zoom/pan souris + tactile.
 // ═══════════════════════════════════════════════════
-// Ancres des régions : positions asymétriques choisies à la main pour un
-// plateau organique (jamais une grille), reliées en boucle par quelques
-// ponts seulement (Dessin—Peinture—Encrage—Anatomie—Dessin).
+// Ancres des régions : un cœur compact et asymétrique (jamais une grille),
+// chaque hub reliée en boucle à ses deux voisins par un pont court, et
+// chaque chaîne de jalons rayonne vers l'extérieur (l'angle pointe à
+// l'opposé du centre du cœur) pour ne jamais recouper les ponts au milieu.
 const BRANCH_HUBS={
-    Dessin:{x:160,y:660,angle:-1.5708},
-    Peinture:{x:500,y:110,angle:0.3},
-    Encrage:{x:860,y:300,angle:1.4},
-    Anatomie:{x:500,y:660,angle:0.15}
+    Dessin:{x:150,y:380,angle:2.61},
+    Peinture:{x:280,y:120,angle:-1.95},
+    Encrage:{x:510,y:190,angle:-0.44},
+    Anatomie:{x:420,y:400,angle:1.02}
 };
 const BRANCH_BRIDGES=[['Dessin','Peinture'],['Peinture','Encrage'],['Encrage','Anatomie'],['Anatomie','Dessin']];
 // Mapping provisoire branche → catégories de session existantes, le temps que
@@ -623,7 +624,7 @@ function isDormantBranch(branch){
     return daysBetween(last,getTodayString())>=DORMANCY_DAYS;
 }
 function computeMilestoneNodePos(branch,index){
-    const hub=BRANCH_HUBS[branch];const spacing=48,wiggle=0.45;
+    const hub=BRANCH_HUBS[branch];const spacing=36,wiggle=0.42;
     const dist=spacing*(index+1);const angle=hub.angle+Math.sin((index+1)*1.15)*wiggle;
     return{x:hub.x+Math.cos(angle)*dist,y:hub.y+Math.sin(angle)*dist};
 }
@@ -632,16 +633,45 @@ function milestoneState(idx,milestones){
     const prevDone=idx===0?true:milestones[idx-1].done;
     return prevDone?'available':'locked';
 }
+// Le libellé d'un hub se place du côté opposé à la direction de sa chaîne de
+// jalons, pour ne jamais se faire recouvrir par le premier nœud (arrive avec
+// une chaîne qui pointe franchement vers le bas, sinon).
+function hubLabelBelow(branch){return Math.sin(BRANCH_HUBS[branch].angle)<=0;}
 let spherierTransform={x:0,y:0,scale:1};
+let spherierViewFitted=false;
 function renderSpherierTransformOnly(){const g=document.getElementById('spherier-viewport');if(g)g.setAttribute('transform',`translate(${spherierTransform.x},${spherierTransform.y}) scale(${spherierTransform.scale})`);}
-function resetSpherierView(){spherierTransform={x:0,y:0,scale:1};renderSpherierTransformOnly();}
+// Le plateau pousse (de nouveaux jalons s'ajoutent au fil des cycles), donc la
+// zone occupée par les nœuds n'est pas une constante : on la mesure à chaque
+// rendu et on choisit un zoom arrière qui la fait tenir en entier dans le
+// cadre, plutôt que des coordonnées figées qui finiraient par déborder.
+function computeSpherierBounds(){
+    const branches=window._branches||{};let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+    const consider=(x,y,r)=>{minX=Math.min(minX,x-r);minY=Math.min(minY,y-r);maxX=Math.max(maxX,x+r);maxY=Math.max(maxY,y+r);};
+    BRANCHES.forEach(branch=>{
+        const hub=BRANCH_HUBS[branch];consider(hub.x,hub.y+(hubLabelBelow(branch)?40:-40),65); // hub + ses deux lignes de texte
+        const milestones=(branches[branch]||{}).milestones||[];
+        milestones.forEach((m,idx)=>{const pos=computeMilestoneNodePos(branch,idx);consider(pos.x,pos.y,18);});
+    });
+    if(!isFinite(minX))return{minX:0,minY:0,maxX:640,maxY:540};
+    return{minX,minY,maxX,maxY};
+}
+function fitSpherierView(){
+    const svg=document.getElementById('spherier-svg');if(!svg)return;
+    const vb=svg.viewBox.baseVal;const vbW=vb.width||1000,vbH=vb.height||800;
+    const b=computeSpherierBounds();const pad=40;
+    const contentW=(b.maxX-b.minX)+pad*2,contentH=(b.maxY-b.minY)+pad*2;
+    const scale=Math.min(1,vbW/contentW,vbH/contentH);
+    const cx=(b.minX+b.maxX)/2,cy=(b.minY+b.maxY)/2;
+    spherierTransform={x:vbW/2-cx*scale,y:vbH/2-cy*scale,scale};
+}
+function resetSpherierView(){fitSpherierView();renderSpherierTransformOnly();}
 function curveMidpoint(p1,p2,bend){return{x:(p1.x+p2.x)/2+(p1.y-p2.y)*bend,y:(p1.y+p2.y)/2+(p2.x-p1.x)*bend};}
 function renderSpherier(){
     const svg=document.getElementById('spherier-svg');if(!svg)return;
     const branches=window._branches||{};
     let bridgesHtml='',chainHtml='',hubsHtml='';
     BRANCH_BRIDGES.forEach(([a,b])=>{
-        const ha=BRANCH_HUBS[a],hb=BRANCH_HUBS[b];const mid=curveMidpoint(ha,hb,0.15);
+        const ha=BRANCH_HUBS[a],hb=BRANCH_HUBS[b];const mid=curveMidpoint(ha,hb,0.28);
         bridgesHtml+=`<path d="M${ha.x},${ha.y} Q${mid.x},${mid.y} ${hb.x},${hb.y}" fill="none" stroke="var(--border)" stroke-width="2" stroke-dasharray="2,7" opacity="0.55"/>`;
     });
     BRANCHES.forEach(branch=>{
@@ -662,14 +692,15 @@ function renderSpherier(){
             chainHtml+=`<circle class="${cls}" cx="${pos.x}" cy="${pos.y}" r="16" style="${style}cursor:pointer;" data-branch="${branch}" data-mid="${m.id}" onmouseenter="showSphTooltip(event,'${branch}','${m.id}')" onmouseleave="hideSphTooltip()" onclick="onSphNodeClick('${branch}','${m.id}')"></circle>`;
             prevPos=pos;
         });
-        const doneCount=milestones.filter(m=>m.done).length;
+        const doneCount=milestones.filter(m=>m.done).length;const labelBelow=hubLabelBelow(branch);
         hubsHtml+=`<g onmouseenter="showSphHubTooltip(event,'${branch}')" onmouseleave="hideSphTooltip()" style="cursor:default;">
             <circle cx="${hub.x}" cy="${hub.y}" r="24" fill="var(--bg-elevated)" stroke="${color}" stroke-width="3"${dormant&&milestones.length?' opacity="0.7"':''}/>
             <text x="${hub.x}" y="${hub.y+5}" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="15" fill="${color}">${b.level||'—'}</text>
-            <text x="${hub.x}" y="${hub.y+44}" text-anchor="middle" font-family="'Space Mono',monospace" font-size="12" fill="${color}" letter-spacing="1">${branch.toUpperCase()}</text>
-            <text x="${hub.x}" y="${hub.y+59}" text-anchor="middle" font-family="'Space Mono',monospace" font-size="9" fill="var(--text-secondary)">${milestones.length?doneCount+'/'+milestones.length:'aucun jalon'}</text>
+            <text x="${hub.x}" y="${hub.y+(labelBelow?44:-28)}" text-anchor="middle" font-family="'Space Mono',monospace" font-size="12" fill="${color}" letter-spacing="1">${branch.toUpperCase()}</text>
+            <text x="${hub.x}" y="${hub.y+(labelBelow?59:-43)}" text-anchor="middle" font-family="'Space Mono',monospace" font-size="9" fill="var(--text-secondary)">${milestones.length?doneCount+'/'+milestones.length:'aucun jalon'}</text>
         </g>`;
     });
+    if(!spherierViewFitted){fitSpherierView();spherierViewFitted=true;}
     svg.innerHTML=`<g id="spherier-viewport" transform="translate(${spherierTransform.x},${spherierTransform.y}) scale(${spherierTransform.scale})">${bridgesHtml}${chainHtml}${hubsHtml}</g>`;
     initSpherierInteractions();
     renderSpherierSnapshots();
@@ -713,7 +744,7 @@ function initSpherierInteractions(){
         if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
         if(pointers.size===2){
             const pts=[...pointers.values()];const dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
-            if(lastPinchDist){spherierTransform.scale=Math.min(2.5,Math.max(0.5,spherierTransform.scale*(dist/lastPinchDist)));renderSpherierTransformOnly();}
+            if(lastPinchDist){spherierTransform.scale=Math.min(2.5,Math.max(0.3,spherierTransform.scale*(dist/lastPinchDist)));renderSpherierTransformOnly();}
             lastPinchDist=dist;
         }else if(pointers.size===1&&dragOrigin){
             spherierTransform.x=dragOrigin.origX+(e.clientX-dragOrigin.startX);
@@ -723,7 +754,7 @@ function initSpherierInteractions(){
     });
     const endPointer=e=>{pointers.delete(e.pointerId);if(pointers.size<2)lastPinchDist=null;if(pointers.size===0){dragOrigin=null;svg.style.cursor='grab';}};
     svg.addEventListener('pointerup',endPointer);svg.addEventListener('pointercancel',endPointer);svg.addEventListener('pointerleave',e=>{if(pointers.size<=1)endPointer(e);});
-    svg.addEventListener('wheel',e=>{e.preventDefault();spherierTransform.scale=Math.min(2.5,Math.max(0.5,spherierTransform.scale*(e.deltaY<0?1.1:0.9)));renderSpherierTransformOnly();},{passive:false});
+    svg.addEventListener('wheel',e=>{e.preventDefault();spherierTransform.scale=Math.min(2.5,Math.max(0.3,spherierTransform.scale*(e.deltaY<0?1.1:0.9)));renderSpherierTransformOnly();},{passive:false});
 }
 function currentMonthKey(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
 async function maybeArchiveMonthlySnapshot(){

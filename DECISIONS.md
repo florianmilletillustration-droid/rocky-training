@@ -8,6 +8,17 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-15 — Le zoom par défaut du sphérier est calculé, pas une valeur fixe
+Les nœuds poussent (nouveaux jalons à chaque cycle), donc l'espace qu'ils occupent
+n'est pas une constante : des coordonnées de plateau figées auraient fini par
+déborder du cadre dès qu'une branche gagne assez de jalons, comme c'est arrivé avec
+les 7 jalons d'Anatomie qui dépassaient le cadre initial. Le sphérier mesure
+maintenant à chaque rendu l'étendue réelle de tous les nœuds et choisit le zoom
+arrière minimal qui les fait tenir entièrement au chargement, plutôt que de
+recalculer à la main un cadre à chaque ajout de jalon. Les quatre régions ont aussi
+été resserrées et les ponts raccourcis pour réduire le vide central signalé par
+Florian.
+
 ## 2026-09-15 — Un nœud du sphérier, c'est un jalon ; les hubs de région ne sont pas des jalons
 Chaque jalon par preuve d'une branche (Phase Évaluation) devient un nœud du sphérier. Les
 quatre régions (Dessin, Peinture, Encrage, Anatomie) reçoivent en plus une ancre fixe — le
