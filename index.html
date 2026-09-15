@@ -152,6 +152,7 @@
         <div class="stat-card" style="cursor:default;">
             <div class="stat-label">Semaine actuelle</div>
             <div class="stat-value" id="current-week">1/12</div>
+            <div id="current-cycle-label" style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text-secondary);letter-spacing:1px;margin-top:2px;">Cycle 1</div>
             <button onclick="advanceWeek()" style="margin-top:10px;font-family:'Space Mono',monospace;background:transparent;border:1px solid var(--accent-yellow);color:var(--accent-yellow);padding:5px 12px;border-radius:4px;cursor:pointer;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;width:100%;">➡ Semaine suivante</button>
         </div>
         <div class="stat-card" title="Jours où une session a été enregistrée (quelle que soit sa catégorie) ou le jour marqué fait, sur les 84 jours du programme. Ne mesure pas si l'exercice du jour précis a été fait — ça, c'est le Check-in."><div class="stat-label">Jours pratiqués</div><div class="stat-value" id="days-completed">0/84</div></div>
@@ -274,7 +275,10 @@
                 <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:5px;">🕸️ Sphérier</h2>
                 <p style="color:var(--text-secondary);font-size:.9rem;max-width:640px;">Niveau et jalons de chaque branche. Le temps investi n'achète rien ici — seul un jalon coché débloque un nœud.</p>
             </div>
-            <button class="btn btn-secondary btn-small" onclick="resetSpherierView()">🎯 Recentrer</button>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-secondary btn-small" onclick="resetSpherierView()">🎯 Recentrer</button>
+                <button class="btn btn-small" style="background:var(--accent-purple);" onclick="openCycleRitual()">🎓 Rituel de fin de cycle</button>
+            </div>
         </div>
         <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:15px;font-size:.75rem;font-family:'Space Mono',monospace;color:var(--text-secondary);align-items:center;">
             <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;border-radius:50%;border:2px solid var(--border);display:inline-block;"></span> Verrouillé</span>
@@ -287,7 +291,7 @@
             <div id="spherier-tooltip" style="display:none;position:absolute;max-width:280px;background:#151515;border:2px solid var(--accent-yellow);border-radius:8px;padding:14px 16px;font-size:.8rem;line-height:1.6;pointer-events:none;z-index:20;box-shadow:0 10px 30px rgba(0,0,0,.5);"></div>
         </div>
         <div style="margin-top:35px;">
-            <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;margin-bottom:15px;color:var(--accent-purple);">📸 Instantanés mensuels</h3>
+            <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;margin-bottom:15px;color:var(--accent-purple);">📸 Instantanés</h3>
             <div id="spherier-snapshots"></div>
         </div>
     </div>
@@ -447,6 +451,30 @@
         </div>
     </div>
 </div>
+
+<!-- RITUEL DE FIN DE CYCLE — écran plein, déclenché manuellement (ROADMAP.md, Phase 5) -->
+<div id="cycle-ritual-screen" style="display:none;position:fixed;inset:0;background:rgba(6,6,6,.97);z-index:5000;overflow-y:auto;padding:40px 20px;">
+    <div style="max-width:900px;margin:0 auto;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:15px;margin-bottom:20px;">
+            <div>
+                <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:5px;color:var(--accent-purple);">🎓 Rituel de fin de cycle</h2>
+                <p id="cycle-ritual-intro" style="color:var(--text-secondary);font-size:.9rem;max-width:640px;"></p>
+            </div>
+            <button class="logout-btn" onclick="closeCycleRitual()">✕ Fermer</button>
+        </div>
+        <div style="background:var(--bg-card);border:2px solid var(--accent-purple);border-radius:12px;padding:20px 25px;margin-bottom:25px;">
+            <p style="font-size:.85rem;line-height:1.7;margin:0;">
+                <strong>1.</strong> Revois et mets à jour ci-dessous le niveau auto-évalué et le registre des faiblesses de chaque domaine.<br>
+                <strong>2.</strong> Une fois prêt, confirme en bas de page pour archiver un instantané daté du sphérier et démarrer le cycle suivant, semaine 1.<br>
+                <strong>Aucune donnée n'est supprimée</strong> — l'instantané reste consultable dans l'historique du sphérier, et tout ce que tu modifies ici (niveaux, faiblesses) reste enregistré normalement.
+            </p>
+        </div>
+        <div id="cycle-ritual-branches"></div>
+        <div style="display:flex;justify-content:center;margin:30px 0 60px;">
+            <button class="btn" style="background:var(--accent-purple);" onclick="completeCycleRitual()">✅ Confirmer et passer au cycle suivant</button>
+        </div>
+    </div>
+</div>
 <script>
 const firebaseConfig={apiKey:"AIzaSyA1y7_GRSPmSCsgMu-8aGhCtcMxMzIdtiQ",authDomain:"drawing-rocky-training.firebaseapp.com",projectId:"drawing-rocky-training",storageBucket:"drawing-rocky-training.firebasestorage.app",messagingSenderId:"106676074989",appId:"1:106676074989:web:1c23055e796e6d21653078",measurementId:"G-YYHWCKFTKD"};
 let ANTHROPIC_API_KEY=localStorage.getItem('anthropic_api_key')||'';
@@ -563,14 +591,21 @@ function branchColor(branch){
     return DEFAULT_BRANCH_COLORS[branch]||'var(--accent-yellow)';
 }
 async function saveBranches(){if(!currentUser)return;await db.collection('users').doc(currentUser.uid).set({branches:window._branches,branchOrder:window._branchOrder||branchList()},{merge:true});}
-async function saveLevelAssessment(branch){
-    const slider=document.getElementById('level-slider-'+branch);if(!slider)return;const val=parseInt(slider.value);
+// `prefix` distingue les cartes de domaine rendues à deux endroits à la fois
+// (onglet Évaluation et écran du rituel de fin de cycle) : sans lui, les deux
+// copies partageraient les mêmes id et document.getElementById lirait
+// systématiquement la mauvaise (celle de l'onglet, restée dans le DOM même
+// invisible). Voir renderBranchCard.
+async function saveLevelAssessment(branch,prefix){
+    prefix=prefix||'';
+    const slider=document.getElementById(prefix+'level-slider-'+branch);if(!slider)return;const val=parseInt(slider.value);
     if(!window._branches[branch])window._branches[branch]={level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)};
     window._branches[branch].level=val;window._branches[branch].levelDate=getTodayString();
     await saveBranches();refreshBranchViews();showQuickFeedback('✅ '+branch+' — niveau '+val+'/10');
 }
-async function addWeakness(branch){
-    const input=document.getElementById('weakness-input-'+branch);const val=input.value.trim();if(!val)return;
+async function addWeakness(branch,prefix){
+    prefix=prefix||'';
+    const input=document.getElementById(prefix+'weakness-input-'+branch);const val=input.value.trim();if(!val)return;
     if(!window._branches[branch])window._branches[branch]={level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)};
     if(!window._branches[branch].weaknesses)window._branches[branch].weaknesses=[];
     window._branches[branch].weaknesses.push(val);input.value='';await saveBranches();refreshBranchViews();
@@ -579,12 +614,13 @@ async function removeWeakness(branch,idx){
     if(!confirm('Retirer cette faiblesse du registre?'))return;
     window._branches[branch].weaknesses.splice(idx,1);await saveBranches();refreshBranchViews();
 }
-async function addMilestone(branch){
-    const input=document.getElementById('milestone-input-'+branch);const val=input.value.trim();if(!val)return;
+async function addMilestone(branch,prefix){
+    prefix=prefix||'';
+    const input=document.getElementById(prefix+'milestone-input-'+branch);const val=input.value.trim();if(!val)return;
     if(!window._branches[branch])window._branches[branch]={level:null,levelDate:null,weaknesses:[],milestones:[]};
     if(!window._branches[branch].milestones)window._branches[branch].milestones=[];
     const label=val.includes('—')?val.split('—')[0].trim():(val.length>30?val.slice(0,30)+'…':val);
-    const depSelect=document.getElementById('milestone-dep-'+branch);
+    const depSelect=document.getElementById(prefix+'milestone-dep-'+branch);
     const dependsOn=depSelect&&depSelect.value?depSelect.value:null; // sans dépendance = disponible d'emblée
     window._branches[branch].milestones.push({id:'m_'+Date.now(),label,text:val,done:false,doneDate:null,dependsOn});
     input.value='';if(depSelect)depSelect.value='';await saveBranches();refreshBranchViews();
@@ -636,7 +672,15 @@ function milestoneState(mid,milestones){
 // l'aspect « débloqué » que si au moins un jalon de sa branche est coché,
 // jamais par défaut ni par la couleur d'accent de la branche.
 function domainHubState(milestones){return(milestones||[]).some(m=>m.done)?'unlocked':'available';}
-function refreshBranchViews(){renderEvaluation();if(document.getElementById('spherier-svg'))renderSpherier();}
+function refreshBranchViews(){
+    renderEvaluation();
+    if(document.getElementById('spherier-svg'))renderSpherier();
+    const ritualScreen=document.getElementById('cycle-ritual-screen');
+    if(ritualScreen&&ritualScreen.style.display!=='none'){
+        const container=document.getElementById('cycle-ritual-branches');const branches=window._branches||{};
+        if(container)container.innerHTML=branchList().map(branch=>renderBranchCard(branch,branches[branch]||{level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)},'ritual-')).join('');
+    }
+}
 async function addBranch(){
     const nameInput=document.getElementById('new-branch-name');const colorInput=document.getElementById('new-branch-color');
     if(!nameInput)return;
@@ -656,7 +700,12 @@ async function removeBranch(branch){
     window._branchOrder=branchList().filter(b=>b!==branch);
     await saveBranches();refreshBranchViews();showQuickFeedback('🗑️ Domaine « '+branch+' » supprimé');
 }
-function renderBranchCard(branch,b){
+// `idPrefix` permet de rendre la même carte à deux endroits du DOM en même
+// temps (onglet Évaluation, toujours présent même masqué, et écran du rituel
+// de fin de cycle) sans collision d'id : voir saveLevelAssessment,
+// addWeakness, addMilestone, qui reçoivent ce même préfixe en argument.
+function renderBranchCard(branch,b,idPrefix){
+    idPrefix=idPrefix||'';
     const color=branchColor(branch);const level=b.level||null;const levelLabel=level?level+'/10':'Non évalué';
     const levelDateLabel=b.levelDate?new Date(b.levelDate+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):'jamais';
     const milestones=b.milestones||[];const weaknesses=b.weaknesses||[];
@@ -671,10 +720,10 @@ function renderBranchCard(branch,b){
         </div>
         <div style="margin-bottom:25px;">
             <div class="form-label">Niveau auto-évalué — <span style="color:${color};font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;">${levelLabel}</span></div>
-            <input type="range" min="1" max="10" step="1" value="${level||1}" id="level-slider-${branch}" oninput="document.getElementById('level-val-${branch}').textContent=this.value" style="width:100%;accent-color:${color};">
+            <input type="range" min="1" max="10" step="1" value="${level||1}" id="${idPrefix}level-slider-${branch}" oninput="document.getElementById('${idPrefix}level-val-${branch}').textContent=this.value" style="width:100%;accent-color:${color};">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:10px;">
-                <span style="font-size:.75rem;color:var(--text-secondary);">Valeur choisie : <span id="level-val-${branch}" style="color:${color};font-weight:700;">${level||1}</span>/10 — dernière auto-évaluation : ${levelDateLabel}</span>
-                <button class="btn btn-secondary btn-small" onclick="saveLevelAssessment('${branch}')">✅ Enregistrer</button>
+                <span style="font-size:.75rem;color:var(--text-secondary);">Valeur choisie : <span id="${idPrefix}level-val-${branch}" style="color:${color};font-weight:700;">${level||1}</span>/10 — dernière auto-évaluation : ${levelDateLabel}</span>
+                <button class="btn btn-secondary btn-small" onclick="saveLevelAssessment('${branch}','${idPrefix}')">✅ Enregistrer</button>
             </div>
         </div>
         <div style="margin-bottom:25px;">
@@ -683,8 +732,8 @@ function renderBranchCard(branch,b){
                 ${weaknesses.length===0?'<div class="empty-state" style="padding:15px;">Aucune faiblesse notée.</div>':weaknesses.map((w,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-elevated);padding:10px 15px;border-radius:6px;border-left:3px solid ${color};gap:10px;"><span style="flex:1;font-size:.9rem;">${w}</span><button class="session-delete" onclick="removeWeakness('${branch}',${i})">🗑️</button></div>`).join('')}
             </div>
             <div style="display:flex;gap:10px;">
-                <input type="text" class="form-input" id="weakness-input-${branch}" placeholder="Ex: les proportions des mains" onkeydown="if(event.key==='Enter')addWeakness('${branch}')">
-                <button class="btn btn-green btn-small" onclick="addWeakness('${branch}')">+ Ajouter</button>
+                <input type="text" class="form-input" id="${idPrefix}weakness-input-${branch}" placeholder="Ex: les proportions des mains" onkeydown="if(event.key==='Enter')addWeakness('${branch}','${idPrefix}')">
+                <button class="btn btn-green btn-small" onclick="addWeakness('${branch}','${idPrefix}')">+ Ajouter</button>
             </div>
         </div>
         <div>
@@ -705,12 +754,12 @@ function renderBranchCard(branch,b){
                 }).join('')}
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <input type="text" class="form-input" id="milestone-input-${branch}" placeholder="Ex: S13 · Titre — description vérifiable par un observateur" style="flex:1;min-width:220px;" onkeydown="if(event.key==='Enter')addMilestone('${branch}')">
-                <select class="form-select" id="milestone-dep-${branch}" style="width:auto;min-width:170px;" title="Dépend de">
+                <input type="text" class="form-input" id="${idPrefix}milestone-input-${branch}" placeholder="Ex: S13 · Titre — description vérifiable par un observateur" style="flex:1;min-width:220px;" onkeydown="if(event.key==='Enter')addMilestone('${branch}','${idPrefix}')">
+                <select class="form-select" id="${idPrefix}milestone-dep-${branch}" style="width:auto;min-width:170px;" title="Dépend de">
                     <option value="">Sans dépendance</option>
                     ${milestones.map(m=>`<option value="${m.id}">${m.label}</option>`).join('')}
                 </select>
-                <button class="btn btn-green btn-small" onclick="addMilestone('${branch}')">+ Ajouter</button>
+                <button class="btn btn-green btn-small" onclick="addMilestone('${branch}','${idPrefix}')">+ Ajouter</button>
             </div>
         </div>
     </div>`;
@@ -945,32 +994,83 @@ function initSpherierInteractions(){
     svg.addEventListener('wheel',e=>{e.preventDefault();spherierTransform.scale=Math.min(2.5,Math.max(0.3,spherierTransform.scale*(e.deltaY<0?1.1:0.9)));renderSpherierTransformOnly();},{passive:false});
 }
 function currentMonthKey(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+// Capture l'état courant (niveau + jalons) de chaque domaine, partagée par
+// l'instantané mensuel automatique et par l'instantané forcé du rituel de fin
+// de cycle ci-dessous.
+function snapshotBranchesNow(){
+    const out={};
+    branchList().forEach(branch=>{
+        const b=(window._branches||{})[branch]||{};const milestones=b.milestones||[];
+        out[branch]={level:b.level||null,milestonesDone:milestones.filter(m=>m.done).length,milestonesTotal:milestones.length};
+    });
+    return out;
+}
 async function maybeArchiveMonthlySnapshot(){
     if(!currentUser)return;
     window._spherierSnapshots=window._spherierSnapshots||[];
     const nowKey=currentMonthKey();
     if(window._spherierSnapshots.some(s=>s.month===nowKey))return;
-    const snapshot={month:nowKey,date:getTodayString(),branches:{}};
-    branchList().forEach(branch=>{
-        const b=(window._branches||{})[branch]||{};const milestones=b.milestones||[];
-        snapshot.branches[branch]={level:b.level||null,milestonesDone:milestones.filter(m=>m.done).length,milestonesTotal:milestones.length};
-    });
+    const snapshot={month:nowKey,date:getTodayString(),type:'monthly',branches:snapshotBranchesNow()};
     window._spherierSnapshots.push(snapshot);
     await db.collection('users').doc(currentUser.uid).set({spherierSnapshots:window._spherierSnapshots},{merge:true});
     renderSpherierSnapshots();
 }
 function renderSpherierSnapshots(){
     const c=document.getElementById('spherier-snapshots');if(!c)return;
-    const snaps=(window._spherierSnapshots||[]).slice().sort((a,b)=>b.month.localeCompare(a.month));
-    if(!snaps.length){c.innerHTML='<div class="empty-state">Aucun instantané pour l\'instant. Le premier sera pris automatiquement au fil des mois.</div>';return;}
+    // Tri sur la date exacte plutôt que sur le mois : un rituel de fin de cycle
+    // peut archiver un instantané le même mois qu'un instantané mensuel déjà
+    // pris, et les deux doivent rester distincts et correctement ordonnés.
+    const snaps=(window._spherierSnapshots||[]).slice().sort((a,b)=>(b.date||b.month).localeCompare(a.date||a.month));
+    if(!snaps.length){c.innerHTML='<div class="empty-state">Aucun instantané pour l\'instant. Le premier sera pris automatiquement au fil des mois, ou au prochain rituel de fin de cycle.</div>';return;}
     c.innerHTML=snaps.map(s=>{
-        const dt=new Date(s.month+'-01T12:00:00');const label=dt.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+        const isCycleEnd=s.type==='cycle-end';
+        const dt=new Date((s.date||s.month+'-01')+'T12:00:00');
+        const dateLabel=isCycleEnd?dt.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):dt.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+        const label=isCycleEnd?`🎓 Fin du cycle ${s.cycleNumber} — ${dateLabel}`:dateLabel;
         // Les domaines listés viennent de l'instantané lui-même, pas de la liste
         // actuelle : un domaine supprimé depuis reste visible dans ses anciens
         // instantanés (la vraie mesure de progrès sur un an, CLAUDE.md §6).
         const rows=Object.keys(s.branches).map(branch=>{const bd=s.branches[branch]||{level:null,milestonesDone:0,milestonesTotal:0};return`<div style="display:flex;justify-content:space-between;font-size:.8rem;padding:4px 0;border-bottom:1px solid var(--border);"><span style="color:${branchColor(branch)};">${branch}</span><span>${bd.level?bd.level+'/10':'—'} · ${bd.milestonesDone}/${bd.milestonesTotal} jalons</span></div>`;}).join('');
-        return`<div style="background:var(--bg-elevated);border-radius:8px;padding:15px 18px;margin-bottom:12px;"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;color:var(--accent-purple);margin-bottom:8px;text-transform:capitalize;">${label}</div>${rows}</div>`;
+        return`<div style="background:var(--bg-elevated);border-radius:8px;padding:15px 18px;margin-bottom:12px;${isCycleEnd?'border-left:3px solid var(--accent-purple);':''}"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;color:var(--accent-purple);margin-bottom:8px;text-transform:${isCycleEnd?'none':'capitalize'};">${label}</div>${rows}</div>`;
     }).join('');
+}
+// ═══════════════════════════════════════════════════
+// RITUEL DE FIN DE CYCLE — écran plein déclenché manuellement (ROADMAP.md,
+// Phase 5). Enchaîne : revue de l'auto-évaluation et du registre des
+// faiblesses de chaque domaine (réutilise les mêmes cartes que l'onglet
+// Évaluation), archivage forcé d'un instantané daté du sphérier, puis passage
+// au cycle suivant (semaine remise à 1, numéro de cycle incrémenté).
+// N'efface jamais rien : le rituel n'ajoute que des champs et des entrées.
+// ═══════════════════════════════════════════════════
+function openCycleRitual(){
+    const screen=document.getElementById('cycle-ritual-screen');if(!screen)return;
+    const cycle=window._cycleNumber||1;
+    const intro=document.getElementById('cycle-ritual-intro');
+    if(intro)intro.textContent=`Tu es à la semaine ${_currentWeekNum}/12 du cycle ${cycle}. Ce rituel archive où en est chaque domaine puis démarre le cycle ${cycle+1} à la semaine 1.`;
+    const container=document.getElementById('cycle-ritual-branches');
+    const branches=window._branches||{};
+    if(container)container.innerHTML=branchList().map(branch=>renderBranchCard(branch,branches[branch]||{level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)},'ritual-')).join('');
+    screen.style.display='block';
+}
+function closeCycleRitual(){const screen=document.getElementById('cycle-ritual-screen');if(screen)screen.style.display='none';}
+async function completeCycleRitual(){
+    if(!currentUser)return;
+    const endingCycle=window._cycleNumber||1;const nextCycle=endingCycle+1;
+    if(!confirm(`Terminer le cycle ${endingCycle} et démarrer le cycle ${nextCycle} ?\n\nUn instantané daté du sphérier sera archivé et restera consultable. La semaine repart à 1. Aucune donnée n'est supprimée.`))return;
+    window._spherierSnapshots=window._spherierSnapshots||[];
+    const snapshot={month:currentMonthKey(),date:getTodayString(),type:'cycle-end',cycleNumber:endingCycle,branches:snapshotBranchesNow()};
+    window._spherierSnapshots.push(snapshot);
+    _currentWeekNum=1;window._cycleNumber=nextCycle;
+    await db.collection('users').doc(currentUser.uid).set({
+        spherierSnapshots:window._spherierSnapshots,
+        cycleNumber:nextCycle,
+        currentWeek:1,
+        weekStartDate:mondayOfThisWeekString(),
+        lastUpdated:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+    closeCycleRitual();
+    showQuickFeedback('🎓 Cycle '+endingCycle+' archivé — Cycle '+nextCycle+' commence !');
+    await loadAllData();
 }
 const ideaData={subject:["Guerrier","Robot","Dragon","Sorcière","Astronaute","Pirate","Ninja","Créature","Chevalier","Magicien","Démon","Ange","Samurai","Viking","Cyborg","Alien","Fantôme","Vampire","Nécromancien","Druide"],style:["Cyberpunk","Steampunk","Fantasy","Sci-fi","Médiéval","Futuriste","Baroque","Minimaliste","Art Nouveau","Gothique","Tribal","Aztèque","Japonais","Égyptien","Nordique","Biomécanique","Post-apocalyptique","Dark Fantasy"],emotion:["Furieux","Serein","Mélancolique","Triomphant","Terrifié","Confiant","Mystérieux","Joueur","Déterminé","Épuisé","Émerveillé","Menaçant","Protecteur","Désespéré","Victorieux"],constraint:["Vue de dessous","Silhouette pure","Palette 3 couleurs","Formes triangulaires","Symétrie parfaite","Asymétrie extrême","Contre-jour","Gros plan","Vue aérienne","Reflet dans l'eau","Fumée/brouillard","Composition circulaire","Diagonales fortes"]};
 const HUE_TEO_GALLERY=[
@@ -1026,6 +1126,8 @@ async function loadAllData(){
         const doc=await db.collection('users').doc(currentUser.uid).get();const data=doc.exists?doc.data():{};
         _currentWeekNum=data.currentWeek||1;
         document.getElementById('current-week').textContent=_currentWeekNum+'/12';
+        window._cycleNumber=data.cycleNumber||1;
+        const cycleLabelEl=document.getElementById('current-cycle-label');if(cycleLabelEl)cycleLabelEl.textContent='Cycle '+window._cycleNumber;
         const completedDays=data.completedDays||[];
         document.getElementById('total-time').textContent=Math.floor((data.totalMinutes||0)/60)+'h';
         allSessions=data.sessions||[];window._checkins=data.checkins||[];
@@ -1189,18 +1291,19 @@ function loadExercises(day){
 function rollDice(cat){const dice=document.getElementById('dice-'+cat);dice.classList.add('rolling');setTimeout(()=>{dice.querySelector('span').textContent=ideaData[cat][Math.floor(Math.random()*ideaData[cat].length)];dice.classList.remove('rolling');updateResult();},500);}
 function rollAllDice(){Object.keys(ideaData).forEach(c=>rollDice(c));}
 function updateResult(){const s=document.querySelector('#dice-subject span').textContent,st=document.querySelector('#dice-style span').textContent,e=document.querySelector('#dice-emotion span').textContent,co=document.querySelector('#dice-constraint span').textContent;if(s!=='?'&&st!=='?'&&e!=='?'&&co!=='?'){document.getElementById('result-text').textContent='Dessine un '+s+' en style '+st+', avec une émotion '+e+', en utilisant '+co;document.getElementById('result-box').style.display='block';}}
+function mondayOfThisWeekString(){
+    const today=new Date();const dow=today.getDay();const monday=new Date(today);monday.setDate(today.getDate()-(dow===0?6:dow-1));monday.setHours(0,0,0,0);
+    return monday.getFullYear()+'-'+String(monday.getMonth()+1).padStart(2,'0')+'-'+String(monday.getDate()).padStart(2,'0');
+}
 async function advanceWeek(){
     const next=_currentWeekNum+1;if(next>12){alert('Tu as terminé les 12 semaines! Bravo! 🏆');return;}if(!confirm('Passer à la semaine '+next+'?'))return;
-    _currentWeekNum=next;const today=new Date();const dow=today.getDay();const monday=new Date(today);monday.setDate(today.getDate()-(dow===0?6:dow-1));monday.setHours(0,0,0,0);
-    const weekStartDate=monday.getFullYear()+'-'+String(monday.getMonth()+1).padStart(2,'0')+'-'+String(monday.getDate()).padStart(2,'0');
-    await db.collection('users').doc(currentUser.uid).set({currentWeek:next,weekStartDate,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    _currentWeekNum=next;
+    await db.collection('users').doc(currentUser.uid).set({currentWeek:next,weekStartDate:mondayOfThisWeekString(),lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     await loadAllData();showQuickFeedback('🗓 Semaine '+next+'!');
 }
 async function resetWeekToOne(){
     if(!confirm('Remettre la semaine à 1?'))return;_currentWeekNum=1;
-    const today=new Date();const dow=today.getDay();const monday=new Date(today);monday.setDate(today.getDate()-(dow===0?6:dow-1));monday.setHours(0,0,0,0);
-    const weekStartDate=monday.getFullYear()+'-'+String(monday.getMonth()+1).padStart(2,'0')+'-'+String(monday.getDate()).padStart(2,'0');
-    await db.collection('users').doc(currentUser.uid).set({currentWeek:1,weekStartDate,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    await db.collection('users').doc(currentUser.uid).set({currentWeek:1,weekStartDate:mondayOfThisWeekString(),lastUpdated:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     await loadAllData();showQuickFeedback('✅ Semaine remise à 1!');
 }
 function renderHeatmap(){

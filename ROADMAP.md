@@ -94,9 +94,18 @@ détaillée dans DECISIONS.md.
 
 - [ ] Le programme devient cyclique : après la semaine 12, un nouveau cycle de
       12 semaines démarre. Le compteur devient « Cycle N · Semaine X/12 ».
+      *Le mécanisme (numéro de cycle, remise à la semaine 1) existe déjà depuis
+      le rituel de fin de cycle ci-dessous ; il ne reste que le changement de
+      format du compteur affiché, volontairement laissé de côté pour ne pas
+      étendre cette PR au-delà de ce qui était demandé.*
 
-- [ ] Rituel de fin de cycle : auto-évaluation de toutes les branches, révision
-      du registre des faiblesses, archivage de l'instantané de la constellation.
+- [x] **Rituel de fin de cycle.** *(2026-09-15)*
+  Écran plein déclenché manuellement (bouton dans l'onglet Sphérier) : revue de
+  l'auto-évaluation et du registre des faiblesses de chaque domaine (mêmes cartes que
+  l'onglet Évaluation), puis confirmation qui archive un instantané daté et tagué du
+  sphérier et passe au cycle suivant (semaine remise à 1, numéro de cycle incrémenté).
+  Aucune donnée supprimée ; les instantanés (mensuels et de fin de cycle) restent tous
+  consultables dans l'historique du sphérier. Voir DECISIONS.md.
 
 - [ ] Le contenu des semaines sort du code et devient une donnée modifiable,
       pour que chaque cycle puisse avoir son propre contenu.
