@@ -154,7 +154,7 @@
             <div class="stat-value" id="current-week">1/12</div>
             <button onclick="advanceWeek()" style="margin-top:10px;font-family:'Space Mono',monospace;background:transparent;border:1px solid var(--accent-yellow);color:var(--accent-yellow);padding:5px 12px;border-radius:4px;cursor:pointer;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;width:100%;">➡ Semaine suivante</button>
         </div>
-        <div class="stat-card"><div class="stat-label">Jours complétés</div><div class="stat-value" id="days-completed">0/84</div></div>
+        <div class="stat-card" title="Jours où une session a été enregistrée (quelle que soit sa catégorie) ou le jour marqué fait, sur les 84 jours du programme. Ne mesure pas si l'exercice du jour précis a été fait — ça, c'est le Check-in."><div class="stat-label">Jours pratiqués</div><div class="stat-value" id="days-completed">0/84</div></div>
         <div class="stat-card"><div class="stat-label">Temps total</div><div class="stat-value" id="total-time">0h</div></div>
         <div class="stat-card"><div class="stat-label">Jours actifs (30 derniers)</div><div class="stat-value" id="active-days-30">0</div></div>
         <div class="stat-card"><div class="stat-label">Jours actifs total</div><div class="stat-value" id="days-active">0</div></div>
@@ -1029,11 +1029,18 @@ async function loadAllData(){
         const completedDays=data.completedDays||[];
         document.getElementById('total-time').textContent=Math.floor((data.totalMinutes||0)/60)+'h';
         allSessions=data.sessions||[];window._checkins=data.checkins||[];
-        // "Jours complétés" = jours où le programme a été confirmé via le Check-in
+        // "Jours pratiqués" (libellé corrigé le 2026-09-15, ex-"Jours complétés" — voir
+        // DECISIONS.md) = jours où le programme a été confirmé via le Check-in
         // (completedDays) UNION jours où au moins une session a été enregistrée
         // (allSessions), sinon le compteur ne reflète que les confirmations
         // explicites du Check-in et ignore les 3/4 des méthodes de tracking
         // (ajout rapide, chrono, manuel), très en retard sur l'activité réelle.
+        // Ce n'est PAS "l'exercice précis du jour a été fait" : une session dans une
+        // catégorie sans rapport avec le programme compte aussi. Diagnostic du
+        // 2026-09-15 : ce n'est pas un bug de calcul, mais deux notions désormais
+        // fusionnées ici (jour confirmé vs jour actif, cette dernière déjà suivie
+        // séparément par "Jours actifs") — d'où le changement de libellé plutôt que
+        // de logique.
         const daysCompletedCount=new Set([...completedDays,...allSessions.map(s=>s.date)]).size;
         document.getElementById('days-completed').textContent=Math.min(daysCompletedCount,84)+'/84';
         const realStreak=calculateStreak();
