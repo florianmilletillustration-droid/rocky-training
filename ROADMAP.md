@@ -108,6 +108,12 @@ détaillée dans DECISIONS.md.
 
 ## Fait
 
+- [x] **Import du registre des faiblesses de CYCLE-2.md dans l'app.** *(2026-09-15)*
+  Les trois entrées du registre au 14 septembre 2026 (insertions musculaires, volume des
+  masses, mains évitées) sont importées une seule fois dans le registre de la branche
+  Anatomie. L'app est désormais la source de vérité de ce registre ; CYCLE-2.md garde les
+  trois lignes comme instantané historique, avec une note à cet effet. Voir DECISIONS.md.
+
 - [x] **Bug : le hub d'une région s'affichait « Débloqué » sans aucun jalon coché.**
   *(2026-09-15)*
   Le hub ANATOMIE apparaissait rempli et lumineux (aspect « Débloqué ») alors qu'aucun de ses

@@ -8,6 +8,19 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-15 — Le registre des faiblesses de CYCLE-2.md est importé dans l'app, qui en devient la source de vérité
+Les trois entrées du « Registre des faiblesses au 14 septembre 2026 » de CYCLE-2.md
+(insertions musculaires, volume des masses, mains évitées) vivaient dans un fichier Markdown
+alors que CLAUDE.md §6 décrit déjà ce registre comme une donnée de l'app, révisée à
+l'auto-évaluation mensuelle et consommée par le Coach (§7). Elles sont importées telles
+quelles dans `weaknesses` de la branche Anatomie via `importCycle2WeaknessesOnce`, sur le même
+principe que l'import ponctuel des 7 jalons du cycle 2 (décision du 2026-09-15 plus bas) : un
+marqueur (`cycle2WeaknessesImported`) empêche toute réimportation, pour qu'une suppression ou
+modification faite ensuite par Florian dans l'app ne soit jamais écrasée au rechargement — et,
+comme pour les jalons, pour que supprimer entièrement la branche Anatomie ne la ressuscite pas.
+CYCLE-2.md garde ces trois lignes mais devient un instantané historique non maintenu ; une note
+l'indique explicitement à l'endroit du registre, dans le fichier.
+
 ## 2026-09-15 — Le hub d'une région ne prend l'aspect « débloqué » que si un de ses jalons est coché
 Bug signalé par Florian : le hub ANATOMIE s'affichait rempli et lumineux (l'aspect « Débloqué »
 de la légende) alors qu'aucun de ses 7 jalons n'était coché — en contradiction directe avec la

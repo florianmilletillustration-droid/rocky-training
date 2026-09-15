@@ -500,6 +500,25 @@ const CYCLE2_ANATOMIE_MILESTONES=[
     {id:'c2-s12-figurelibre',label:'S12 · Figure libre',text:"Dessiner une figure complète, debout, de trois quarts, entièrement de mémoire, où un observateur peut nommer trois groupes musculaires sans avoir vu le processus."}
 ];
 function defaultMilestonesFor(branch){return branch==='Anatomie'?CYCLE2_ANATOMIE_MILESTONES.map(m=>({id:m.id,label:m.label,text:m.text,done:false,doneDate:null})):[];}
+// Registre des faiblesses du cycle 2 (CYCLE-2.md, « Registre des faiblesses au
+// 14 septembre 2026 »), importé tel quel une seule fois : CYCLE-2.md n'est
+// plus qu'un instantané historique, l'app est désormais la source de vérité
+// de ce registre (voir importCycle2WeaknessesOnce ci-dessous).
+const CYCLE2_ANATOMIE_WEAKNESSES=[
+    "Les insertions musculaires ne sont pas connues : où exactement chaque masse s'attache.",
+    "Le volume des masses n'est pas maîtrisé une fois posé sur un mannequin en rotation.",
+    "Les mains sont évitées."
+];
+// Import ponctuel, comme celui des jalons du cycle 2 : n'ajoute ces trois
+// entrées qu'une fois (marqueur `cycle2WeaknessesImported`), jamais réimporté
+// si Florian les modifie ou les supprime ensuite dans l'app.
+function importCycle2WeaknessesOnce(branches){
+    const b=branches.Anatomie;if(!b||b.cycle2WeaknessesImported)return false;
+    b.weaknesses=b.weaknesses||[];
+    CYCLE2_ANATOMIE_WEAKNESSES.forEach(w=>{if(!b.weaknesses.includes(w))b.weaknesses.push(w);});
+    b.cycle2WeaknessesImported=true;
+    return true;
+}
 // Migration additive : donne à chaque jalon créé avant le champ « dépend de »
 // une dépendance explicite qui reproduit son ancien verrouillage séquentiel
 // (chaque jalon dépendait implicitement du précédent dans sa branche). Ne
@@ -534,6 +553,7 @@ function ensureBranchDefaults(data){
         if(branches[branch].levelDate===undefined){branches[branch].levelDate=null;changed=true;}
     });
     if(backfillMilestoneDependencies(branches))changed=true;
+    if(importCycle2WeaknessesOnce(branches))changed=true;
     return{branches,order,changed};
 }
 function branchColor(branch){

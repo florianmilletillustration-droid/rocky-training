@@ -79,10 +79,12 @@ dessin. Jamais à un seuil d'heures.
 
 ## Registre des faiblesses au 14 septembre 2026
 
+> Instantané historique. Ces trois entrées ont été importées dans l'app (onglet
+> Évaluation, domaine Anatomie) : c'est désormais elle la source de vérité du
+> registre, et lui seul se révise. Ce qui suit ne sera plus mis à jour.
+
 - Les insertions musculaires ne sont pas connues : où exactement chaque masse
   s'attache.
 - Le volume des masses n'est pas maîtrisé une fois posé sur un mannequin en
   rotation.
 - Les mains sont évitées.
-
-Ce registre sera révisé au rituel de fin de cycle 2.
