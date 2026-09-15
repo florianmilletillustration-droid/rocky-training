@@ -161,6 +161,7 @@
     <div class="tab-nav">
         <button class="tab-btn active" onclick="switchTab('programme',event)">Programme</button>
         <button class="tab-btn" onclick="switchTab('tracking',event)">Tracking</button>
+        <button class="tab-btn" onclick="switchTab('evaluation',event)" style="color:var(--accent-yellow);">🧭 Évaluation</button>
         <button class="tab-btn" onclick="switchTab('historique',event)">Historique</button>
         <button class="tab-btn" onclick="switchTab('generator',event)">Générateur</button>
         <button class="tab-btn" onclick="switchTab('checkin',event)" style="color:var(--accent-green);">⚡ Check-in</button>
@@ -253,6 +254,13 @@
             <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;margin-bottom:20px;color:var(--accent-yellow);">📊 Stats par catégorie</h3>
             <div class="category-stats" id="category-stats"></div>
         </div>
+    </div>
+
+    <!-- ÉVALUATION -->
+    <div id="tab-evaluation" class="tab-content">
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:5px;">🧭 Évaluation</h2>
+        <p style="color:var(--text-secondary);margin-bottom:30px;font-size:.9rem;">Le niveau ne monte jamais avec le temps investi. Il monte à l'auto-évaluation et au jalon coché — jamais à un seuil d'heures.</p>
+        <div id="evaluation-container"></div>
     </div>
 
     <!-- HISTORIQUE -->
@@ -441,6 +449,111 @@ const weekProgram={
     12:{theme:"Mois 3 — Expression et dynamisme",name:"Semaine 12 — Design de masse",main:{title:"Des silhouettes uniques par les proportions",time:"45 min",exercises:["10 personnages/créatures avec masses extrêmes uniquement.","Aucun détail — chaque silhouette doit être unique."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute.","Ligne d'action en C ou S.","Mouvement, pas détails."]}}
 };
 function getProgramForWeekDay(week,day){const w=weekProgram[week];if(!w)return null;if(day===5)return'rest';return w;}
+
+// ═══════════════════════════════════════════════════
+// ÉVALUATION — niveau par branche, registre des faiblesses, jalons par preuve
+// Le niveau ne monte JAMAIS par un seuil d'heures (CLAUDE.md §6, §9) :
+// uniquement par auto-évaluation (slider) ou jalon coché.
+// ═══════════════════════════════════════════════════
+const BRANCHES=['Dessin','Peinture','Encrage','Anatomie'];
+// Jalons du cycle 2 (CYCLE-2.md), importés tels quels : rédigés par Florian, pas inventés.
+const CYCLE2_ANATOMIE_MILESTONES=[
+    {id:'c2-s6-torse',label:'S6 · Torse',text:"Dessiner un torse mannequin en rotation de 45°, masses appliquées, où la séparation entre le pectoral et le deltoïde reste lisible. Sans le cours."},
+    {id:'c2-s7-bras',label:'S7 · Bras',text:"Dessiner un bras plié à 90°, en supination puis en pronation, où la masse du biceps et celle de l'avant-bras changent correctement entre les deux. Sans le cours."},
+    {id:'c2-s8-bassin',label:'S8 · Bassin',text:"Dessiner un bassin mannequin en rotation, avec les masses fessières et l'attache des obliques, où l'inclinaison du bassin se lit clairement dans une pose en appui sur une jambe. Sans le cours."},
+    {id:'c2-s9-perspective2',label:'S9 · Perspective 2 points',text:"Dessiner trois mannequins à des hauteurs différentes dans une même scène, masses posées, où aucune figure ne flotte."},
+    {id:'c2-s10-perspective3',label:'S10 · Perspective 3 points',text:"Dessiner une figure en contre-plongée marquée où le raccourci du torse tient et où les masses ne s'aplatissent pas."},
+    {id:'c2-s11-curviligne',label:'S11 · Curvilinéaire',text:"Dessiner une figure en perspective 4-5 points où la déformation est cohérente sur tout le corps, sans que les membres partent dans des directions contradictoires."},
+    {id:'c2-s12-figurelibre',label:'S12 · Figure libre',text:"Dessiner une figure complète, debout, de trois quarts, entièrement de mémoire, où un observateur peut nommer trois groupes musculaires sans avoir vu le processus."}
+];
+function defaultMilestonesFor(branch){return branch==='Anatomie'?CYCLE2_ANATOMIE_MILESTONES.map(m=>({id:m.id,label:m.label,text:m.text,done:false,doneDate:null})):[];}
+function ensureBranchDefaults(data){
+    const branches=data.branches?JSON.parse(JSON.stringify(data.branches)):{};let changed=false;
+    BRANCHES.forEach(branch=>{
+        if(!branches[branch]){branches[branch]={level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)};changed=true;return;}
+        if(branches[branch].milestones===undefined){branches[branch].milestones=defaultMilestonesFor(branch);changed=true;}
+        if(branches[branch].weaknesses===undefined){branches[branch].weaknesses=[];changed=true;}
+        if(branches[branch].level===undefined){branches[branch].level=null;changed=true;}
+        if(branches[branch].levelDate===undefined){branches[branch].levelDate=null;changed=true;}
+    });
+    return{branches,changed};
+}
+function branchColor(branch){return{Dessin:'var(--accent-yellow)',Peinture:'var(--accent-blue)',Encrage:'var(--accent-purple)',Anatomie:'var(--accent-green)'}[branch]||'var(--accent-yellow)';}
+async function saveBranches(){if(!currentUser)return;await db.collection('users').doc(currentUser.uid).set({branches:window._branches},{merge:true});}
+async function saveLevelAssessment(branch){
+    const slider=document.getElementById('level-slider-'+branch);if(!slider)return;const val=parseInt(slider.value);
+    if(!window._branches[branch])window._branches[branch]={level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)};
+    window._branches[branch].level=val;window._branches[branch].levelDate=getTodayString();
+    await saveBranches();renderEvaluation();showQuickFeedback('✅ '+branch+' — niveau '+val+'/10');
+}
+async function addWeakness(branch){
+    const input=document.getElementById('weakness-input-'+branch);const val=input.value.trim();if(!val)return;
+    if(!window._branches[branch])window._branches[branch]={level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)};
+    if(!window._branches[branch].weaknesses)window._branches[branch].weaknesses=[];
+    window._branches[branch].weaknesses.push(val);input.value='';await saveBranches();renderEvaluation();
+}
+async function removeWeakness(branch,idx){
+    if(!confirm('Retirer cette faiblesse du registre?'))return;
+    window._branches[branch].weaknesses.splice(idx,1);await saveBranches();renderEvaluation();
+}
+async function addMilestone(branch){
+    const input=document.getElementById('milestone-input-'+branch);const val=input.value.trim();if(!val)return;
+    if(!window._branches[branch])window._branches[branch]={level:null,levelDate:null,weaknesses:[],milestones:[]};
+    if(!window._branches[branch].milestones)window._branches[branch].milestones=[];
+    const label=val.includes('—')?val.split('—')[0].trim():(val.length>30?val.slice(0,30)+'…':val);
+    window._branches[branch].milestones.push({id:'m_'+Date.now(),label,text:val,done:false,doneDate:null});
+    input.value='';await saveBranches();renderEvaluation();
+}
+async function toggleMilestone(branch,id){
+    const m=(window._branches[branch].milestones||[]).find(x=>x.id===id);if(!m)return;
+    m.done=!m.done;m.doneDate=m.done?getTodayString():null;
+    await saveBranches();renderEvaluation();
+}
+function renderBranchCard(branch,b){
+    const color=branchColor(branch);const level=b.level||null;const levelLabel=level?level+'/10':'Non évalué';
+    const levelDateLabel=b.levelDate?new Date(b.levelDate+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):'jamais';
+    const milestones=b.milestones||[];const weaknesses=b.weaknesses||[];
+    const doneCount=milestones.filter(m=>m.done).length;
+    return`<div style="background:var(--bg-card);border:2px solid var(--border);border-radius:12px;padding:25px;margin-bottom:25px;border-top:4px solid ${color};">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+            <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:${color};">${branch}</h3>
+            <div style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--text-secondary);">${milestones.length?doneCount+'/'+milestones.length+' jalons':'aucun jalon'}</div>
+        </div>
+        <div style="margin-bottom:25px;">
+            <div class="form-label">Niveau auto-évalué — <span style="color:${color};font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;">${levelLabel}</span></div>
+            <input type="range" min="1" max="10" step="1" value="${level||1}" id="level-slider-${branch}" oninput="document.getElementById('level-val-${branch}').textContent=this.value" style="width:100%;accent-color:${color};">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:10px;">
+                <span style="font-size:.75rem;color:var(--text-secondary);">Valeur choisie : <span id="level-val-${branch}" style="color:${color};font-weight:700;">${level||1}</span>/10 — dernière auto-évaluation : ${levelDateLabel}</span>
+                <button class="btn btn-secondary btn-small" onclick="saveLevelAssessment('${branch}')">✅ Enregistrer</button>
+            </div>
+        </div>
+        <div style="margin-bottom:25px;">
+            <div class="form-label">Registre des faiblesses</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+                ${weaknesses.length===0?'<div class="empty-state" style="padding:15px;">Aucune faiblesse notée.</div>':weaknesses.map((w,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-elevated);padding:10px 15px;border-radius:6px;border-left:3px solid ${color};gap:10px;"><span style="flex:1;font-size:.9rem;">${w}</span><button class="session-delete" onclick="removeWeakness('${branch}',${i})">🗑️</button></div>`).join('')}
+            </div>
+            <div style="display:flex;gap:10px;">
+                <input type="text" class="form-input" id="weakness-input-${branch}" placeholder="Ex: les proportions des mains" onkeydown="if(event.key==='Enter')addWeakness('${branch}')">
+                <button class="btn btn-green btn-small" onclick="addWeakness('${branch}')">+ Ajouter</button>
+            </div>
+        </div>
+        <div>
+            <div class="form-label">Jalons par preuve</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+                ${milestones.length===0?'<div class="empty-state" style="padding:15px;">Aucun jalon défini. Ajoute le premier ci-dessous.</div>':milestones.map(m=>`<label style="display:flex;align-items:flex-start;gap:12px;background:var(--bg-elevated);padding:12px 15px;border-radius:6px;cursor:pointer;border-left:3px solid ${m.done?color:'var(--border)'};"><input type="checkbox" ${m.done?'checked':''} onchange="toggleMilestone('${branch}','${m.id}')" style="width:18px;height:18px;margin-top:2px;accent-color:${color};cursor:pointer;flex-shrink:0;"><span style="font-size:.85rem;line-height:1.5;${m.done?'color:var(--text-secondary);':''}"><strong style="color:${m.done?'var(--text-secondary)':color};">${m.label}</strong> — ${m.text}</span></label>`).join('')}
+            </div>
+            <div style="display:flex;gap:10px;">
+                <input type="text" class="form-input" id="milestone-input-${branch}" placeholder="Ex: S13 · Titre — description vérifiable par un observateur" onkeydown="if(event.key==='Enter')addMilestone('${branch}')">
+                <button class="btn btn-green btn-small" onclick="addMilestone('${branch}')">+ Ajouter</button>
+            </div>
+        </div>
+    </div>`;
+}
+function renderEvaluation(){
+    const c=document.getElementById('evaluation-container');if(!c)return;
+    const branches=window._branches||{};
+    c.innerHTML=BRANCHES.map(branch=>renderBranchCard(branch,branches[branch]||{level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)})).join('');
+}
 const ideaData={subject:["Guerrier","Robot","Dragon","Sorcière","Astronaute","Pirate","Ninja","Créature","Chevalier","Magicien","Démon","Ange","Samurai","Viking","Cyborg","Alien","Fantôme","Vampire","Nécromancien","Druide"],style:["Cyberpunk","Steampunk","Fantasy","Sci-fi","Médiéval","Futuriste","Baroque","Minimaliste","Art Nouveau","Gothique","Tribal","Aztèque","Japonais","Égyptien","Nordique","Biomécanique","Post-apocalyptique","Dark Fantasy"],emotion:["Furieux","Serein","Mélancolique","Triomphant","Terrifié","Confiant","Mystérieux","Joueur","Déterminé","Épuisé","Émerveillé","Menaçant","Protecteur","Désespéré","Victorieux"],constraint:["Vue de dessous","Silhouette pure","Palette 3 couleurs","Formes triangulaires","Symétrie parfaite","Asymétrie extrême","Contre-jour","Gros plan","Vue aérienne","Reflet dans l'eau","Fumée/brouillard","Composition circulaire","Diagonales fortes"]};
 const HUE_TEO_GALLERY=[
     {url:'https://cdna.artstation.com/p/assets/images/images/031/093/058/large/hue-teo-inking3.jpg?1602589391',title:'Inking Techniques'},
@@ -486,7 +599,9 @@ async function loadAllData(){
         const cutoff30Str=cutoff30.getFullYear()+'-'+String(cutoff30.getMonth()+1).padStart(2,'0')+'-'+String(cutoff30.getDate()).padStart(2,'0');
         document.getElementById('active-days-30').textContent=new Set(allSessions.filter(s=>s.date>=cutoff30Str).map(s=>s.date)).size;
         if(realStreak!==(data.streak||0))db.collection('users').doc(currentUser.uid).set({streak:realStreak},{merge:true});
-        updateTodayDisplay();updateCategoryStats();renderHistory();initDaySelector();loadExercises(currentDay);
+        const{branches,changed}=ensureBranchDefaults(data);window._branches=branches;
+        if(changed)db.collection('users').doc(currentUser.uid).set({branches},{merge:true});
+        updateTodayDisplay();updateCategoryStats();renderHistory();initDaySelector();loadExercises(currentDay);renderEvaluation();
         updateDayButtons(completedDays,_currentWeekNum,data.weekStartDate||null);
     }catch(e){console.error(e);}
 }
@@ -762,7 +877,7 @@ async function saveCheckin(){
 function switchTab(name,e){
     document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     document.getElementById('tab-'+name).classList.add('active');if(e&&e.target)e.target.classList.add('active');
-    if(name==='heatmap')setTimeout(renderHeatmap,50);if(name==='stats')setTimeout(renderStats,50);if(name==='checkin')setTimeout(initCheckin,50);if(name==='historique')setTimeout(renderJournal,50);
+    if(name==='heatmap')setTimeout(renderHeatmap,50);if(name==='stats')setTimeout(renderStats,50);if(name==='checkin')setTimeout(initCheckin,50);if(name==='historique')setTimeout(renderJournal,50);if(name==='evaluation')setTimeout(renderEvaluation,50);
 }
 </script>
 
