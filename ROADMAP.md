@@ -108,6 +108,13 @@ détaillée dans DECISIONS.md.
 
 ## Fait
 
+- [x] **Domaine personnalisé + dépendance de jalon.** *(2026-09-15)*
+  Demande directe de Florian, hors ordre des phases. Un domaine peut être ajouté depuis
+  l'Évaluation (nom + couleur d'accent), avec suppression confirmée qui prévient de la perte
+  des jalons et de l'historique de niveau. Chaque jalon porte un champ optionnel « dépend de »
+  (liste déroulante des jalons de sa branche) que le sphérier utilise pour l'adjacence, avec
+  interdiction des dépendances circulaires. Voir DECISIONS.md.
+
 - [x] **Bug : compteur « jours complétés N/84 » très en dessous de l'activité réelle.**
   *(2026-09-14)*
   Affichait 13/84 alors que l'app enregistrait 91 jours actifs et 248 h. Le compteur ne

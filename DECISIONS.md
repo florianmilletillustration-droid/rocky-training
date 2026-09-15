@@ -8,6 +8,59 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-15 — Le jalon « dépend de » remplace le verrouillage séquentiel implicite, avec migration rétrocompatible
+Chaque jalon porte désormais un champ optionnel `dependsOn` (l'id d'un autre jalon de la même
+branche) choisi dans une liste déroulante, plutôt que de dépendre toujours et uniquement du
+jalon précédent dans la liste. Un jalon sans dépendance est disponible d'emblée — c'est la
+règle demandée par Florian, et elle vaut pour tout nouveau jalon créé sans choisir de
+dépendance. Problème : les jalons existants (les 7 d'Anatomie, et tout jalon déjà ajouté par
+Florian dans une autre branche) reposaient jusqu'ici sur ce verrouillage séquentiel implicite
+sans aucun champ explicite ; leur appliquer la nouvelle règle telle quelle aurait débloqué
+d'un coup tous les jalons existants, une régression silencieuse du sphérier. `ensureBranchDefaults`
+migre donc chaque jalon dont `dependsOn` est encore `undefined` (jamais migré) vers une
+dépendance explicite sur le jalon précédent de sa branche — `null` pour le premier — ce qui
+reproduit exactement l'ancien comportement. Une valeur `null` explicite n'est plus jamais
+réécrite : c'est le signal « sans dépendance, disponible d'emblée » que la migration ne doit
+pas toucher. Les dépendances circulaires (directes ou en remontant la chaîne) sont refusées
+(`wouldCreateMilestoneCycle`), sans quoi deux jalons pourraient s'entre-verrouiller
+définitivement. Le sphérier dessine désormais le lien de chaque nœud vers le nœud dont il
+dépend (ou vers le hub de sa branche si aucune dépendance), au lieu de toujours relier au
+nœud précédent dans l'ordre d'ajout — la position des nœuds, elle, ne change pas (toujours
+en chaîne rayonnante depuis le hub), seul le lien affiché reflète la vraie dépendance.
+
+## 2026-09-15 — Domaines ajoutés depuis l'Évaluation : ordre persisté séparément, couleur libre, suppression jamais réinjectée
+Florian peut désormais ajouter un domaine (nom + couleur d'accent au choix, via un simple
+`<input type="color">`) depuis l'onglet Évaluation ; il apparaît aussitôt dans l'Évaluation et
+le sphérier comme les quatre domaines existants. L'ordre d'affichage vit dans un nouveau champ
+`branchOrder` (tableau de noms) séparé de `branches` (l'objet clé→données), parce que l'ordre
+des clés d'un objet Firestore n'est pas garanti — s'appuyer sur `Object.keys(data.branches)`
+aurait pu réordonner les domaines de façon imprévisible d'une lecture à l'autre. Un document
+antérieur à cette fonctionnalité (sans champ `branchOrder`) est initialisé avec les quatre
+domaines par défaut, comme avant. Une fois `branchOrder` présent, il fait foi tel quel : si
+Florian supprime un domaine (y compris un des quatre par défaut — la suppression demande une
+confirmation explicite qui rappelle que les jalons et l'historique de niveau associés seront
+perdus, CLAUDE.md §9), `ensureBranchDefaults` ne le réinjecte plus jamais automatiquement au
+chargement suivant. Les instantanés mensuels déjà archivés listent toujours les domaines tels
+qu'ils existaient au moment de l'instantané (`Object.keys(s.branches)`), pas la liste actuelle
+— un domaine supprimé depuis reste visible dans son historique, cohérent avec « la vraie
+mesure de progrès sur un an » (CLAUDE.md §6).
+
+## 2026-09-15 — Les domaines ajoutés par Florian n'ont pas d'ancre de sphérier dessinée à la main
+Les positions des quatre hubs de région (`BRANCH_HUBS`) sont réglées à la main pour former le
+« cœur compact et asymétrique » voulu par les décisions précédentes. Un domaine créé depuis
+l'Évaluation n'a pas ce traitement manuel : son hub est calculé en spirale (pas à pas selon
+l'angle doré, rayon croissant) autour du centre du cœur existant, ce qui le place à l'écart des
+quatre régions fixes sans jamais les recouvrir, quel que soit le nombre de domaines ajoutés.
+Cette position n'est pas mise en cache — elle dépend du rang du domaine parmi les domaines
+custom actuels, qui peut changer si un domaine est supprimé, et la recalculer à chaque rendu
+est plus sûr que de risquer une position figée obsolète. Aucun cadrage manuel n'est nécessaire
+non plus : `fitSpherierView` mesure déjà l'étendue réelle de tous les nœuds à chaque rendu
+(décision du 2026-09-15 ci-dessous) et cadre la vue en conséquence, spirale comprise. Les ponts
+entre régions (`BRANCH_BRIDGES`, statique) deviennent `computeBridges()` : chaque domaine est
+relié au suivant dans l'ordre d'affichage, la boucle se refermant sur le premier — ce qui
+reproduit exactement l'ancienne boucle Dessin—Peinture—Encrage—Anatomie—Dessin et s'étend
+automatiquement à tout domaine ajouté ou retiré.
+
 ## 2026-09-15 — Le zoom par défaut du sphérier est calculé, pas une valeur fixe
 Les nœuds poussent (nouveaux jalons à chaque cycle), donc l'espace qu'ils occupent
 n'est pas une constante : des coordonnées de plateau figées auraient fini par
