@@ -142,6 +142,7 @@
         <div style="display:inline-block;background:#00ff88;color:#0a0a0a;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:2px;padding:4px 14px;border-radius:20px;margin-top:8px;text-transform:uppercase;">✅ VERSION V3.4 — FIX RESET HEBDO</div>
         <div class="user-info">
             <span class="user-email" id="user-email"></span>
+            <button class="logout-btn" onclick="exportAllData()" style="border-color:var(--accent-green);color:var(--accent-green);" title="Télécharge toutes les données de pratique en JSON">📦 Export JSON</button>
             <button class="logout-btn" onclick="changeApiKey()" style="border-color:var(--accent-purple);color:var(--accent-purple);">🔑 Clé API</button>
             <button class="logout-btn" onclick="logout()">Déconnexion</button>
         </div>
@@ -500,6 +501,25 @@ const CYCLE2_ANATOMIE_MILESTONES=[
     {id:'c2-s12-figurelibre',label:'S12 · Figure libre',text:"Dessiner une figure complète, debout, de trois quarts, entièrement de mémoire, où un observateur peut nommer trois groupes musculaires sans avoir vu le processus."}
 ];
 function defaultMilestonesFor(branch){return branch==='Anatomie'?CYCLE2_ANATOMIE_MILESTONES.map(m=>({id:m.id,label:m.label,text:m.text,done:false,doneDate:null})):[];}
+// Registre des faiblesses du cycle 2 (CYCLE-2.md, « Registre des faiblesses au
+// 14 septembre 2026 »), importé tel quel une seule fois : CYCLE-2.md n'est
+// plus qu'un instantané historique, l'app est désormais la source de vérité
+// de ce registre (voir importCycle2WeaknessesOnce ci-dessous).
+const CYCLE2_ANATOMIE_WEAKNESSES=[
+    "Les insertions musculaires ne sont pas connues : où exactement chaque masse s'attache.",
+    "Le volume des masses n'est pas maîtrisé une fois posé sur un mannequin en rotation.",
+    "Les mains sont évitées."
+];
+// Import ponctuel, comme celui des jalons du cycle 2 : n'ajoute ces trois
+// entrées qu'une fois (marqueur `cycle2WeaknessesImported`), jamais réimporté
+// si Florian les modifie ou les supprime ensuite dans l'app.
+function importCycle2WeaknessesOnce(branches){
+    const b=branches.Anatomie;if(!b||b.cycle2WeaknessesImported)return false;
+    b.weaknesses=b.weaknesses||[];
+    CYCLE2_ANATOMIE_WEAKNESSES.forEach(w=>{if(!b.weaknesses.includes(w))b.weaknesses.push(w);});
+    b.cycle2WeaknessesImported=true;
+    return true;
+}
 // Migration additive : donne à chaque jalon créé avant le champ « dépend de »
 // une dépendance explicite qui reproduit son ancien verrouillage séquentiel
 // (chaque jalon dépendait implicitement du précédent dans sa branche). Ne
@@ -534,6 +554,7 @@ function ensureBranchDefaults(data){
         if(branches[branch].levelDate===undefined){branches[branch].levelDate=null;changed=true;}
     });
     if(backfillMilestoneDependencies(branches))changed=true;
+    if(importCycle2WeaknessesOnce(branches))changed=true;
     return{branches,order,changed};
 }
 function branchColor(branch){
@@ -607,6 +628,14 @@ function milestoneState(mid,milestones){
     if(!dep)return'available';
     return dep.done?'available':'locked';
 }
+// État du hub d'une région. Un hub n'est pas un jalon (DECISIONS.md,
+// 2026-09-15) : il n'a pas de dépendance et ne peut donc jamais être
+// « verrouillé » — c'est le point d'entrée de la région, toujours accessible.
+// Mais son apparence doit quand même respecter la règle affichée dans
+// l'interface (« seul un jalon coché débloque un nœud ») : il ne prend
+// l'aspect « débloqué » que si au moins un jalon de sa branche est coché,
+// jamais par défaut ni par la couleur d'accent de la branche.
+function domainHubState(milestones){return(milestones||[]).some(m=>m.done)?'unlocked':'available';}
 function refreshBranchViews(){renderEvaluation();if(document.getElementById('spherier-svg'))renderSpherier();}
 async function addBranch(){
     const nameInput=document.getElementById('new-branch-name');const colorInput=document.getElementById('new-branch-color');
@@ -843,9 +872,18 @@ function renderSpherier(){
             chainHtml+=`<circle class="${cls}" cx="${pos.x}" cy="${pos.y}" r="16" style="${style}cursor:pointer;" data-branch="${branch}" data-mid="${m.id}" onmouseenter="showSphTooltip(event,'${branch}','${m.id}')" onmouseleave="hideSphTooltip()" onclick="onSphNodeClick('${branch}','${m.id}')"></circle>`;
         });
         const doneCount=milestones.filter(m=>m.done).length;const labelBelow=hubLabelBelow(branch);
+        const hubState=domainHubState(milestones);
+        // La dormance (CLAUDE.md §6) ne décrit que l'oubli d'un nœud déjà
+        // débloqué — elle ne s'applique donc qu'à l'état "unlocked" du hub,
+        // jamais à un hub encore "available" (rien coché = rien à oublier).
+        const hubDormant=dormant&&hubState==='unlocked';
+        const hubStyle=hubState==='unlocked'
+            ?(hubDormant?`fill:#666;opacity:.6;`:`fill:${color};filter:drop-shadow(0 0 10px ${color});`)
+            :`fill:var(--bg-elevated);stroke:${color};stroke-width:3;filter:drop-shadow(0 0 6px ${color});`;
+        const hubLevelTextColor=(hubState==='unlocked'&&!hubDormant)?'var(--bg-dark)':color;
         hubsHtml+=`<g onmouseenter="showSphHubTooltip(event,'${branch}')" onmouseleave="hideSphTooltip()" style="cursor:default;">
-            <circle cx="${hub.x}" cy="${hub.y}" r="24" fill="var(--bg-elevated)" stroke="${color}" stroke-width="3"${dormant&&milestones.length?' opacity="0.7"':''}/>
-            <text x="${hub.x}" y="${hub.y+5}" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="15" fill="${color}">${b.level||'—'}</text>
+            <circle cx="${hub.x}" cy="${hub.y}" r="24" style="${hubStyle}"/>
+            <text x="${hub.x}" y="${hub.y+5}" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="15" fill="${hubLevelTextColor}">${b.level||'—'}</text>
             <text x="${hub.x}" y="${hub.y+(labelBelow?44:-28)}" text-anchor="middle" font-family="'Space Mono',monospace" font-size="12" fill="${color}" letter-spacing="1">${branch.toUpperCase()}</text>
             <text x="${hub.x}" y="${hub.y+(labelBelow?59:-43)}" text-anchor="middle" font-family="'Space Mono',monospace" font-size="9" fill="var(--text-secondary)">${milestones.length?doneCount+'/'+milestones.length:'aucun jalon'}</text>
         </g>`;
@@ -957,6 +995,31 @@ const HUE_TEO_GALLERY=[
 function initDailyImage(){const now=new Date();const idx=Math.floor((now-new Date(now.getFullYear(),0,0))/86400000)%HUE_TEO_GALLERY.length;const art=HUE_TEO_GALLERY[idx];const el=(id)=>document.getElementById(id);if(el('login-bg-img'))el('login-bg-img').src=art.url;if(el('login-artwork-label'))el('login-artwork-label').textContent='Hue Teo — '+art.title;if(el('prog-daily-img'))el('prog-daily-img').src=art.url;if(el('prog-daily-title'))el('prog-daily-title').textContent=art.title;}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initDailyImage);else initDailyImage();
 
+// Export JSON complet des données de pratique (ROADMAP.md, Phase 0 — le filet
+// de sécurité à avoir avant toute migration de schéma, CLAUDE.md §9). Relit le
+// document Firestore tel quel plutôt que de le recomposer depuis les
+// variables JS en mémoire (allSessions, window._branches, etc.) : celles-ci ne
+// couvrent pas tous les champs (completedDays, weekStartDate, streak...), et
+// toute donnée future ajoutée au document est ainsi exportée sans jamais
+// avoir à mettre cette fonction à jour. Un seul bouton, un seul fichier.
+async function exportAllData(){
+    if(!currentUser)return;
+    try{
+        const doc=await db.collection('users').doc(currentUser.uid).get();
+        const data=doc.exists?doc.data():{};
+        const payload={exportedAt:new Date().toISOString(),email:currentUser.email,data};
+        // Les champs `lastUpdated` sont des Timestamp Firestore, non
+        // sérialisables tels quels : convertis en ISO au passage.
+        const json=JSON.stringify(payload,(key,val)=>(val&&typeof val.toDate==='function')?val.toDate().toISOString():val,2);
+        const blob=new Blob([json],{type:'application/json'});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');
+        a.href=url;a.download=`rocky-training-export-${getTodayString()}.json`;
+        document.body.appendChild(a);a.click();a.remove();
+        URL.revokeObjectURL(url);
+        showQuickFeedback('📦 Export téléchargé');
+    }catch(e){console.error(e);alert("Erreur pendant l'export : "+e.message);}
+}
 async function loadAllData(){
     if(!currentUser)return;
     try{

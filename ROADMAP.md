@@ -11,8 +11,10 @@ détaillée dans DECISIONS.md.
 
 ## Phase 0 — Correctif et filet de sécurité
 
-- [ ] **Export JSON complet des données de pratique.**
-  Un bouton qui télécharge tout. À faire **avant** toute migration. C'est le filet.
+- [x] **Export JSON complet des données de pratique.** *(2026-09-15)*
+  Un bouton (📦 Export JSON, dans l'en-tête) télécharge le document Firestore complet en un
+  seul fichier JSON : sessions, temps, check-ins, niveaux auto-évalués, registres de
+  faiblesses, jalons et leur état, instantanés du sphérier. Voir DECISIONS.md.
 
 - [ ] **Ajouter `schemaVersion` aux documents Firestore**, avec lecture rétrocompatible.
 
@@ -107,6 +109,20 @@ détaillée dans DECISIONS.md.
 - [ ] Import de références ou de photos de travaux dans les jalons.
 
 ## Fait
+
+- [x] **Import du registre des faiblesses de CYCLE-2.md dans l'app.** *(2026-09-15)*
+  Les trois entrées du registre au 14 septembre 2026 (insertions musculaires, volume des
+  masses, mains évitées) sont importées une seule fois dans le registre de la branche
+  Anatomie. L'app est désormais la source de vérité de ce registre ; CYCLE-2.md garde les
+  trois lignes comme instantané historique, avec une note à cet effet. Voir DECISIONS.md.
+
+- [x] **Bug : le hub d'une région s'affichait « Débloqué » sans aucun jalon coché.**
+  *(2026-09-15)*
+  Le hub ANATOMIE apparaissait rempli et lumineux (aspect « Débloqué ») alors qu'aucun de ses
+  7 jalons n'était coché, contredisant la règle affichée dans l'interface. Le hub n'avait
+  aucune logique d'état ; il utilise désormais l'aspect « Disponible » tant qu'aucun jalon de
+  sa branche n'est coché, et ne passe à « Débloqué » qu'une fois une preuve réelle enregistrée.
+  Voir DECISIONS.md.
 
 - [x] **Domaine personnalisé + dépendance de jalon.** *(2026-09-15)*
   Demande directe de Florian, hors ordre des phases. Un domaine peut être ajouté depuis
