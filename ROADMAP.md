@@ -16,6 +16,13 @@ détaillée dans DECISIONS.md.
   seul fichier JSON : sessions, temps, check-ins, niveaux auto-évalués, registres de
   faiblesses, jalons et leur état, instantanés du sphérier. Voir DECISIONS.md.
 
+- [x] **Diagnostic du compteur « Jours complétés N/84 ».** *(2026-09-15)*
+  Conclusion : pas de bug de calcul restant après le correctif du 2026-09-14, mais deux
+  notions distinctes fusionnées sous un même libellé — jour du programme confirmé
+  (Check-in/case cochée) et jour actif au sens large (déjà suivi séparément par « Jours
+  actifs »). Le libellé est corrigé en « Jours pratiqués » ; la logique de calcul ne change
+  pas. Voir DECISIONS.md.
+
 - [ ] **Ajouter `schemaVersion` aux documents Firestore**, avec lecture rétrocompatible.
 
 ## Phase 1 — Évaluation

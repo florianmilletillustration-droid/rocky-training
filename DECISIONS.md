@@ -8,6 +8,43 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-15 — « Jours complétés N/84 » renommé « Jours pratiqués » : pas de bug, deux notions fusionnées
+Diagnostic demandé sur le compteur corrigé le 2026-09-14. Ce correctif avait remplacé
+`completedDays.length` par `size(completedDays ∪ dates(allSessions))`, plafonné à 84, pour
+arrêter d'ignorer les trois quarts des méthodes de tracking. Résultat du diagnostic : la
+formule n'a pas de bug arithmétique, mais elle mélange maintenant deux notions distinctes qui
+étaient jusque-là séparées à raison :
+
+1. **Jour du programme confirmé** — `completedDays` seul, alimenté uniquement par la case
+   Check-in (« exercice principal fait ») ou le bouton « Marquer ce jour comme complété » :
+   un signal explicite et volontaire, indépendant de toute session enregistrée.
+2. **Jour actif** — une date où *n'importe quelle* session existe, dans *n'importe quelle*
+   catégorie, y compris sans rapport avec le programme (ex. une session Gouache un jour où
+   l'exercice du programme portait sur la perspective). C'est exactement ce que mesurent déjà,
+   séparément, « Jours actifs (30 derniers) » et « Jours actifs total ».
+
+Le correctif du 09-14 a uni ces deux notions pour corriger un sous-comptage réel, mais le
+libellé « Jours complétés » n'a pas suivi : il continue d'affirmer que le jour précis du
+programme a été honoré, ce qui n'est plus garanti (un jour peut désormais compter comme
+« complété » sur la seule foi d'une pratique complètement étrangère à l'exercice du jour).
+
+Revenir à `completedDays` seul réintroduirait le sous-comptage du 09-14 (13/84 alors que 91
+jours actifs et 248 h étaient déjà enregistrés). Restreindre l'union à une catégorie
+« Programme Rocky » ne réglerait rien non plus : le contenu du programme (perspective, croquis,
+anatomie...) est en pratique loggé sous ces catégories précises, pas sous une étiquette
+dédiée — une session du programme est donc, la plupart du temps, indiscernable d'une session
+libre par sa seule catégorie. Il n'existe aujourd'hui aucun signal fiable pour isoler « c'est
+l'exercice précis du jour » en dehors du Check-in lui-même, et en ajouter un (marqueur par
+session, étape supplémentaire à l'ajout rapide) irait contre CLAUDE.md §5 (« Toute friction
+ajoutée ici est une régression »).
+
+**Correction retenue : le libellé, pas la logique.** La carte passe de « Jours complétés » à
+« Jours pratiqués », avec une infobulle (`title`) qui précise ce qui est compté et ce qui ne
+l'est pas. Le calcul et le plafond à 84 restent inchangés — il continue à avoir un sens propre
+(distinct de « Jours actifs total », non plafonné) : une fois le total d'activité réelle au-delà
+de 84 jours, les deux compteurs divergent et « Jours pratiqués » se fige à 84/84, marquant que
+l'ampleur d'activité du programme a été atteinte au moins une fois par jour sur toute sa durée.
+
 ## 2026-09-15 — L'export JSON relit le document Firestore brut plutôt que de le recomposer depuis les variables JS
 `exportAllData()` refait un `get()` sur le document Firestore de l'utilisateur au moment du
 clic, et télécharge son contenu quasi tel quel (seuls les champs `lastUpdated`, des `Timestamp`
