@@ -483,7 +483,12 @@ function getProgramForWeekDay(week,day){const w=weekProgram[week];if(!w)return n
 // Le niveau ne monte JAMAIS par un seuil d'heures (CLAUDE.md §6, §9) :
 // uniquement par auto-évaluation (slider) ou jalon coché.
 // ═══════════════════════════════════════════════════
-const BRANCHES=['Dessin','Peinture','Encrage','Anatomie'];
+const DEFAULT_BRANCHES=['Dessin','Peinture','Encrage','Anatomie'];
+const DEFAULT_BRANCH_COLORS={Dessin:'var(--accent-yellow)',Peinture:'var(--accent-blue)',Encrage:'var(--accent-purple)',Anatomie:'var(--accent-green)'};
+// Liste ordonnée des domaines affichés (Évaluation + sphérier). Les quatre
+// domaines par défaut, puis les domaines ajoutés par Florian, dans l'ordre
+// d'ajout. Alimentée par ensureBranchDefaults() au chargement.
+function branchList(){return(window._branchOrder&&window._branchOrder.length)?window._branchOrder:DEFAULT_BRANCHES.slice();}
 // Jalons du cycle 2 (CYCLE-2.md), importés tels quels : rédigés par Florian, pas inventés.
 const CYCLE2_ANATOMIE_MILESTONES=[
     {id:'c2-s6-torse',label:'S6 · Torse',text:"Dessiner un torse mannequin en rotation de 45°, masses appliquées, où la séparation entre le pectoral et le deltoïde reste lisible. Sans le cours."},
@@ -495,19 +500,48 @@ const CYCLE2_ANATOMIE_MILESTONES=[
     {id:'c2-s12-figurelibre',label:'S12 · Figure libre',text:"Dessiner une figure complète, debout, de trois quarts, entièrement de mémoire, où un observateur peut nommer trois groupes musculaires sans avoir vu le processus."}
 ];
 function defaultMilestonesFor(branch){return branch==='Anatomie'?CYCLE2_ANATOMIE_MILESTONES.map(m=>({id:m.id,label:m.label,text:m.text,done:false,doneDate:null})):[];}
+// Migration additive : donne à chaque jalon créé avant le champ « dépend de »
+// une dépendance explicite qui reproduit son ancien verrouillage séquentiel
+// (chaque jalon dépendait implicitement du précédent dans sa branche). Ne
+// s'applique qu'aux jalons où dependsOn est encore `undefined` (jamais migré) ;
+// une valeur `null` explicite veut dire « sans dépendance, disponible d'emblée »
+// et n'est jamais réécrite. Aucune donnée n'est perdue, un seul champ est ajouté.
+function backfillMilestoneDependencies(branches){
+    let changed=false;
+    Object.keys(branches).forEach(branch=>{
+        const milestones=branches[branch].milestones||[];
+        milestones.forEach((m,idx)=>{
+            if(m.dependsOn===undefined){m.dependsOn=idx===0?null:milestones[idx-1].id;changed=true;}
+        });
+    });
+    return changed;
+}
 function ensureBranchDefaults(data){
-    const branches=data.branches?JSON.parse(JSON.stringify(data.branches)):{};let changed=false;
-    BRANCHES.forEach(branch=>{
+    const branches=data.branches?JSON.parse(JSON.stringify(data.branches)):{};
+    // branchOrder absent = document créé avant cette fonctionnalité : on part
+    // des quatre domaines par défaut. branchOrder présent = respecté tel quel,
+    // y compris si un domaine par défaut en a été retiré (suppression voulue) :
+    // on ne le réinjecte jamais automatiquement.
+    const hadOrder=Array.isArray(data.branchOrder);
+    const order=hadOrder?data.branchOrder.slice():DEFAULT_BRANCHES.slice();
+    let changed=!hadOrder;
+    Object.keys(branches).forEach(branch=>{if(!order.includes(branch)){order.push(branch);changed=true;}});
+    order.forEach(branch=>{
         if(!branches[branch]){branches[branch]={level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)};changed=true;return;}
         if(branches[branch].milestones===undefined){branches[branch].milestones=defaultMilestonesFor(branch);changed=true;}
         if(branches[branch].weaknesses===undefined){branches[branch].weaknesses=[];changed=true;}
         if(branches[branch].level===undefined){branches[branch].level=null;changed=true;}
         if(branches[branch].levelDate===undefined){branches[branch].levelDate=null;changed=true;}
     });
-    return{branches,changed};
+    if(backfillMilestoneDependencies(branches))changed=true;
+    return{branches,order,changed};
 }
-function branchColor(branch){return{Dessin:'var(--accent-yellow)',Peinture:'var(--accent-blue)',Encrage:'var(--accent-purple)',Anatomie:'var(--accent-green)'}[branch]||'var(--accent-yellow)';}
-async function saveBranches(){if(!currentUser)return;await db.collection('users').doc(currentUser.uid).set({branches:window._branches},{merge:true});}
+function branchColor(branch){
+    const b=(window._branches||{})[branch];
+    if(b&&b.color)return b.color;
+    return DEFAULT_BRANCH_COLORS[branch]||'var(--accent-yellow)';
+}
+async function saveBranches(){if(!currentUser)return;await db.collection('users').doc(currentUser.uid).set({branches:window._branches,branchOrder:window._branchOrder||branchList()},{merge:true});}
 async function saveLevelAssessment(branch){
     const slider=document.getElementById('level-slider-'+branch);if(!slider)return;const val=parseInt(slider.value);
     if(!window._branches[branch])window._branches[branch]={level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)};
@@ -529,15 +563,70 @@ async function addMilestone(branch){
     if(!window._branches[branch])window._branches[branch]={level:null,levelDate:null,weaknesses:[],milestones:[]};
     if(!window._branches[branch].milestones)window._branches[branch].milestones=[];
     const label=val.includes('—')?val.split('—')[0].trim():(val.length>30?val.slice(0,30)+'…':val);
-    window._branches[branch].milestones.push({id:'m_'+Date.now(),label,text:val,done:false,doneDate:null});
-    input.value='';await saveBranches();refreshBranchViews();
+    const depSelect=document.getElementById('milestone-dep-'+branch);
+    const dependsOn=depSelect&&depSelect.value?depSelect.value:null; // sans dépendance = disponible d'emblée
+    window._branches[branch].milestones.push({id:'m_'+Date.now(),label,text:val,done:false,doneDate:null,dependsOn});
+    input.value='';if(depSelect)depSelect.value='';await saveBranches();refreshBranchViews();
 }
 async function toggleMilestone(branch,id){
     const m=(window._branches[branch].milestones||[]).find(x=>x.id===id);if(!m)return;
     m.done=!m.done;m.doneDate=m.done?getTodayString():null;
     await saveBranches();refreshBranchViews();
 }
+// Un jalon ne peut pas dépendre (directement ou en remontant la chaîne) de
+// lui-même, sans quoi aucun des deux ne se débloquerait jamais.
+function wouldCreateMilestoneCycle(milestones,startId,newDependsOn){
+    let cur=newDependsOn;const seen=new Set();
+    while(cur){
+        if(cur===startId)return true;
+        if(seen.has(cur))return true;
+        seen.add(cur);
+        const node=milestones.find(x=>x.id===cur);
+        cur=node?node.dependsOn:null;
+    }
+    return false;
+}
+async function setMilestoneDependency(branch,id,newDependsOn){
+    const milestones=(window._branches[branch]||{}).milestones||[];
+    const m=milestones.find(x=>x.id===id);if(!m)return;
+    newDependsOn=newDependsOn||null;
+    if(newDependsOn&&wouldCreateMilestoneCycle(milestones,id,newDependsOn)){
+        showQuickFeedback('⚠️ Dépendance circulaire refusée');refreshBranchViews();return;
+    }
+    m.dependsOn=newDependsOn;
+    await saveBranches();refreshBranchViews();
+}
+// État d'un jalon par rapport à son adjacence : un jalon coché est débloqué ;
+// un jalon sans dépendance (ou dont la dépendance a été retirée) est
+// disponible d'emblée ; sinon il attend que le jalon dont il dépend soit coché.
+function milestoneState(mid,milestones){
+    const m=milestones.find(x=>x.id===mid);if(!m)return'locked';
+    if(m.done)return'unlocked';
+    if(!m.dependsOn)return'available';
+    const dep=milestones.find(x=>x.id===m.dependsOn);
+    if(!dep)return'available';
+    return dep.done?'available':'locked';
+}
 function refreshBranchViews(){renderEvaluation();if(document.getElementById('spherier-svg'))renderSpherier();}
+async function addBranch(){
+    const nameInput=document.getElementById('new-branch-name');const colorInput=document.getElementById('new-branch-color');
+    if(!nameInput)return;
+    const name=nameInput.value.trim().replace(/["'<>]/g,'');
+    if(!name)return;
+    window._branches=window._branches||{};window._branchOrder=window._branchOrder||branchList().slice();
+    if(window._branches[name]){showQuickFeedback('⚠️ Ce domaine existe déjà');return;}
+    const color=(colorInput&&colorInput.value)||'#ffd700';
+    window._branches[name]={level:null,levelDate:null,weaknesses:[],milestones:[],color};
+    window._branchOrder.push(name);
+    nameInput.value='';
+    await saveBranches();refreshBranchViews();showQuickFeedback('✅ Domaine « '+name+' » ajouté');
+}
+async function removeBranch(branch){
+    if(!confirm('Supprimer le domaine « '+branch+' » ? Les jalons et l\'historique de niveau de ce domaine seront perdus définitivement.'))return;
+    delete window._branches[branch];
+    window._branchOrder=branchList().filter(b=>b!==branch);
+    await saveBranches();refreshBranchViews();showQuickFeedback('🗑️ Domaine « '+branch+' » supprimé');
+}
 function renderBranchCard(branch,b){
     const color=branchColor(branch);const level=b.level||null;const levelLabel=level?level+'/10':'Non évalué';
     const levelDateLabel=b.levelDate?new Date(b.levelDate+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):'jamais';
@@ -546,7 +635,10 @@ function renderBranchCard(branch,b){
     return`<div style="background:var(--bg-card);border:2px solid var(--border);border-radius:12px;padding:25px;margin-bottom:25px;border-top:4px solid ${color};">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
             <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:${color};">${branch}</h3>
-            <div style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--text-secondary);">${milestones.length?doneCount+'/'+milestones.length+' jalons':'aucun jalon'}</div>
+            <div style="display:flex;align-items:center;gap:14px;">
+                <div style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--text-secondary);">${milestones.length?doneCount+'/'+milestones.length+' jalons':'aucun jalon'}</div>
+                <button class="session-delete" title="Supprimer ce domaine" onclick="removeBranch('${branch}')">🗑️</button>
+            </div>
         </div>
         <div style="margin-bottom:25px;">
             <div class="form-label">Niveau auto-évalué — <span style="color:${color};font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;">${levelLabel}</span></div>
@@ -569,19 +661,45 @@ function renderBranchCard(branch,b){
         <div>
             <div class="form-label">Jalons par preuve</div>
             <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
-                ${milestones.length===0?'<div class="empty-state" style="padding:15px;">Aucun jalon défini. Ajoute le premier ci-dessous.</div>':milestones.map(m=>`<label style="display:flex;align-items:flex-start;gap:12px;background:var(--bg-elevated);padding:12px 15px;border-radius:6px;cursor:pointer;border-left:3px solid ${m.done?color:'var(--border)'};"><input type="checkbox" ${m.done?'checked':''} onchange="toggleMilestone('${branch}','${m.id}')" style="width:18px;height:18px;margin-top:2px;accent-color:${color};cursor:pointer;flex-shrink:0;"><span style="font-size:.85rem;line-height:1.5;${m.done?'color:var(--text-secondary);':''}"><strong style="color:${m.done?'var(--text-secondary)':color};">${m.label}</strong> — ${m.text}</span></label>`).join('')}
+                ${milestones.length===0?'<div class="empty-state" style="padding:15px;">Aucun jalon défini. Ajoute le premier ci-dessous.</div>':milestones.map(m=>{
+                    const depOptions=milestones.filter(x=>x.id!==m.id).map(x=>`<option value="${x.id}" ${m.dependsOn===x.id?'selected':''}>${x.label}</option>`).join('');
+                    return`<div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;background:var(--bg-elevated);padding:12px 15px;border-radius:6px;border-left:3px solid ${m.done?color:'var(--border)'};">
+                        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;flex:1;min-width:220px;">
+                            <input type="checkbox" ${m.done?'checked':''} onchange="toggleMilestone('${branch}','${m.id}')" style="width:18px;height:18px;margin-top:2px;accent-color:${color};cursor:pointer;flex-shrink:0;">
+                            <span style="font-size:.85rem;line-height:1.5;${m.done?'color:var(--text-secondary);':''}"><strong style="color:${m.done?'var(--text-secondary)':color};">${m.label}</strong> — ${m.text}</span>
+                        </label>
+                        <select class="form-select" style="width:auto;max-width:200px;font-size:.72rem;padding:8px 10px;" title="Dépend de" onchange="setMilestoneDependency('${branch}','${m.id}',this.value)">
+                            <option value="">Sans dépendance</option>
+                            ${depOptions}
+                        </select>
+                    </div>`;
+                }).join('')}
             </div>
-            <div style="display:flex;gap:10px;">
-                <input type="text" class="form-input" id="milestone-input-${branch}" placeholder="Ex: S13 · Titre — description vérifiable par un observateur" onkeydown="if(event.key==='Enter')addMilestone('${branch}')">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <input type="text" class="form-input" id="milestone-input-${branch}" placeholder="Ex: S13 · Titre — description vérifiable par un observateur" style="flex:1;min-width:220px;" onkeydown="if(event.key==='Enter')addMilestone('${branch}')">
+                <select class="form-select" id="milestone-dep-${branch}" style="width:auto;min-width:170px;" title="Dépend de">
+                    <option value="">Sans dépendance</option>
+                    ${milestones.map(m=>`<option value="${m.id}">${m.label}</option>`).join('')}
+                </select>
                 <button class="btn btn-green btn-small" onclick="addMilestone('${branch}')">+ Ajouter</button>
             </div>
+        </div>
+    </div>`;
+}
+function renderAddBranchForm(){
+    return`<div style="background:var(--bg-card);border:2px dashed var(--border);border-radius:12px;padding:20px 25px;margin-bottom:25px;">
+        <div class="form-label">Ajouter un domaine</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <input type="text" class="form-input" id="new-branch-name" placeholder="Ex: Sculpture" style="flex:1;min-width:180px;" onkeydown="if(event.key==='Enter')addBranch()">
+            <input type="color" id="new-branch-color" value="#ffd700" title="Couleur d'accent" style="width:46px;height:44px;border:2px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;padding:2px;">
+            <button class="btn btn-green btn-small" onclick="addBranch()">+ Ajouter</button>
         </div>
     </div>`;
 }
 function renderEvaluation(){
     const c=document.getElementById('evaluation-container');if(!c)return;
     const branches=window._branches||{};
-    c.innerHTML=BRANCHES.map(branch=>renderBranchCard(branch,branches[branch]||{level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)})).join('');
+    c.innerHTML=renderAddBranchForm()+branchList().map(branch=>renderBranchCard(branch,branches[branch]||{level:null,levelDate:null,weaknesses:[],milestones:defaultMilestonesFor(branch)})).join('');
 }
 
 // ═══════════════════════════════════════════════════
@@ -601,7 +719,38 @@ const BRANCH_HUBS={
     Encrage:{x:510,y:190,angle:-0.44},
     Anatomie:{x:420,y:400,angle:1.02}
 };
-const BRANCH_BRIDGES=[['Dessin','Peinture'],['Peinture','Encrage'],['Encrage','Anatomie'],['Anatomie','Dessin']];
+// Un domaine ajouté par Florian n'a pas d'ancre dessinée à la main : son hub
+// est placé en spirale (angle doré) autour du cœur des quatre régions fixes,
+// à une distance croissante pour ne jamais recouvrir les régions existantes.
+// computeSpherierBounds()/fitSpherierView() cadrent de toute façon la vue sur
+// l'étendue réelle des nœuds à chaque rendu, donc la position exacte importe
+// peu tant qu'elle reste organique et sans collision.
+const CUSTOM_HUB_CENTER={x:315,y:260};
+// Pas de cache : la position d'un domaine custom dépend de son rang parmi les
+// domaines custom actuels, qui peut changer si un domaine est supprimé — la
+// recalculer à chaque appel (coût négligeable vu le nombre de domaines) évite
+// des positions figées et incohérentes après une suppression.
+function getBranchHub(branch){
+    if(BRANCH_HUBS[branch])return BRANCH_HUBS[branch];
+    const customs=branchList().filter(b=>!BRANCH_HUBS[b]);
+    const idx=Math.max(0,customs.indexOf(branch));
+    const goldenAngle=2.399963229728653;
+    const angle=idx*goldenAngle;
+    const radius=230+idx*70;
+    return{x:CUSTOM_HUB_CENTER.x+Math.cos(angle)*radius,y:CUSTOM_HUB_CENTER.y+Math.sin(angle)*radius,angle};
+}
+// Les ponts relient chaque domaine au suivant dans l'ordre d'affichage et
+// referment la boucle sur le premier, ce qui reproduit exactement la boucle
+// Dessin—Peinture—Encrage—Anatomie—Dessin d'origine et s'étend automatiquement
+// à tout domaine ajouté ou retiré.
+function computeBridges(){
+    const list=branchList();
+    if(list.length<2)return[];
+    if(list.length===2)return[[list[0],list[1]]];
+    const bridges=[];
+    for(let i=0;i<list.length;i++)bridges.push([list[i],list[(i+1)%list.length]]);
+    return bridges;
+}
 // Mapping provisoire branche → catégories de session existantes, le temps que
 // la taxonomie Domaine → Discipline → Médium (Phase 3) remplace les catégories
 // plates. Sert uniquement à la dormance visuelle ci-dessous — jamais à calculer
@@ -624,19 +773,14 @@ function isDormantBranch(branch){
     return daysBetween(last,getTodayString())>=DORMANCY_DAYS;
 }
 function computeMilestoneNodePos(branch,index){
-    const hub=BRANCH_HUBS[branch];const spacing=36,wiggle=0.42;
+    const hub=getBranchHub(branch);const spacing=36,wiggle=0.42;
     const dist=spacing*(index+1);const angle=hub.angle+Math.sin((index+1)*1.15)*wiggle;
     return{x:hub.x+Math.cos(angle)*dist,y:hub.y+Math.sin(angle)*dist};
-}
-function milestoneState(idx,milestones){
-    const m=milestones[idx];if(m.done)return'unlocked';
-    const prevDone=idx===0?true:milestones[idx-1].done;
-    return prevDone?'available':'locked';
 }
 // Le libellé d'un hub se place du côté opposé à la direction de sa chaîne de
 // jalons, pour ne jamais se faire recouvrir par le premier nœud (arrive avec
 // une chaîne qui pointe franchement vers le bas, sinon).
-function hubLabelBelow(branch){return Math.sin(BRANCH_HUBS[branch].angle)<=0;}
+function hubLabelBelow(branch){return Math.sin(getBranchHub(branch).angle)<=0;}
 let spherierTransform={x:0,y:0,scale:1};
 let spherierViewFitted=false;
 function renderSpherierTransformOnly(){const g=document.getElementById('spherier-viewport');if(g)g.setAttribute('transform',`translate(${spherierTransform.x},${spherierTransform.y}) scale(${spherierTransform.scale})`);}
@@ -647,8 +791,8 @@ function renderSpherierTransformOnly(){const g=document.getElementById('spherier
 function computeSpherierBounds(){
     const branches=window._branches||{};let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
     const consider=(x,y,r)=>{minX=Math.min(minX,x-r);minY=Math.min(minY,y-r);maxX=Math.max(maxX,x+r);maxY=Math.max(maxY,y+r);};
-    BRANCHES.forEach(branch=>{
-        const hub=BRANCH_HUBS[branch];consider(hub.x,hub.y+(hubLabelBelow(branch)?40:-40),65); // hub + ses deux lignes de texte
+    branchList().forEach(branch=>{
+        const hub=getBranchHub(branch);consider(hub.x,hub.y+(hubLabelBelow(branch)?40:-40),65); // hub + ses deux lignes de texte
         const milestones=(branches[branch]||{}).milestones||[];
         milestones.forEach((m,idx)=>{const pos=computeMilestoneNodePos(branch,idx);consider(pos.x,pos.y,18);});
     });
@@ -670,27 +814,33 @@ function renderSpherier(){
     const svg=document.getElementById('spherier-svg');if(!svg)return;
     const branches=window._branches||{};
     let bridgesHtml='',chainHtml='',hubsHtml='';
-    BRANCH_BRIDGES.forEach(([a,b])=>{
-        const ha=BRANCH_HUBS[a],hb=BRANCH_HUBS[b];const mid=curveMidpoint(ha,hb,0.28);
+    computeBridges().forEach(([a,b])=>{
+        const ha=getBranchHub(a),hb=getBranchHub(b);const mid=curveMidpoint(ha,hb,0.28);
         bridgesHtml+=`<path d="M${ha.x},${ha.y} Q${mid.x},${mid.y} ${hb.x},${hb.y}" fill="none" stroke="var(--border)" stroke-width="2" stroke-dasharray="2,7" opacity="0.55"/>`;
     });
-    BRANCHES.forEach(branch=>{
-        const hub=BRANCH_HUBS[branch];const color=branchColor(branch);
+    branchList().forEach(branch=>{
+        const hub=getBranchHub(branch);const color=branchColor(branch);
         const b=branches[branch]||{level:null,milestones:[]};const milestones=b.milestones||[];
         const dormant=isDormantBranch(branch);
-        let prevPos=hub;
-        milestones.forEach((m,idx)=>{
-            const pos=computeMilestoneNodePos(branch,idx);
-            const state=milestoneState(idx,milestones);
-            const mid=curveMidpoint(prevPos,pos,0.12);
-            chainHtml+=`<path d="M${prevPos.x},${prevPos.y} Q${mid.x},${mid.y} ${pos.x},${pos.y}" fill="none" stroke="${state==='locked'?'var(--border)':color}" stroke-width="2" opacity="${state==='locked'?0.35:0.7}"/>`;
+        // La position d'un nœud suit toujours son index (chaîne qui rayonne
+        // depuis le hub, cf. computeMilestoneNodePos) ; le lien affiché, lui,
+        // suit désormais la vraie dépendance (dependsOn) plutôt que l'ordre
+        // d'ajout — un jalon peut donc dépendre de n'importe quel jalon de sa
+        // branche, pas seulement du précédent.
+        const posById={};
+        milestones.forEach((m,idx)=>{posById[m.id]=computeMilestoneNodePos(branch,idx);});
+        milestones.forEach(m=>{
+            const pos=posById[m.id];
+            const state=milestoneState(m.id,milestones);
+            const fromPos=(m.dependsOn&&posById[m.dependsOn])?posById[m.dependsOn]:hub;
+            const mid=curveMidpoint(fromPos,pos,0.12);
+            chainHtml+=`<path d="M${fromPos.x},${fromPos.y} Q${mid.x},${mid.y} ${pos.x},${pos.y}" fill="none" stroke="${state==='locked'?'var(--border)':color}" stroke-width="2" opacity="${state==='locked'?0.35:0.7}"/>`;
             let style;
             if(state==='locked')style=`fill:var(--bg-dark);stroke:var(--border);stroke-width:2;opacity:.55;`;
             else if(state==='available')style=`fill:var(--bg-elevated);stroke:${color};stroke-width:3;filter:drop-shadow(0 0 6px ${color});`;
             else style=(dormant?`fill:#666;opacity:.6;`:`fill:${color};filter:drop-shadow(0 0 10px ${color});`);
             const cls=state==='available'?'sph-available':'';
             chainHtml+=`<circle class="${cls}" cx="${pos.x}" cy="${pos.y}" r="16" style="${style}cursor:pointer;" data-branch="${branch}" data-mid="${m.id}" onmouseenter="showSphTooltip(event,'${branch}','${m.id}')" onmouseleave="hideSphTooltip()" onclick="onSphNodeClick('${branch}','${m.id}')"></circle>`;
-            prevPos=pos;
         });
         const doneCount=milestones.filter(m=>m.done).length;const labelBelow=hubLabelBelow(branch);
         hubsHtml+=`<g onmouseenter="showSphHubTooltip(event,'${branch}')" onmouseleave="hideSphTooltip()" style="cursor:default;">
@@ -710,8 +860,8 @@ function showSphTooltip(evt,branch,mid){
     const idx=milestones.findIndex(x=>x.id===mid);if(idx<0)return;const m=milestones[idx];
     const wrap=document.getElementById('spherier-wrap');const tip=document.getElementById('spherier-tooltip');if(!wrap||!tip)return;
     const rect=wrap.getBoundingClientRect();
-    const state=milestoneState(idx,milestones);
-    const stateLabel={locked:'🔒 Verrouillé — coche d\'abord le jalon précédent',available:'✨ Disponible',unlocked:'✅ Débloqué'}[state];
+    const state=milestoneState(mid,milestones);
+    const stateLabel={locked:'🔒 Verrouillé — coche d\'abord le jalon dont il dépend',available:'✨ Disponible',unlocked:'✅ Débloqué'}[state];
     tip.innerHTML=`<div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;color:${branchColor(branch)};margin-bottom:6px;">${m.label}</div><div style="margin-bottom:8px;">${m.text}</div><div style="font-size:.7rem;color:var(--text-secondary);">${stateLabel}</div>`;
     tip.style.left=Math.max(0,evt.clientX-rect.left+14)+'px';tip.style.top=Math.max(0,evt.clientY-rect.top+14)+'px';tip.style.display='block';
 }
@@ -728,9 +878,9 @@ function showSphHubTooltip(evt,branch){
     tip.style.left=Math.max(0,evt.clientX-rect.left+14)+'px';tip.style.top=Math.max(0,evt.clientY-rect.top+14)+'px';tip.style.display='block';
 }
 async function onSphNodeClick(branch,mid){
-    const b=window._branches[branch];const milestones=b.milestones||[];const idx=milestones.findIndex(x=>x.id===mid);if(idx<0)return;
-    const state=milestoneState(idx,milestones);
-    if(state==='locked'){showQuickFeedback('🔒 Coche d\'abord le jalon précédent');return;}
+    const b=window._branches[branch];const milestones=b.milestones||[];
+    const state=milestoneState(mid,milestones);
+    if(state==='locked'){showQuickFeedback('🔒 Coche d\'abord le jalon dont il dépend');return;}
     await toggleMilestone(branch,mid);
 }
 function initSpherierInteractions(){
@@ -763,7 +913,7 @@ async function maybeArchiveMonthlySnapshot(){
     const nowKey=currentMonthKey();
     if(window._spherierSnapshots.some(s=>s.month===nowKey))return;
     const snapshot={month:nowKey,date:getTodayString(),branches:{}};
-    BRANCHES.forEach(branch=>{
+    branchList().forEach(branch=>{
         const b=(window._branches||{})[branch]||{};const milestones=b.milestones||[];
         snapshot.branches[branch]={level:b.level||null,milestonesDone:milestones.filter(m=>m.done).length,milestonesTotal:milestones.length};
     });
@@ -777,7 +927,10 @@ function renderSpherierSnapshots(){
     if(!snaps.length){c.innerHTML='<div class="empty-state">Aucun instantané pour l\'instant. Le premier sera pris automatiquement au fil des mois.</div>';return;}
     c.innerHTML=snaps.map(s=>{
         const dt=new Date(s.month+'-01T12:00:00');const label=dt.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
-        const rows=BRANCHES.map(branch=>{const bd=s.branches[branch]||{level:null,milestonesDone:0,milestonesTotal:0};return`<div style="display:flex;justify-content:space-between;font-size:.8rem;padding:4px 0;border-bottom:1px solid var(--border);"><span style="color:${branchColor(branch)};">${branch}</span><span>${bd.level?bd.level+'/10':'—'} · ${bd.milestonesDone}/${bd.milestonesTotal} jalons</span></div>`;}).join('');
+        // Les domaines listés viennent de l'instantané lui-même, pas de la liste
+        // actuelle : un domaine supprimé depuis reste visible dans ses anciens
+        // instantanés (la vraie mesure de progrès sur un an, CLAUDE.md §6).
+        const rows=Object.keys(s.branches).map(branch=>{const bd=s.branches[branch]||{level:null,milestonesDone:0,milestonesTotal:0};return`<div style="display:flex;justify-content:space-between;font-size:.8rem;padding:4px 0;border-bottom:1px solid var(--border);"><span style="color:${branchColor(branch)};">${branch}</span><span>${bd.level?bd.level+'/10':'—'} · ${bd.milestonesDone}/${bd.milestonesTotal} jalons</span></div>`;}).join('');
         return`<div style="background:var(--bg-elevated);border-radius:8px;padding:15px 18px;margin-bottom:12px;"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;color:var(--accent-purple);margin-bottom:8px;text-transform:capitalize;">${label}</div>${rows}</div>`;
     }).join('');
 }
@@ -826,8 +979,8 @@ async function loadAllData(){
         const cutoff30Str=cutoff30.getFullYear()+'-'+String(cutoff30.getMonth()+1).padStart(2,'0')+'-'+String(cutoff30.getDate()).padStart(2,'0');
         document.getElementById('active-days-30').textContent=new Set(allSessions.filter(s=>s.date>=cutoff30Str).map(s=>s.date)).size;
         if(realStreak!==(data.streak||0))db.collection('users').doc(currentUser.uid).set({streak:realStreak},{merge:true});
-        const{branches,changed}=ensureBranchDefaults(data);window._branches=branches;
-        if(changed)db.collection('users').doc(currentUser.uid).set({branches},{merge:true});
+        const{branches,order,changed}=ensureBranchDefaults(data);window._branches=branches;window._branchOrder=order;
+        if(changed)db.collection('users').doc(currentUser.uid).set({branches,branchOrder:order},{merge:true});
         window._spherierSnapshots=data.spherierSnapshots||[];
         updateTodayDisplay();updateCategoryStats();renderHistory();initDaySelector();loadExercises(currentDay);renderEvaluation();renderSpherier();maybeArchiveMonthlySnapshot();
         updateDayButtons(completedDays,_currentWeekNum,data.weekStartDate||null);
