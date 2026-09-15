@@ -8,6 +8,20 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-15 — L'export JSON relit le document Firestore brut plutôt que de le recomposer depuis les variables JS
+`exportAllData()` refait un `get()` sur le document Firestore de l'utilisateur au moment du
+clic, et télécharge son contenu quasi tel quel (seuls les champs `lastUpdated`, des `Timestamp`
+Firestore non sérialisables en JSON, sont convertis en ISO 8601). L'alternative — reconstituer
+l'export à partir des variables JS déjà en mémoire (`allSessions`, `window._branches`,
+`window._checkins`...) — a été écartée : plusieurs champs du document (`completedDays`,
+`weekStartDate`, `totalMinutes`, `streak`) ne sont mirroités dans aucune variable globale, et
+toute donnée future ajoutée au document (schemaVersion à venir, Phase 0 aussi) serait invisible
+à l'export tant que cette fonction n'aurait pas été mise à jour à la main — exactement le genre
+d'angle mort qu'un filet de sécurité avant migration ne peut pas se permettre (CLAUDE.md §9).
+Un bouton unique (📦 Export JSON, dans l'en-tête, visible sur tous les onglets puisqu'il
+n'appartient à aucun domaine particulier) télécharge un seul fichier
+`rocky-training-export-YYYY-MM-DD.json`, horodaté et associé à l'email du compte connecté.
+
 ## 2026-09-15 — Le registre des faiblesses de CYCLE-2.md est importé dans l'app, qui en devient la source de vérité
 Les trois entrées du « Registre des faiblesses au 14 septembre 2026 » de CYCLE-2.md
 (insertions musculaires, volume des masses, mains évitées) vivaient dans un fichier Markdown

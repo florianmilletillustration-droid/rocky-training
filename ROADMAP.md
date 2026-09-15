@@ -11,8 +11,10 @@ détaillée dans DECISIONS.md.
 
 ## Phase 0 — Correctif et filet de sécurité
 
-- [ ] **Export JSON complet des données de pratique.**
-  Un bouton qui télécharge tout. À faire **avant** toute migration. C'est le filet.
+- [x] **Export JSON complet des données de pratique.** *(2026-09-15)*
+  Un bouton (📦 Export JSON, dans l'en-tête) télécharge le document Firestore complet en un
+  seul fichier JSON : sessions, temps, check-ins, niveaux auto-évalués, registres de
+  faiblesses, jalons et leur état, instantanés du sphérier. Voir DECISIONS.md.
 
 - [ ] **Ajouter `schemaVersion` aux documents Firestore**, avec lecture rétrocompatible.
 

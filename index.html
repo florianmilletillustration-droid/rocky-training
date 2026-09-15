@@ -142,6 +142,7 @@
         <div style="display:inline-block;background:#00ff88;color:#0a0a0a;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:2px;padding:4px 14px;border-radius:20px;margin-top:8px;text-transform:uppercase;">✅ VERSION V3.4 — FIX RESET HEBDO</div>
         <div class="user-info">
             <span class="user-email" id="user-email"></span>
+            <button class="logout-btn" onclick="exportAllData()" style="border-color:var(--accent-green);color:var(--accent-green);" title="Télécharge toutes les données de pratique en JSON">📦 Export JSON</button>
             <button class="logout-btn" onclick="changeApiKey()" style="border-color:var(--accent-purple);color:var(--accent-purple);">🔑 Clé API</button>
             <button class="logout-btn" onclick="logout()">Déconnexion</button>
         </div>
@@ -994,6 +995,31 @@ const HUE_TEO_GALLERY=[
 function initDailyImage(){const now=new Date();const idx=Math.floor((now-new Date(now.getFullYear(),0,0))/86400000)%HUE_TEO_GALLERY.length;const art=HUE_TEO_GALLERY[idx];const el=(id)=>document.getElementById(id);if(el('login-bg-img'))el('login-bg-img').src=art.url;if(el('login-artwork-label'))el('login-artwork-label').textContent='Hue Teo — '+art.title;if(el('prog-daily-img'))el('prog-daily-img').src=art.url;if(el('prog-daily-title'))el('prog-daily-title').textContent=art.title;}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initDailyImage);else initDailyImage();
 
+// Export JSON complet des données de pratique (ROADMAP.md, Phase 0 — le filet
+// de sécurité à avoir avant toute migration de schéma, CLAUDE.md §9). Relit le
+// document Firestore tel quel plutôt que de le recomposer depuis les
+// variables JS en mémoire (allSessions, window._branches, etc.) : celles-ci ne
+// couvrent pas tous les champs (completedDays, weekStartDate, streak...), et
+// toute donnée future ajoutée au document est ainsi exportée sans jamais
+// avoir à mettre cette fonction à jour. Un seul bouton, un seul fichier.
+async function exportAllData(){
+    if(!currentUser)return;
+    try{
+        const doc=await db.collection('users').doc(currentUser.uid).get();
+        const data=doc.exists?doc.data():{};
+        const payload={exportedAt:new Date().toISOString(),email:currentUser.email,data};
+        // Les champs `lastUpdated` sont des Timestamp Firestore, non
+        // sérialisables tels quels : convertis en ISO au passage.
+        const json=JSON.stringify(payload,(key,val)=>(val&&typeof val.toDate==='function')?val.toDate().toISOString():val,2);
+        const blob=new Blob([json],{type:'application/json'});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');
+        a.href=url;a.download=`rocky-training-export-${getTodayString()}.json`;
+        document.body.appendChild(a);a.click();a.remove();
+        URL.revokeObjectURL(url);
+        showQuickFeedback('📦 Export téléchargé');
+    }catch(e){console.error(e);alert("Erreur pendant l'export : "+e.message);}
+}
 async function loadAllData(){
     if(!currentUser)return;
     try{
