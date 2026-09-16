@@ -8,6 +8,22 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-16 — `schemaVersion` est semé à 1 pour tout document existant, jamais réécrit ensuite sans migration réelle
+CLAUDE.md §8 exige que chaque document porte un champ `schemaVersion`, que toute migration
+incrémente en sachant lire les versions antérieures. Aucune migration de schéma n'existe encore
+(la migration de taxonomie de la Phase 3 sera la première) : il n'y a donc rien à transformer
+aujourd'hui, seulement le filet à poser avant que la première vraie migration en ait besoin —
+raison pour laquelle Phase 0 passe avant Phase 3 dans l'ordre des phases.
+
+`ensureSchemaVersion(data)` suit le même principe que `ensureCyclesDefaults` et
+`ensureBranchDefaults` : un document sans champ `schemaVersion` (tous les documents actuels)
+est traité comme portant la forme qui existait jusqu'ici, semée une seule fois à
+`CURRENT_SCHEMA_VERSION` (1) ; une fois le champ présent, il fait foi tel quel. Une migration
+future incrémente `CURRENT_SCHEMA_VERSION` et ajoute son propre bloc `if(schemaVersion<N){...}`
+dans cette même fonction, qui doit continuer à lire la version précédente plutôt que de
+supposer que tous les documents ont déjà été migrés. Aucune donnée existante n'est modifiée par
+ce changement : un seul champ ajouté, jamais rien retiré ni transformé.
+
 ## 2026-09-16 — Le contenu des semaines devient une donnée, migré sans catalogue ni sélecteur
 Implémente deux items de Phase 5 (hors ordre des phases, demande directe — même raison que les
 décisions du 2026-09-15 ci-dessous). Un cycle est désormais `{number, title,
