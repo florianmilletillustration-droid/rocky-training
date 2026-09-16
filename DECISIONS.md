@@ -8,6 +8,50 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-15 — Le rituel de fin de cycle est implémenté hors ordre des phases, sur demande directe
+Phase 5 (Le cycle) vient après les phases 3 (taxonomie) et 4 (qualité de pratique) dans
+ROADMAP.md, toutes deux encore entièrement décochées. Florian a demandé cet item précisément,
+comme pour les domaines personnalisés/dépendances de jalons du 2026-09-15 plus haut : une
+demande directe passe devant l'ordre des phases, qui sert à choisir quoi faire en l'absence
+d'instruction explicite, pas à la remplacer.
+
+## 2026-09-15 — Le rituel de fin de cycle réutilise les cartes de domaine de l'Évaluation, avec un préfixe d'id
+« Auto-évaluation de tous les domaines » et « révision du registre des faiblesses de chacun »
+sont exactement ce que `renderBranchCard` affiche déjà dans l'onglet Évaluation (curseur de
+niveau, liste de faiblesses). Plutôt que dupliquer cette UI, le rituel réutilise la même
+fonction. Problème concret : les onglets ne sont jamais retirés du DOM (juste masqués en CSS),
+donc si le rituel générait des éléments avec les mêmes id que l'onglet Évaluation
+(`level-slider-Anatomie`, etc.), les deux copies coexisteraient et
+`document.getElementById` renverrait systématiquement la première trouvée — un curseur modifié
+dans l'écran du rituel aurait pu silencieusement enregistrer la valeur restée dans l'onglet
+Évaluation. `renderBranchCard` accepte donc un `idPrefix` optionnel (vide par défaut, `'ritual-'`
+pour l'écran du rituel), et les trois fonctions qui lisent un champ par son id
+(`saveLevelAssessment`, `addWeakness`, `addMilestone`) le reçoivent en second argument. Vérifié
+par un test qui donne des valeurs différentes aux deux curseurs et confirme que chaque écran
+enregistre bien la sienne.
+
+## 2026-09-15 — L'instantané de fin de cycle est forcé, distinct de l'instantané mensuel automatique, jamais un remplacement
+`maybeArchiveMonthlySnapshot` n'archive qu'une fois par mois calendaire (déduplication sur
+`month`). Le rituel de fin de cycle doit pouvoir archiver un instantané à la demande, y compris
+le même mois qu'un instantané automatique déjà pris — les deux racontent des choses
+différentes (un relevé de routine vs la clôture délibérée d'un cycle) et aucun ne doit
+supprimer ou écraser l'autre. `spherierSnapshots` reste un tableau à qui l'on ajoute
+seulement : chaque entrée porte désormais un `type` (`'monthly'` ou `'cycle-end'`, absent sur
+les entrées créées avant ce changement — traitées comme `'monthly'` à l'affichage), et les
+entrées `cycle-end` portent en plus le numéro du cycle qui vient de se terminer. La liste des
+instantanés trie maintenant sur la date exacte plutôt que sur le mois, pour ordonner
+correctement deux entrées tombées le même mois, et affiche un libellé « 🎓 Fin du cycle N »
+distinct pour les secondes.
+
+## 2026-09-15 — Le numéro de cycle s'affiche en petit sous « Semaine actuelle », sans changer son format
+ROADMAP.md prévoit séparément que « le compteur devient « Cycle N · Semaine X/12 » » (item non
+coché de Phase 5, toujours en attente). Cette PR introduit `cycleNumber` comme donnée — il faut
+bien qu'il soit visible quelque part, sans quoi ce serait un champ suivi mais jamais montré —
+mais reformater le compteur principal est un changement de mise en page distinct, non demandé
+ici (CLAUDE.md, anti-objectifs : « changer la mise en page sans demande explicite »). Une
+simple ligne « Cycle N » ajoutée sous la valeur existante rend le nombre visible sans toucher
+au format ni à la disposition de la carte.
+
 ## 2026-09-15 — « Jours complétés N/84 » renommé « Jours pratiqués » : pas de bug, deux notions fusionnées
 Diagnostic demandé sur le compteur corrigé le 2026-09-14. Ce correctif avait remplacé
 `completedDays.length` par `size(completedDays ∪ dates(allSessions))`, plafonné à 84, pour
