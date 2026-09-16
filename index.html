@@ -189,6 +189,9 @@
                 <button onclick="switchTab('checkin',{target:document.querySelector('[onclick*=checkin]')})" style="font-family:'Space Mono',monospace;background:var(--accent-green);color:var(--bg-dark);border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">⚡ Check-in</button>
             </div>
         </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+            <button class="btn btn-secondary btn-small" onclick="openCycleEditor()">✏️ Contenu du programme</button>
+        </div>
         <div class="day-selector" id="day-selector"></div>
         <div id="exercises-container"></div>
     </div>
@@ -475,6 +478,32 @@
         </div>
     </div>
 </div>
+
+<!-- CONTENU DU PROGRAMME — créer/dupliquer/modifier un cycle (ROADMAP.md, Phase 5).
+     Pas un catalogue de programmes prêts à l'emploi : un simple éditeur du
+     contenu déjà associé au compte, jamais une liste mise en avant. -->
+<div id="cycle-editor-screen" style="display:none;position:fixed;inset:0;background:rgba(6,6,6,.97);z-index:5000;overflow-y:auto;padding:40px 20px;">
+    <div style="max-width:900px;margin:0 auto;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:15px;margin-bottom:20px;">
+            <div>
+                <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:3px;margin-bottom:5px;">✏️ Contenu du programme</h2>
+                <p style="color:var(--text-secondary);font-size:.9rem;max-width:640px;">Le contenu de chaque semaine est une donnée, pas du code. Le contenu d'un nouveau cycle se compose à partir du registre des faiblesses au rituel de fin de cycle — cet écran sert à créer, dupliquer ou corriger, pas à choisir un programme prêt à l'emploi.</p>
+            </div>
+            <button class="logout-btn" onclick="closeCycleEditor()">✕ Fermer</button>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--bg-card);border:2px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:25px;">
+            <select class="form-select" id="cycle-editor-select" style="width:auto;min-width:140px;" onchange="onCycleEditorSelectChange()"></select>
+            <input type="text" class="form-input" id="cycle-editor-title" placeholder="Titre du cycle" style="flex:1;min-width:200px;">
+            <button class="btn btn-secondary btn-small" onclick="duplicateCycleFromEditor()">📋 Dupliquer</button>
+            <button class="btn btn-green btn-small" onclick="createNewCycleFromEditor()">➕ Nouveau cycle</button>
+            <button class="session-delete" onclick="deleteCycleFromEditor()">🗑️ Supprimer ce cycle</button>
+        </div>
+        <div id="cycle-editor-weeks"></div>
+        <div style="display:flex;justify-content:center;margin:30px 0 60px;">
+            <button class="btn" onclick="saveCycleEdits()">💾 Enregistrer ce cycle</button>
+        </div>
+    </div>
+</div>
 <script>
 const firebaseConfig={apiKey:"AIzaSyA1y7_GRSPmSCsgMu-8aGhCtcMxMzIdtiQ",authDomain:"drawing-rocky-training.firebaseapp.com",projectId:"drawing-rocky-training",storageBucket:"drawing-rocky-training.firebasestorage.app",messagingSenderId:"106676074989",appId:"1:106676074989:web:1c23055e796e6d21653078",measurementId:"G-YYHWCKFTKD"};
 let ANTHROPIC_API_KEY=localStorage.getItem('anthropic_api_key')||'';
@@ -491,7 +520,11 @@ function logout(){auth.signOut();}
 let allSessions=[],currentDay=0,coachHistory=[],_currentWeekNum=1;
 function getCurrentWeek(){return _currentWeekNum;}
 function getTodayString(){const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
-const weekProgram={
+// Contenu du cycle 1, gardé ici uniquement comme donnée de départ (semée une
+// fois dans les documents sans champ `cycles` — voir ensureCyclesDefaults) :
+// ce n'est plus la source lue au quotidien, qui est désormais le champ
+// Firestore `cycles`, modifiable depuis l'app (ROADMAP.md, Phase 5).
+const DEFAULT_CYCLE1_WEEKS={
     1:{theme:"Mois 1 — Le langage des formes",name:"Semaine 1 — Cubes et lignes droites",main:{title:"Cubes à main levée",time:"45 min",exercises:["Dessine 20 cubes à main levée, sans règle. Commence par un cube de face, puis tourne-le progressivement.","Chaque cube doit avoir des arêtes droites et des angles cohérents. Si une arête est courbe, recommence ce cube.","Varie la taille : petits (1 cm), moyens (3 cm), grands (6 cm). Répartis-les sur toute la page."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun. Corps humain entier.","Commence toujours par tracer la ligne d'action (courbe en C ou S) avant d'ajouter quoi que ce soit d'autre.","Objectif : capturer le mouvement, pas les détails."]}},
     2:{theme:"Mois 1 — Le langage des formes",name:"Semaine 2 — Cylindres et ellipses",main:{title:"Cylindres dans l'espace",time:"45 min",exercises:["Dessine 20 cylindres dans des orientations différentes : vertical, horizontal, en diagonale à 45°.","Pour chaque cylindre, trace d'abord les deux ellipses (dessus et dessous), PUIS relie-les avec deux lignes droites.","L'ellipse du dessus et celle du dessous doivent être identiques en largeur."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute chacun.","Ligne d'action en C ou S en premier.","Capturer le mouvement, pas les détails."]}},
     3:{theme:"Mois 1 — Le langage des formes",name:"Semaine 3 — Perspective 1 et 2 points",main:{title:"Grilles et boîtes en perspective",time:"45 min",exercises:["Partie 1 — 20 min : Trace une ligne d'horizon. Place un point de fuite au centre. Dessine une grille en perspective 1 point puis 5 boîtes.","Partie 2 — 25 min : Deux points de fuite aux extrémités. Dessine 5 boîtes en perspective 2 points.","Critère : si tu prolonges les arêtes, elles doivent rejoindre exactement le point de fuite."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute.","Ligne d'action en C ou S.","Mouvement, pas détails."]}},
@@ -505,7 +538,180 @@ const weekProgram={
     11:{theme:"Mois 3 — Expression et dynamisme",name:"Semaine 11 — Croquis dynamique",main:{title:"Le mouvement avant tout",time:"45 min",exercises:["20 personnages en mouvement. Ligne d'action obligatoire en premier.","Exagère chaque pose de 30%."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute.","Ligne d'action en C ou S.","Mouvement, pas détails."]}},
     12:{theme:"Mois 3 — Expression et dynamisme",name:"Semaine 12 — Design de masse",main:{title:"Des silhouettes uniques par les proportions",time:"45 min",exercises:["10 personnages/créatures avec masses extrêmes uniquement.","Aucun détail — chaque silhouette doit être unique."]},bonus:{title:"Boni — Gesture",time:"15 min",exercises:["15 gestures de 1 minute.","Ligne d'action en C ou S.","Mouvement, pas détails."]}}
 };
-function getProgramForWeekDay(week,day){const w=weekProgram[week];if(!w)return null;if(day===5)return'rest';return w;}
+// ═══════════════════════════════════════════════════
+// CYCLES — le contenu des semaines est une donnée (ROADMAP.md, Phase 5),
+// stockée dans le champ Firestore `cycles` (map numéro→cycle). Un cycle :
+// {number, title, weeks:{1..12:{theme,name,main:{title,time,exercises[]},
+// bonus:{title,time,exercises[]}}}}. Jamais de catalogue de programmes
+// prêts à l'emploi ni de sélecteur mis en avant (DECISIONS.md) : le contenu
+// d'un nouveau cycle se compose au rituel de fin de cycle, à partir du
+// registre des faiblesses — cet écran ne fait que créer/dupliquer/modifier,
+// pas choisir parmi des programmes proposés.
+// ═══════════════════════════════════════════════════
+function blankWeekContent(){return{theme:'',name:'',main:{title:'',time:'',exercises:[]},bonus:{title:'',time:'',exercises:[]}};}
+function defaultCycle1(){
+    const weeks={};
+    Object.keys(DEFAULT_CYCLE1_WEEKS).forEach(k=>{
+        const w=DEFAULT_CYCLE1_WEEKS[k];
+        weeks[k]={theme:w.theme,name:w.name,main:{title:w.main.title,time:w.main.time,exercises:w.main.exercises.slice()},bonus:{title:w.bonus.title,time:w.bonus.time,exercises:w.bonus.exercises.slice()}};
+    });
+    return{number:1,title:"Fondamentaux du dessin d'imagination",weeks};
+}
+// Contenu du cycle 2 (CYCLE-2.md), transcrit fidèlement — CYCLE-2.md est plus
+// sparse que le cycle 1 (pas de détail pas-à-pas par semaine, seulement les
+// règles du bloc et, pour les blocs 2 et 3, le jalon qui sert aussi
+// d'instruction concrète) : la migration reflète ça tel quel plutôt que
+// d'inventer des étapes que Florian n'a pas écrites.
+const CYCLE2_WEEK_NAMES={1:"Tête, mains, pieds",2:"Muscles du haut du corps",3:"Muscles du bas du corps",4:"Proportions et morphologies",5:"Pièce personnelle",6:"Le torse",7:"Les bras",8:"Le bassin",9:"Perspective 2 points",10:"Perspective 3 points",11:"Curvilinéaire",12:"Figure libre"};
+const CYCLE2_JALON_TEXT={
+    6:"Dessiner un torse mannequin en rotation de 45°, masses appliquées, où la séparation entre le pectoral et le deltoïde reste lisible. Sans le cours.",
+    7:"Dessiner un bras plié à 90°, en supination puis en pronation, où la masse du biceps et celle de l'avant-bras changent correctement entre les deux. Sans le cours.",
+    8:"Dessiner un bassin mannequin en rotation, avec les masses fessières et l'attache des obliques, où l'inclinaison du bassin se lit clairement dans une pose en appui sur une jambe. Sans le cours.",
+    9:"Dessiner trois mannequins à des hauteurs différentes dans une même scène, masses posées, où aucune figure ne flotte.",
+    10:"Dessiner une figure en contre-plongée marquée où le raccourci du torse tient et où les masses ne s'aplatissent pas.",
+    11:"Dessiner une figure en perspective 4-5 points où la déformation est cohérente sur tout le corps, sans que les membres partent dans des directions contradictoires.",
+    12:"Dessiner une figure complète, debout, de trois quarts, entièrement de mémoire, où un observateur peut nommer trois groupes musculaires sans avoir vu le processus."
+};
+function defaultCycle2(){
+    const weeks={};
+    for(let n=1;n<=12;n++){
+        const block=n<=5?1:(n<=8?2:3);
+        const theme=block===1?"Bloc 1 — En parallèle du cours (semaines 1 à 5)":block===2?"Bloc 2 — Sans le cours (semaines 6 à 8)":"Bloc 3 — Application (semaines 9 à 12)";
+        const mainExercises=block===1
+            ?["Le cours est visionné le lundi.","Les cinq jours suivants appliquent la notion du jour sur des mannequins en rotation.","Pas de jalon sur ce bloc : il apporte du savoir, pas de la preuve."]
+            :block===2
+            ?["Règle stricte du bloc : les vidéos du cours ne sont jamais rouvertes.","Référence photo et écorché permis. Cours interdit.","Jalon : "+CYCLE2_JALON_TEXT[n]]
+            :["Figure complète depuis l'imagination, construite. Pas de copie.","Jalon : "+CYCLE2_JALON_TEXT[n]];
+        const bonusTitle=block===1?"Boni — Les mains":block===2?"Boni — Les jambes":"Boni — Thème libre";
+        const bonusExercises=[block===1?"Thème persistant : les mains, une zone écartée du programme principal.":block===2?"Thème persistant : les jambes, une zone écartée du programme principal.":"Thème libre pour ce bloc.","Reste optionnel, ne porte aucun jalon."];
+        weeks[n]={theme,name:"Semaine "+n+" — "+CYCLE2_WEEK_NAMES[n],main:{title:CYCLE2_WEEK_NAMES[n],time:"45 min",exercises:mainExercises},bonus:{title:bonusTitle,time:"15 min",exercises:bonusExercises}};
+    }
+    return{number:2,title:"Anatomie",weeks};
+}
+// branchOrder n'a pas d'équivalent ici : les numéros de cycle ont un ordre
+// naturel (numérique), pas besoin de mémoriser un ordre d'ajout séparé.
+function ensureCyclesDefaults(data){
+    const hadCycles=data.cycles&&typeof data.cycles==='object'&&!Array.isArray(data.cycles);
+    const cycles=hadCycles?JSON.parse(JSON.stringify(data.cycles)):{};
+    let changed=false;
+    if(!hadCycles){cycles['1']=defaultCycle1();cycles['2']=defaultCycle2();changed=true;}
+    return{cycles,changed};
+}
+function getActiveCycle(){return(window._cycles||{})[String(window._cycleNumber||1)]||null;}
+function getProgramForWeekDay(week,day){
+    const cycle=getActiveCycle();if(!cycle)return null;
+    const w=(cycle.weeks||{})[week];if(!w)return null;
+    if(day===5)return'rest';
+    return w;
+}
+async function saveCycles(){if(!currentUser)return;await db.collection('users').doc(currentUser.uid).set({cycles:window._cycles},{merge:true});}
+function nextCycleNumber(){const nums=Object.keys(window._cycles||{}).map(Number);return(nums.length?Math.max(...nums):0)+1;}
+// Échappe pour un attribut `value="…"` : nécessaire ici seulement parce que
+// c'est le premier endroit du fichier qui pré-remplit des champs texte avec
+// du contenu existant plutôt que de les laisser vides — un guillemet ou une
+// apostrophe non échappé (fréquent en français : « l'objet », « n'importe »)
+// couperait l'attribut et casserait le rendu.
+function escAttr(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderCycleEditorWeekBlock(n,w){
+    w=w||blankWeekContent();
+    return`<div style="background:var(--bg-card);border:2px solid var(--border);border-radius:12px;padding:20px 25px;margin-bottom:18px;">
+        <div class="form-label">Semaine ${n}</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+            <input type="text" class="form-input" id="cwk-${n}-theme" placeholder="Thème (ex: Mois 1 — Le langage des formes)" value="${escAttr(w.theme)}" style="flex:1;min-width:220px;">
+            <input type="text" class="form-input" id="cwk-${n}-name" placeholder="Nom (ex: Semaine ${n} — Titre)" value="${escAttr(w.name)}" style="flex:1;min-width:220px;">
+        </div>
+        <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent-yellow);margin-bottom:6px;">Bloc obligatoire</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+            <input type="text" class="form-input" id="cwk-${n}-main-title" placeholder="Titre de l'exercice" value="${escAttr(w.main.title)}" style="flex:2;min-width:180px;">
+            <input type="text" class="form-input" id="cwk-${n}-main-time" placeholder="Durée (ex: 45 min)" value="${escAttr(w.main.time)}" style="flex:1;min-width:100px;">
+        </div>
+        <textarea class="form-textarea" id="cwk-${n}-main-exercises" placeholder="Un point par ligne" rows="3" style="margin-bottom:14px;resize:vertical;">${escAttr((w.main.exercises||[]).join('\n'))}</textarea>
+        <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent-green);margin-bottom:6px;">⭐ Bloc boni</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+            <input type="text" class="form-input" id="cwk-${n}-bonus-title" placeholder="Titre du boni" value="${escAttr(w.bonus.title)}" style="flex:2;min-width:180px;">
+            <input type="text" class="form-input" id="cwk-${n}-bonus-time" placeholder="Durée (ex: 15 min)" value="${escAttr(w.bonus.time)}" style="flex:1;min-width:100px;">
+        </div>
+        <textarea class="form-textarea" id="cwk-${n}-bonus-exercises" placeholder="Un point par ligne" rows="2" style="resize:vertical;">${escAttr((w.bonus.exercises||[]).join('\n'))}</textarea>
+    </div>`;
+}
+function renderCycleEditorForNumber(num){
+    const cycle=(window._cycles||{})[num];
+    document.getElementById('cycle-editor-title').value=cycle?cycle.title:'';
+    const weeksHtml=[];
+    for(let n=1;n<=12;n++)weeksHtml.push(renderCycleEditorWeekBlock(n,cycle&&cycle.weeks&&cycle.weeks[n]));
+    document.getElementById('cycle-editor-weeks').innerHTML=weeksHtml.join('');
+}
+function refreshCycleEditorSelect(selected){
+    const select=document.getElementById('cycle-editor-select');
+    const nums=Object.keys(window._cycles||{}).map(Number).sort((a,b)=>a-b);
+    select.innerHTML=nums.map(n=>`<option value="${n}">Cycle ${n}${n===window._cycleNumber?' (en cours)':''}</option>`).join('');
+    select.value=String(selected!=null?selected:(window._cycleNumber||1));
+    if(!select.value&&nums.length)select.value=String(nums[0]);
+}
+function openCycleEditor(){
+    const screen=document.getElementById('cycle-editor-screen');if(!screen)return;
+    window._cycles=window._cycles||{};
+    refreshCycleEditorSelect(window._cycleNumber||1);
+    renderCycleEditorForNumber(document.getElementById('cycle-editor-select').value);
+    screen.style.display='block';
+}
+function closeCycleEditor(){const screen=document.getElementById('cycle-editor-screen');if(screen)screen.style.display='none';}
+function onCycleEditorSelectChange(){renderCycleEditorForNumber(document.getElementById('cycle-editor-select').value);}
+async function createNewCycleFromEditor(){
+    const num=nextCycleNumber();
+    window._cycles[num]={number:num,title:'Cycle '+num,weeks:{}};
+    for(let n=1;n<=12;n++)window._cycles[num].weeks[n]=blankWeekContent();
+    await saveCycles();
+    refreshCycleEditorSelect(num);renderCycleEditorForNumber(String(num));
+    showQuickFeedback('➕ Cycle '+num+' créé');
+}
+async function duplicateCycleFromEditor(){
+    const current=document.getElementById('cycle-editor-select').value;
+    const source=(window._cycles||{})[current];if(!source)return;
+    const num=nextCycleNumber();
+    window._cycles[num]=JSON.parse(JSON.stringify(source));
+    window._cycles[num].number=num;window._cycles[num].title=source.title+' (copie)';
+    await saveCycles();
+    refreshCycleEditorSelect(num);renderCycleEditorForNumber(String(num));
+    showQuickFeedback('📋 Cycle '+num+' créé à partir du cycle '+current);
+}
+async function deleteCycleFromEditor(){
+    const current=document.getElementById('cycle-editor-select').value;
+    if(!(window._cycles||{})[current])return;
+    if(!confirm('Supprimer le cycle '+current+' ? Son contenu de semaines sera perdu définitivement (les sessions, jalons et niveaux ne sont pas concernés).'))return;
+    delete window._cycles[current];
+    await saveCycles();
+    const remaining=Object.keys(window._cycles).map(Number).sort((a,b)=>a-b);
+    refreshCycleEditorSelect(remaining[0]);
+    renderCycleEditorForNumber(document.getElementById('cycle-editor-select').value||'');
+    showQuickFeedback('🗑️ Cycle '+current+' supprimé');
+}
+async function saveCycleEdits(){
+    const num=document.getElementById('cycle-editor-select').value;if(!num)return;
+    const title=document.getElementById('cycle-editor-title').value.trim()||('Cycle '+num);
+    const weeks={};
+    for(let n=1;n<=12;n++){
+        weeks[n]={
+            theme:document.getElementById('cwk-'+n+'-theme').value.trim(),
+            name:document.getElementById('cwk-'+n+'-name').value.trim(),
+            main:{
+                title:document.getElementById('cwk-'+n+'-main-title').value.trim(),
+                time:document.getElementById('cwk-'+n+'-main-time').value.trim(),
+                exercises:document.getElementById('cwk-'+n+'-main-exercises').value.split('\n').map(s=>s.trim()).filter(Boolean)
+            },
+            bonus:{
+                title:document.getElementById('cwk-'+n+'-bonus-title').value.trim(),
+                time:document.getElementById('cwk-'+n+'-bonus-time').value.trim(),
+                exercises:document.getElementById('cwk-'+n+'-bonus-exercises').value.split('\n').map(s=>s.trim()).filter(Boolean)
+            }
+        };
+    }
+    window._cycles[num]={number:parseInt(num),title,weeks};
+    await saveCycles();
+    refreshCycleEditorSelect(num);
+    showQuickFeedback('💾 Cycle '+num+' enregistré');
+    await loadAllData();
+}
 
 // ═══════════════════════════════════════════════════
 // ÉVALUATION — niveau par branche, registre des faiblesses, jalons par preuve
@@ -1128,6 +1334,8 @@ async function loadAllData(){
         document.getElementById('current-week').textContent=_currentWeekNum+'/12';
         window._cycleNumber=data.cycleNumber||1;
         const cycleLabelEl=document.getElementById('current-cycle-label');if(cycleLabelEl)cycleLabelEl.textContent='Cycle '+window._cycleNumber;
+        const{cycles,changed:cyclesChanged}=ensureCyclesDefaults(data);window._cycles=cycles;
+        if(cyclesChanged)db.collection('users').doc(currentUser.uid).set({cycles},{merge:true});
         const completedDays=data.completedDays||[];
         document.getElementById('total-time').textContent=Math.floor((data.totalMinutes||0)/60)+'h';
         allSessions=data.sessions||[];window._checkins=data.checkins||[];
@@ -1391,7 +1599,7 @@ function initCheckin(){
     const now=new Date();const idx=Math.floor((now-new Date(now.getFullYear(),0,0))/86400000)%HUE_TEO_GALLERY.length;const art=HUE_TEO_GALLERY[idx];
     const di=document.getElementById('checkin-daily-img');const dt=document.getElementById('checkin-daily-title');if(di)di.src=art.url;if(dt)dt.textContent=art.title;
     renderEodSessions();
-    const week=getCurrentWeek();const prog=weekProgram[week];const container=document.getElementById('checkin-exercises');if(!prog||!container)return;
+    const week=getCurrentWeek();const cycle=getActiveCycle();const prog=cycle&&cycle.weeks[week];const container=document.getElementById('checkin-exercises');if(!prog||!container)return;
     container.innerHTML=[{id:'main',label:'🎯 '+prog.main.title+' — '+prog.main.time},{id:'bonus',label:'⭐ '+prog.bonus.title+' — '+prog.bonus.time}].map(item=>`<label style="display:flex;align-items:center;gap:12px;background:var(--bg-elevated);padding:14px 18px;border-radius:8px;cursor:pointer;border:2px solid transparent;" onmouseover="this.style.borderColor='var(--accent-green)'" onmouseout="this.style.borderColor='transparent'"><input type="checkbox" id="checkin-ex-${item.id}" style="width:18px;height:18px;accent-color:var(--accent-green);cursor:pointer;"><span style="font-size:.9rem;">${item.label}</span></label>`).join('');
 }
 function renderEodSessions(){
@@ -1408,7 +1616,7 @@ function handleInspirationUpload(input){if(!input.files||!input.files[0])return;
 function clearInspirationImage(){checkinImageBase64=null;document.getElementById('checkin-image-preview').style.display='none';document.getElementById('checkin-image-input').value='';}
 async function getAIInspiration(){
     if(!getApiKey())return;const btn=document.getElementById('btn-ai-inspo');btn.textContent='⏳ Génération...';btn.disabled=true;
-    const week=getCurrentWeek();const prog=weekProgram[week];const weekTheme=prog?prog.name+' — '+prog.theme:'Semaine '+week;
+    const week=getCurrentWeek();const cycle=getActiveCycle();const prog=cycle&&cycle.weeks[week];const weekTheme=prog?prog.name+' — '+prog.theme:'Semaine '+week;
     try{
         const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:500,messages:[{role:'user',content:`Tu es un expert en concept art. Florian travaille sur : "${weekTheme}". Il admire Hue Teo (Riot Games). Suggère UNE référence précise. Structure : ARTISTE / OEUVRE : [nom] / POURQUOI MAINTENANT : [2-3 phrases] / À OBSERVER : [concept technique] / EXERCICE DÉRIVÉ : [application concrète]. En français, concis. Pas de markdown.`}]})});
         const data=await res.json();document.getElementById('checkin-ai-inspo-text').textContent=data.content?.[0]?.text||'Erreur.';document.getElementById('checkin-ai-inspo').style.display='block';
