@@ -8,6 +8,42 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-16 — Le contenu des semaines devient une donnée, migré sans catalogue ni sélecteur
+Implémente deux items de Phase 5 (hors ordre des phases, demande directe — même raison que les
+décisions du 2026-09-15 ci-dessous). Un cycle est désormais `{number, title,
+weeks:{1..12:{theme, name, main:{title,time,exercises[]}, bonus:{title,time,exercises[]}}}}`,
+stocké dans le champ Firestore `cycles` (map numéro→cycle) plutôt qu'un tableau : les numéros
+de cycle ont un ordre total naturel (numérique), contrairement aux noms de domaines qui ont
+demandé `branchOrder` — pas besoin de mémoriser un ordre d'ajout séparé ici.
+
+`ensureCyclesDefaults` suit exactement le principe déjà posé pour `branchOrder` et pour les
+jalons/faiblesses du cycle 2 : un document sans champ `cycles` (créé avant cette
+fonctionnalité) est semé une fois avec les cycles 1 et 2 ; une fois le champ présent, il fait
+foi tel quel, y compris si Florian supprime un cycle — jamais réinjecté au chargement suivant.
+
+**Le cycle 2 est migré fidèlement, pas enrichi.** CYCLE-2.md est nettement plus sparse que le
+contenu du cycle 1 (pas de détail pas-à-pas par semaine, seulement les règles de chaque bloc et,
+pour les blocs 2 et 3, le jalon déjà rédigé par Florian, repris texto comme instruction
+concrète de la semaine). Inventer des étapes intermédiaires pour égaler la richesse du cycle 1
+aurait fabriqué du contenu pédagogique que Florian n'a pas écrit — la même règle que pour les
+jalons (« rédigés par Florian, pas inventés », CLAUDE.md). Le résultat migré est donc
+volontairement plus sparse pour le cycle 2, à l'image de sa source.
+
+**Aucun catalogue de programmes ni sélecteur mis en avant** (demande explicite de Florian,
+cohérente avec la décision du 2026-09-13 : « le contenu du cycle suivant naît du registre des
+faiblesses », jamais choisi dans une liste proposée). L'écran d'édition est un utilitaire
+discret (bouton secondaire dans l'onglet Programme, pas une page d'accueil ni un menu mis en
+avant) : une simple liste déroulante native pour choisir QUEL cycle déjà associé au compte
+afficher/modifier, jamais une galerie de programmes à parcourir ou à activer.
+
+**Premier endroit du fichier à pré-remplir des champs texte avec du contenu existant** (les
+autres formulaires ne pré-remplissent que des valeurs vides, à ajouter). `escAttr()` échappe
+`&`, `"`, `<`, `>` avant d'injecter une valeur dans un attribut `value="…"` ou dans le texte
+d'un `<textarea>` — sans ça, une apostrophe ou un guillemet dans le texte existant (fréquent en
+français : « l'objet », « n'importe ») aurait coupé l'attribut HTML et cassé le rendu. Vérifié
+par un test qui inspecte directement la chaîne HTML générée pour du contenu contenant
+apostrophes, guillemets et chevrons.
+
 ## 2026-09-15 — Le rituel de fin de cycle est implémenté hors ordre des phases, sur demande directe
 Phase 5 (Le cycle) vient après les phases 3 (taxonomie) et 4 (qualité de pratique) dans
 ROADMAP.md, toutes deux encore entièrement décochées. Florian a demandé cet item précisément,

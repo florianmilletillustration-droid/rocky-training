@@ -107,15 +107,20 @@ détaillée dans DECISIONS.md.
   Aucune donnée supprimée ; les instantanés (mensuels et de fin de cycle) restent tous
   consultables dans l'historique du sphérier. Voir DECISIONS.md.
 
-- [ ] Le contenu des semaines sort du code et devient une donnée modifiable,
-      pour que chaque cycle puisse avoir son propre contenu.
+- [x] **Le contenu des semaines sort du code et devient une donnée modifiable.**
+  *(2026-09-16)*
+  Un cycle est un objet `{number, title, weeks:{1..12:{theme, name, main, bonus}}}`, stocké
+  dans le champ Firestore `cycles`. Écran dédié (bouton discret dans l'onglet Programme, pas
+  de catalogue mis en avant) pour créer, dupliquer et modifier un cycle. Voir DECISIONS.md.
 
 - [ ] Le contenu d'un nouveau cycle se compose à partir du registre des
       faiblesses issu du rituel de fin de cycle. Ne jamais générer un cycle
       automatiquement : Florian le compose, l'app l'assiste.
 
-- [ ] Le contenu du cycle 2 est défini dans CYCLE-2.md. L'intégrer à l'app
-      lorsque le contenu des semaines sera sorti du code.
+- [x] **Le contenu du cycle 2 est défini dans CYCLE-2.md. Intégré à l'app.** *(2026-09-16)*
+  Migré fidèlement dans la même migration que le cycle 1 : CYCLE-2.md étant plus sparse
+  (règles de bloc + jalons, pas de détail pas-à-pas), le contenu migré l'est tout autant,
+  rien n'a été inventé. Voir DECISIONS.md.
 
 ## Idées non validées
 
