@@ -520,6 +520,21 @@ function logout(){auth.signOut();}
 let allSessions=[],currentDay=0,coachHistory=[],_currentWeekNum=1;
 function getCurrentWeek(){return _currentWeekNum;}
 function getTodayString(){const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
+// Version courante du schéma du document Firestore. Toute migration future
+// incrémente ce nombre et ajoute son propre bloc `if(schemaVersion<N){...}`
+// dans ensureSchemaVersion, qui doit rester capable de lire une version
+// antérieure (CLAUDE.md §8) — jamais de suppression de champ ici, seulement
+// des ajouts/transformations.
+const CURRENT_SCHEMA_VERSION=1;
+// Un document créé avant ce champ n'a pas de `schemaVersion` du tout : il est
+// traité comme la version 1 (la forme du document telle qu'elle existait
+// jusqu'ici) et le champ est semé une seule fois, jamais réécrit ensuite tant
+// qu'aucune migration ne change réellement la forme des données.
+function ensureSchemaVersion(data){
+    const changed=data.schemaVersion===undefined;
+    const schemaVersion=changed?CURRENT_SCHEMA_VERSION:data.schemaVersion;
+    return{schemaVersion,changed};
+}
 // Contenu du cycle 1, gardé ici uniquement comme donnée de départ (semée une
 // fois dans les documents sans champ `cycles` — voir ensureCyclesDefaults) :
 // ce n'est plus la source lue au quotidien, qui est désormais le champ
@@ -1330,6 +1345,8 @@ async function loadAllData(){
     if(!currentUser)return;
     try{
         const doc=await db.collection('users').doc(currentUser.uid).get();const data=doc.exists?doc.data():{};
+        const{schemaVersion,changed:schemaChanged}=ensureSchemaVersion(data);window._schemaVersion=schemaVersion;
+        if(schemaChanged)db.collection('users').doc(currentUser.uid).set({schemaVersion},{merge:true});
         _currentWeekNum=data.currentWeek||1;
         document.getElementById('current-week').textContent=_currentWeekNum+'/12';
         window._cycleNumber=data.cycleNumber||1;
