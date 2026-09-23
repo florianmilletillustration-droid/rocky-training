@@ -511,6 +511,18 @@ function getApiKey(){if(ANTHROPIC_API_KEY)return true;const key=prompt('🔑 Ent
 function changeApiKey(){const key=prompt('🔑 Nouvelle clé API Anthropic:');if(!key)return;if(!key.startsWith('sk-')){alert('Clé invalide!');return;}ANTHROPIC_API_KEY=key.trim();localStorage.setItem('anthropic_api_key',ANTHROPIC_API_KEY);alert('✅ Clé API mise à jour!');}
 let db,auth,currentUser;
 try{firebase.initializeApp(firebaseConfig);db=firebase.firestore();auth=firebase.auth();}catch(e){console.error(e);}
+// Versionnement du schéma de document (CLAUDE.md §8) : chaque document
+// Firestore porte ce champ. Un document créé avant ce champ n'a pas
+// `schemaVersion` du tout — traité comme version 0, jamais comme une erreur.
+// Aucune migration de champ n'existe encore ; ce numéro trace seulement la
+// version actuelle pour que la première migration à venir sache d'où lire.
+// Elle s'ajoutera ici, appliquée dans l'ordre croissant de `version` avant la
+// mise à jour de `schemaVersion`, jamais en écrasant les versions antérieures.
+const SCHEMA_VERSION=1;
+function ensureSchemaVersion(data){
+    const version=data.schemaVersion||0;
+    return{schemaVersion:SCHEMA_VERSION,changed:version!==SCHEMA_VERSION};
+}
 auth.onAuthStateChanged(user=>{
     if(user){currentUser=user;document.getElementById('login-screen').style.display='none';document.getElementById('app-content').classList.add('active');document.getElementById('user-email').textContent=user.email;document.getElementById('manual-date').value=getTodayString();initDailyImage();loadAllData();}
     else{document.getElementById('login-screen').style.display='flex';document.getElementById('app-content').classList.remove('active');}
@@ -1330,6 +1342,8 @@ async function loadAllData(){
     if(!currentUser)return;
     try{
         const doc=await db.collection('users').doc(currentUser.uid).get();const data=doc.exists?doc.data():{};
+        const{schemaVersion,changed:schemaChanged}=ensureSchemaVersion(data);window._schemaVersion=schemaVersion;
+        if(schemaChanged)db.collection('users').doc(currentUser.uid).set({schemaVersion},{merge:true});
         _currentWeekNum=data.currentWeek||1;
         document.getElementById('current-week').textContent=_currentWeekNum+'/12';
         window._cycleNumber=data.cycleNumber||1;

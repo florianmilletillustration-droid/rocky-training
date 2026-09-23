@@ -8,6 +8,20 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-23 — `schemaVersion` ajouté sans aucune migration de contenu
+CLAUDE.md §8 exige ce champ mais aucun changement de schéma n'est en cours à ce point de la
+roadmap (Phase 3, la première migration réelle — taxonomie et catégories plates — n'a pas
+commencé). Cette PR pose donc seulement le mécanisme, pas une migration : `ensureSchemaVersion`
+lit `data.schemaVersion`, traite son absence comme version `0` (tout document créé avant ce
+champ, jamais une erreur), et écrit `SCHEMA_VERSION` (`1`) au premier chargement suivant via le
+même motif `{valeur, changed}` + `set(...,{merge:true})` déjà utilisé par
+`ensureCyclesDefaults` et `ensureBranchDefaults` — cohérent avec le reste du fichier plutôt
+qu'un nouveau mécanisme parallèle. Aucune donnée existante n'est lue ni transformée : la seule
+écriture est l'ajout du champ lui-même, une fois, jamais réécrit une fois à jour. Le
+commentaire au-dessus de `SCHEMA_VERSION` indique où une future migration s'insérera (une
+branche par `version` avant la mise à jour du champ), pour que Phase 3 n'ait qu'à suivre le
+motif plutôt qu'à l'inventer.
+
 ## 2026-09-16 — Le contenu des semaines devient une donnée, migré sans catalogue ni sélecteur
 Implémente deux items de Phase 5 (hors ordre des phases, demande directe — même raison que les
 décisions du 2026-09-15 ci-dessous). Un cycle est désormais `{number, title,
