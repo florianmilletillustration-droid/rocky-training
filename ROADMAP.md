@@ -23,7 +23,13 @@ détaillée dans DECISIONS.md.
   actifs »). Le libellé est corrigé en « Jours pratiqués » ; la logique de calcul ne change
   pas. Voir DECISIONS.md.
 
-- [ ] **Ajouter `schemaVersion` aux documents Firestore**, avec lecture rétrocompatible.
+- [x] **Ajouter `schemaVersion` aux documents Firestore**, avec lecture rétrocompatible.
+  *(2026-09-23)*
+  Chaque document Firestore porte désormais un champ `schemaVersion` (actuellement `1`). Un
+  document créé avant ce champ (absent) est lu comme version `0`, jamais comme une erreur, et
+  reçoit `1` au premier chargement suivant. Aucune migration de contenu n'existe encore : ce
+  changement pose seulement le mécanisme requis par CLAUDE.md §8 pour que la première vraie
+  migration (Phase 3, taxonomie) sache d'où lire. Voir DECISIONS.md.
 
 ## Phase 1 — Évaluation
 
