@@ -1326,10 +1326,26 @@ async function exportAllData(){
         showQuickFeedback('📦 Export téléchargé');
     }catch(e){console.error(e);alert("Erreur pendant l'export : "+e.message);}
 }
+// Version du schéma du document Firestore (ROADMAP.md, Phase 0). Un document sans
+// champ `schemaVersion` est un document d'avant ce chantier : traité comme version 0,
+// dont la forme est exactement celle que le reste du code sait déjà lire. La version 1
+// ne change donc AUCUNE donnée existante, elle l'atteste seulement. Toute migration
+// future incrémente SCHEMA_VERSION et ajoute une étape dans migrateData() qui sait lire
+// les versions antérieures. Un document plus récent que l'app n'est jamais réécrit.
+const SCHEMA_VERSION=1;
+function readSchemaVersion(data){const v=data&&data.schemaVersion;return(typeof v==='number'&&isFinite(v)&&v>=0)?v:0;}
+function migrateData(data){
+    const from=readSchemaVersion(data);
+    if(from>SCHEMA_VERSION){console.warn('Document en version de schéma '+from+' > '+SCHEMA_VERSION+' : aucune réécriture du numéro de version.');return{data,stamp:false};}
+    // v0 -> v1 : aucune transformation, la forme est identique. Les futures étapes iront ici.
+    return{data,stamp:from<SCHEMA_VERSION};
+}
 async function loadAllData(){
     if(!currentUser)return;
     try{
-        const doc=await db.collection('users').doc(currentUser.uid).get();const data=doc.exists?doc.data():{};
+        const doc=await db.collection('users').doc(currentUser.uid).get();const rawData=doc.exists?doc.data():{};
+        const{data,stamp}=migrateData(rawData);
+        if(stamp)db.collection('users').doc(currentUser.uid).set({schemaVersion:SCHEMA_VERSION},{merge:true});
         _currentWeekNum=data.currentWeek||1;
         document.getElementById('current-week').textContent=_currentWeekNum+'/12';
         window._cycleNumber=data.cycleNumber||1;

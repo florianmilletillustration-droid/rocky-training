@@ -8,6 +8,18 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-09-30 — `schemaVersion` : version 1 posée au chargement, sans transformation
+Premier item non coché de la roadmap (Phase 0), prérequis de toute migration (CLAUDE.md §8, §9).
+Le document utilisateur porte `schemaVersion`. Un document sans ce champ est traité comme
+version 0 : sa forme est exactement celle que le code lit déjà, donc v0 → v1 n'est qu'un
+marquage, aucune donnée touchée. `migrateData()` (dans `loadAllData`) est le point d'entrée des
+futures migrations : chacune incrémente `SCHEMA_VERSION` et ajoute une étape qui lit les
+versions antérieures. Le numéro est écrit avec `merge:true`, une seule fois (quand il manque
+ou est inférieur). Un document dont la version dépasse celle de l'app n'est jamais réécrit
+(on ne rétrograde pas un schéma plus récent). L'export JSON inclut le champ automatiquement,
+puisqu'il relit le document tel quel. Choix : estampiller au chargement plutôt qu'à chaque
+sauvegarde, pour ne pas toucher aux sept chemins d'écriture existants.
+
 ## 2026-09-16 — Le contenu des semaines devient une donnée, migré sans catalogue ni sélecteur
 Implémente deux items de Phase 5 (hors ordre des phases, demande directe — même raison que les
 décisions du 2026-09-15 ci-dessous). Un cycle est désormais `{number, title,
