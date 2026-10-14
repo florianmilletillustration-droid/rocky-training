@@ -1326,10 +1326,29 @@ async function exportAllData(){
         showQuickFeedback('📦 Export téléchargé');
     }catch(e){console.error(e);alert("Erreur pendant l'export : "+e.message);}
 }
+// Version du schéma du document utilisateur (CLAUDE.md §8). Un document sans
+// champ `schemaVersion` est lu comme version 0 (antérieur au versionnement) :
+// sa structure est identique à la version 1, donc aucune transformation de
+// données n'est nécessaire, seulement l'estampillage. Toute migration future
+// incrémente cette constante et sait lire les versions antérieures (branche sur
+// `readSchemaVersion(data)` dans loadAllData).
+const SCHEMA_VERSION=1;
+function readSchemaVersion(data){
+    const v=data&&data.schemaVersion;
+    return(typeof v==='number'&&v>=0)?v:0;
+}
 async function loadAllData(){
     if(!currentUser)return;
     try{
         const doc=await db.collection('users').doc(currentUser.uid).get();const data=doc.exists?doc.data():{};
+        const docVersion=readSchemaVersion(data);
+        if(docVersion>SCHEMA_VERSION){
+            // Document écrit par une version plus récente de l'app : on lit
+            // tel quel mais on ne le re-estampille jamais à la baisse.
+            console.warn('schemaVersion du document ('+docVersion+') supérieure à celle de l\'app ('+SCHEMA_VERSION+')');
+        }else if(docVersion<SCHEMA_VERSION){
+            db.collection('users').doc(currentUser.uid).set({schemaVersion:SCHEMA_VERSION},{merge:true});
+        }
         _currentWeekNum=data.currentWeek||1;
         document.getElementById('current-week').textContent=_currentWeekNum+'/12';
         window._cycleNumber=data.cycleNumber||1;

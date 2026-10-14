@@ -8,6 +8,18 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-10-14 — `schemaVersion` : version 0 implicite, estampillage au chargement, jamais à la baisse
+Dernier item de Phase 0 (CLAUDE.md §8). `SCHEMA_VERSION = 1` ; un document sans champ
+`schemaVersion` (tous les documents existants) est lu comme version 0. Les versions 0 et 1 ont
+exactement la même structure, donc l'estampillage est la seule écriture : `loadAllData` fait
+un `set({schemaVersion:1},{merge:true})`, sans toucher à aucun autre champ (règle §9.1 : pas de
+destruction de données de pratique). Un seul point d'écriture suffit car toutes les écritures
+du document utilisent `merge:true`. Si le document porte une version *supérieure* à celle de
+l'app (écrit par une version plus récente), il est lu tel quel, un avertissement console est
+émis et le champ n'est jamais réécrit à la baisse. Les futures migrations (Phase 3) brancheront
+sur `readSchemaVersion(data)` et devront lire les versions antérieures. L'export JSON relisant
+le document brut, il inclut automatiquement `schemaVersion`.
+
 ## 2026-09-16 — Le contenu des semaines devient une donnée, migré sans catalogue ni sélecteur
 Implémente deux items de Phase 5 (hors ordre des phases, demande directe — même raison que les
 décisions du 2026-09-15 ci-dessous). Un cycle est désormais `{number, title,

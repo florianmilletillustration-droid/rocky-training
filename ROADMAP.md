@@ -23,7 +23,9 @@ détaillée dans DECISIONS.md.
   actifs »). Le libellé est corrigé en « Jours pratiqués » ; la logique de calcul ne change
   pas. Voir DECISIONS.md.
 
-- [ ] **Ajouter `schemaVersion` aux documents Firestore**, avec lecture rétrocompatible.
+- [x] **Ajouter `schemaVersion` aux documents Firestore**, avec lecture rétrocompatible. *(2026-10-14)*
+  Constante `SCHEMA_VERSION = 1`. Un document sans le champ est lu comme version 0 et estampillé
+  à 1 au chargement ; aucune donnée existante n'est transformée. Voir DECISIONS.md.
 
 ## Phase 1 — Évaluation
 
