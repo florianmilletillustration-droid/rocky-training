@@ -8,6 +8,15 @@ explicitement, avec sa raison.
 
 ---
 
+## 2026-11-04 — `schemaVersion` : version 0 implicite, version 1 = simple estampille
+Un document sans `schemaVersion` est lu comme version 0, qui est exactement la forme actuelle :
+aucune conversion, donc aucun risque pour les données de pratique. Au chargement, si la version
+lue est inférieure à `SCHEMA_VERSION` (1), l'app écrit uniquement `{schemaVersion: 1}` en
+`merge`. Un document de version supérieure à celle de l'app n'est jamais rétrogradé. Pas de
+dépendance ajoutée ; l'export JSON inclut le champ automatiquement (il relit le document brut).
+Les futures migrations (Phase 3) incrémenteront la constante et devront lire les versions
+antérieures.
+
 ## 2026-09-16 — Le contenu des semaines devient une donnée, migré sans catalogue ni sélecteur
 Implémente deux items de Phase 5 (hors ordre des phases, demande directe — même raison que les
 décisions du 2026-09-15 ci-dessous). Un cycle est désormais `{number, title,

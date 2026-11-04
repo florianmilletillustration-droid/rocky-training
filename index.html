@@ -1326,10 +1326,19 @@ async function exportAllData(){
         showQuickFeedback('📦 Export téléchargé');
     }catch(e){console.error(e);alert("Erreur pendant l'export : "+e.message);}
 }
+// Version du schéma du document Firestore (ROADMAP.md Phase 0, CLAUDE.md §8).
+// Un document sans champ `schemaVersion` est la version 0 : exactement la forme
+// actuelle, aucune donnée à convertir. La version 1 ne fait qu'ajouter ce champ.
+// Règles : ne jamais rétrograder un document plus récent que l'app ; toute future
+// migration incrémente ce numéro et sait lire les versions antérieures.
+const SCHEMA_VERSION=1;
+function readSchemaVersion(data){const v=data&&data.schemaVersion;return(typeof v==='number'&&isFinite(v)&&v>=0)?v:0;}
 async function loadAllData(){
     if(!currentUser)return;
     try{
         const doc=await db.collection('users').doc(currentUser.uid).get();const data=doc.exists?doc.data():{};
+        // Estampille additive uniquement (merge) : aucune autre donnée n'est touchée.
+        if(readSchemaVersion(data)<SCHEMA_VERSION)db.collection('users').doc(currentUser.uid).set({schemaVersion:SCHEMA_VERSION},{merge:true}).catch(e=>console.error('schemaVersion',e));
         _currentWeekNum=data.currentWeek||1;
         document.getElementById('current-week').textContent=_currentWeekNum+'/12';
         window._cycleNumber=data.cycleNumber||1;
